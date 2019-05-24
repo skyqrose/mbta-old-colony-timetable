@@ -1,41 +1,65 @@
 module Main exposing (main)
 
 import Browser
+import AssocList as Dict exposing (Dict)
+import Http
 import Html exposing (Html, button, div, text)
 import Html.Events exposing (onClick)
+import Mbta
+import RemoteData
 
+routeIds : List Mbta.RouteId
+routeIds =
+    [ Mbta.RouteId "CR-Greenbush"
+    , Mbta.RouteId "CR-Middleborough"
+    , Mbta.RouteId "CR-Kingston"
+    ]
+
+stopIds : List Mbta.StopId
+stopIds =
+    [ Mbta.StopId "place-sstat"
+    , Mbta.StopId "place-jfk"
+    , Mbta.StopId "place-qnctr"
+    , Mbta.StopId "place-brntn"
+    ]
 
 type alias Model =
-    { count : Int }
+    { routes : RemoteData.WebData (List Mbta.Route)
+    }
 
 
 initialModel : Model
 initialModel =
-    { count = 0 }
+    { routes = RemoteData.Loading
+    }
 
 
 type Msg
-    = Increment
-    | Decrement
+    = ReceiveRoutes (Result Http.Error (List Mbta.Route))
 
 
 update : Msg -> Model -> Model
 update msg model =
     case msg of
-        Increment ->
-            { model | count = model.count + 1 }
-
-        Decrement ->
-            { model | count = model.count - 1 }
+        ReceiveRoutes routesResult ->
+            { model |
+                routes = RemoteData.fromResult routesResult
+            }
 
 
 view : Model -> Html Msg
 view model =
-    div []
-        [ button [ onClick Increment ] [ text "+1" ]
-        , div [] [ text <| String.fromInt model.count ]
-        , button [ onClick Decrement ] [ text "-1" ]
-        ]
+    case model.routes of
+        RemoteData.NotAsked ->
+            Html.text "Not Asked"
+        RemoteData.Loading ->
+            Html.text "Loading"
+        RemoteData.Failure e ->
+            Html.text "Error"
+        RemoteData.Success routes ->
+            Html.div []
+                (List.map (Html.text << .longName) routes)
+
 
 
 main : Program () Model Msg

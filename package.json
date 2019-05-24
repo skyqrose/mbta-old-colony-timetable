@@ -1,0 +1,20 @@
+{
+  "name": "mbta-old-colony-timetable",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "elm-live src/Main.elm --path-to-elm node_modules/.bin/elm --open -- --debug --output=js/elm.js",
+    "build": "elm make src/Main.elm --debug --output=js/elm.js",
+    "format": "elm-format . --yes",
+    "test": "elm-format --validate . && elm-test"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "elm": "^0.19.0-no-deps",
+    "elm-format": "^0.8.1",
+    "elm-live": "^3.4.0",
+    "elm-test": "^0.19.0-rev6"
+  }
+}

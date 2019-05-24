@@ -1,5 +1,7 @@
 node_modules
 elm-stuff
 
+elm-mbta-api
+
 index.html
 js/elm.js

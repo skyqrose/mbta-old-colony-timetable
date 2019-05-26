@@ -2,8 +2,7 @@ module Main exposing (main)
 
 import AssocList as Dict exposing (Dict)
 import Browser
-import Html exposing (Html, button, div, text)
-import Html.Events exposing (onClick)
+import Element as El exposing (Element)
 import Http
 import Mbta
 import Mbta.Api exposing (routesFilter, schedulesFilter, stopsFilter)
@@ -95,33 +94,36 @@ view : Model -> Browser.Document Msg
 view model =
     { title = "MBTA Old Colony Timetable - skyqrose"
     , body =
-        (case model.routes of
-            RemoteData.NotAsked ->
-                [ Html.text "Not Asked" ]
-
-            RemoteData.Loading ->
-                [ Html.text "Loading" ]
-
-            RemoteData.Failure e ->
-                [ Html.text "Error" ]
-
-            RemoteData.Success routes ->
-                List.map (Html.text << .longName) routes
-        )
-            ++ (case model.stops of
-                    RemoteData.NotAsked ->
-                        [ Html.text "Not Asked" ]
-
-                    RemoteData.Loading ->
-                        [ Html.text "Loading" ]
-
-                    RemoteData.Failure e ->
-                        [ Html.text "Error" ]
-
-                    RemoteData.Success stops ->
-                        List.map (Html.text << .name) stops
-               )
+        [ El.layout [] (body model) ]
     }
+
+
+body : Model -> Element Msg
+body model =
+    El.row
+        []
+        [ viewData (El.text << .longName) model.routes
+        , viewData (El.text << .name) model.stops
+        , viewData (El.text << Debug.toString) model.schedules
+        ]
+
+
+viewData : (a -> Element msg) -> RemoteData.WebData (List a) -> Element msg
+viewData toElement remoteData =
+    case remoteData of
+        RemoteData.NotAsked ->
+            El.text "Not Asked"
+
+        RemoteData.Loading ->
+            El.text "Loading"
+
+        RemoteData.Failure e ->
+            El.text "Error"
+
+        RemoteData.Success data ->
+            El.column
+                []
+                (List.map toElement data)
 
 
 main : Program () Model Msg

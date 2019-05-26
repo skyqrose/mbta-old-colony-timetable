@@ -1,13 +1,14 @@
 module Main exposing (main)
 
-import Browser
 import AssocList as Dict exposing (Dict)
-import Http
+import Browser
 import Html exposing (Html, button, div, text)
 import Html.Events exposing (onClick)
+import Http
 import Mbta
-import Mbta.Api exposing (routesFilter)
+import Mbta.Api exposing (routesFilter, stopsFilter)
 import RemoteData
+
 
 routeIds : List Mbta.RouteId
 routeIds =
@@ -15,6 +16,7 @@ routeIds =
     , Mbta.RouteId "CR-Middleborough"
     , Mbta.RouteId "CR-Kingston"
     ]
+
 
 stopIds : List Mbta.StopId
 stopIds =
@@ -24,35 +26,50 @@ stopIds =
     , Mbta.StopId "place-brntn"
     ]
 
+
 apiConfig : Mbta.Api.Config
 apiConfig =
     { host = Mbta.Api.Default
     , apiKey = Mbta.Api.NoApiKey
     }
 
+
 type alias Model =
     { routes : RemoteData.WebData (List Mbta.Route)
+    , stops : RemoteData.WebData (List Mbta.Stop)
     }
 
 
-init : (Model, Cmd Msg)
+init : ( Model, Cmd Msg )
 init =
     ( { routes = RemoteData.Loading
+      , stops = RemoteData.Loading
       }
-    , Mbta.Api.getRoutes ReceiveRoutes apiConfig { routesFilter | id = routeIds }
+    , Cmd.batch
+        [ Mbta.Api.getRoutes ReceiveRoutes apiConfig { routesFilter | id = routeIds }
+        , Mbta.Api.getStops ReceiveStops apiConfig { stopsFilter | id = stopIds }
+        ]
     )
 
 
 type Msg
     = ReceiveRoutes (Result Http.Error (List Mbta.Route))
+    | ReceiveStops (Result Http.Error (List Mbta.Stop))
 
 
-update : Msg -> Model -> (Model, Cmd Msg)
+update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         ReceiveRoutes routesResult ->
-            ( { model |
-                routes = RemoteData.fromResult routesResult
+            ( { model
+                | routes = RemoteData.fromResult routesResult
+              }
+            , Cmd.none
+            )
+
+        ReceiveStops stopsResult ->
+            ( { model
+                | stops = RemoteData.fromResult stopsResult
               }
             , Cmd.none
             )
@@ -60,17 +77,34 @@ update msg model =
 
 view : Model -> Browser.Document Msg
 view model =
-    { title= "MBTA Old Colony Timetable - skyqrose"
+    { title = "MBTA Old Colony Timetable - skyqrose"
     , body =
-    case model.routes of
-        RemoteData.NotAsked ->
-            [ Html.text "Not Asked" ]
-        RemoteData.Loading ->
-            [ Html.text "Loading" ]
-        RemoteData.Failure e ->
-            [ Html.text "Error" ]
-        RemoteData.Success routes ->
-            (List.map (Html.text << .longName) routes)
+        (case model.routes of
+            RemoteData.NotAsked ->
+                [ Html.text "Not Asked" ]
+
+            RemoteData.Loading ->
+                [ Html.text "Loading" ]
+
+            RemoteData.Failure e ->
+                [ Html.text "Error" ]
+
+            RemoteData.Success routes ->
+                List.map (Html.text << .longName) routes
+        )
+            ++ (case model.stops of
+                    RemoteData.NotAsked ->
+                        [ Html.text "Not Asked" ]
+
+                    RemoteData.Loading ->
+                        [ Html.text "Loading" ]
+
+                    RemoteData.Failure e ->
+                        [ Html.text "Error" ]
+
+                    RemoteData.Success stops ->
+                        List.map (Html.text << .name) stops
+               )
     }
 
 

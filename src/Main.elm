@@ -6,6 +6,7 @@ import Http
 import Html exposing (Html, button, div, text)
 import Html.Events exposing (onClick)
 import Mbta
+import Mbta.Api exposing (routesFilter)
 import RemoteData
 
 routeIds : List Mbta.RouteId
@@ -23,6 +24,12 @@ stopIds =
     , Mbta.StopId "place-brntn"
     ]
 
+apiConfig : Mbta.Api.Config
+apiConfig =
+    { host = Mbta.Api.Default
+    , apiKey = Mbta.Api.NoApiKey
+    }
+
 type alias Model =
     { routes : RemoteData.WebData (List Mbta.Route)
     }
@@ -32,7 +39,7 @@ init : (Model, Cmd Msg)
 init =
     ( { routes = RemoteData.Loading
       }
-    , Cmd.none
+    , Mbta.Api.getRoutes ReceiveRoutes apiConfig { routesFilter | id = routeIds }
     )
 
 

@@ -28,44 +28,50 @@ type alias Model =
     }
 
 
-initialModel : Model
-initialModel =
-    { routes = RemoteData.Loading
-    }
+init : (Model, Cmd Msg)
+init =
+    ( { routes = RemoteData.Loading
+      }
+    , Cmd.none
+    )
 
 
 type Msg
     = ReceiveRoutes (Result Http.Error (List Mbta.Route))
 
 
-update : Msg -> Model -> Model
+update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
     case msg of
         ReceiveRoutes routesResult ->
-            { model |
+            ( { model |
                 routes = RemoteData.fromResult routesResult
-            }
+              }
+            , Cmd.none
+            )
 
 
-view : Model -> Html Msg
+view : Model -> Browser.Document Msg
 view model =
+    { title= "MBTA Old Colony Timetable - skyqrose"
+    , body =
     case model.routes of
         RemoteData.NotAsked ->
-            Html.text "Not Asked"
+            [ Html.text "Not Asked" ]
         RemoteData.Loading ->
-            Html.text "Loading"
+            [ Html.text "Loading" ]
         RemoteData.Failure e ->
-            Html.text "Error"
+            [ Html.text "Error" ]
         RemoteData.Success routes ->
-            Html.div []
-                (List.map (Html.text << .longName) routes)
-
+            (List.map (Html.text << .longName) routes)
+    }
 
 
 main : Program () Model Msg
 main =
-    Browser.sandbox
-        { init = initialModel
+    Browser.document
+        { init = \flags -> init
         , view = view
         , update = update
+        , subscriptions = \model -> Sub.none
         }

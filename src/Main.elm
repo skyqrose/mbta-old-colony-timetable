@@ -6,7 +6,7 @@ import Html exposing (Html, button, div, text)
 import Html.Events exposing (onClick)
 import Http
 import Mbta
-import Mbta.Api exposing (routesFilter, stopsFilter)
+import Mbta.Api exposing (routesFilter, schedulesFilter, stopsFilter)
 import RemoteData
 
 
@@ -37,6 +37,7 @@ apiConfig =
 type alias Model =
     { routes : RemoteData.WebData (List Mbta.Route)
     , stops : RemoteData.WebData (List Mbta.Stop)
+    , schedules : RemoteData.WebData (List Mbta.Schedule)
     }
 
 
@@ -44,10 +45,17 @@ init : ( Model, Cmd Msg )
 init =
     ( { routes = RemoteData.Loading
       , stops = RemoteData.Loading
+      , schedules = RemoteData.Loading
       }
     , Cmd.batch
         [ Mbta.Api.getRoutes ReceiveRoutes apiConfig { routesFilter | id = routeIds }
         , Mbta.Api.getStops ReceiveStops apiConfig { stopsFilter | id = stopIds }
+        , Mbta.Api.getSchedules ReceiveSchedules
+            apiConfig
+            { schedulesFilter
+                | route = routeIds
+                , stop = stopIds
+            }
         ]
     )
 
@@ -55,6 +63,7 @@ init =
 type Msg
     = ReceiveRoutes (Result Http.Error (List Mbta.Route))
     | ReceiveStops (Result Http.Error (List Mbta.Stop))
+    | ReceiveSchedules (Result Http.Error (List Mbta.Schedule))
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -70,6 +79,13 @@ update msg model =
         ReceiveStops stopsResult ->
             ( { model
                 | stops = RemoteData.fromResult stopsResult
+              }
+            , Cmd.none
+            )
+
+        ReceiveSchedules schedulesResult ->
+            ( { model
+                | schedules = RemoteData.fromResult schedulesResult
               }
             , Cmd.none
             )

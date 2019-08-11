@@ -5,7 +5,7 @@ import Browser
 import Element as El exposing (Element)
 import Http
 import Mbta
-import Mbta.Api exposing (routesFilter, schedulesFilter, stopsFilter)
+import Mbta.Api
 import RemoteData
 
 
@@ -26,17 +26,19 @@ stopIds =
     ]
 
 
-apiConfig : Mbta.Api.Config
-apiConfig =
-    { host = Mbta.Api.Default
-    , apiKey = Mbta.Api.NoApiKey
-    }
+apiHost : Mbta.Api.Host
+apiHost =
+    Mbta.Api.Default { apiKey = Nothing }
 
+type alias RemoteDataApi primary =
+    RemoteData.RemoteData
+        Mbta.Api.ApiError
+        (Mbta.Api.Data primary)
 
 type alias Model =
-    { routes : RemoteData.WebData (List Mbta.Route)
-    , stops : RemoteData.WebData (List Mbta.Stop)
-    , schedules : RemoteData.WebData (List Mbta.Schedule)
+    { routes : RemoteDataApi (List Mbta.Route)
+    , stops : RemoteDataApi (List Mbta.Stop)
+    , schedules : RemoteDataApi (List Mbta.Schedule)
     }
 
 
@@ -47,22 +49,31 @@ init =
       , schedules = RemoteData.Loading
       }
     , Cmd.batch
-        [ Mbta.Api.getRoutes ReceiveRoutes apiConfig { routesFilter | id = routeIds }
-        , Mbta.Api.getStops ReceiveStops apiConfig { stopsFilter | id = stopIds }
-        , Mbta.Api.getSchedules ReceiveSchedules
-            apiConfig
-            { schedulesFilter
-                | route = routeIds
-                , stop = stopIds
-            }
+        [ Mbta.Api.getRoutes
+            ReceiveRoutes
+            apiHost
+            []
+            [ Mbta.Api.filterRoutesByIds routeIds ]
+        , Mbta.Api.getStops
+            ReceiveStops
+            apiHost
+            []
+            [ Mbta.Api.filterStopsByIds stopIds ]
+        , Mbta.Api.getSchedules
+            ReceiveSchedules
+            apiHost
+            []
+            [ Mbta.Api.filterSchedulesByRouteIds routeIds
+            , Mbta.Api.filterSchedulesByStopIds stopIds
+            ]
         ]
     )
 
 
 type Msg
-    = ReceiveRoutes (Result Http.Error (List Mbta.Route))
-    | ReceiveStops (Result Http.Error (List Mbta.Stop))
-    | ReceiveSchedules (Result Http.Error (List Mbta.Schedule))
+    = ReceiveRoutes (Mbta.Api.ApiResult (List Mbta.Route))
+    | ReceiveStops (Mbta.Api.ApiResult (List Mbta.Stop))
+    | ReceiveSchedules (Mbta.Api.ApiResult (List Mbta.Schedule))
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -103,12 +114,12 @@ body model =
     El.row
         []
         [ viewData (El.text << .longName) model.routes
-        , viewData (El.text << .name) model.stops
+        , viewData (El.text << Mbta.stopName) model.stops
         , viewData (El.text << Debug.toString) model.schedules
         ]
 
 
-viewData : (a -> Element msg) -> RemoteData.WebData (List a) -> Element msg
+viewData : (resource -> Element msg) -> RemoteDataApi (List resource) -> Element msg
 viewData toElement remoteData =
     case remoteData of
         RemoteData.NotAsked ->
@@ -123,7 +134,10 @@ viewData toElement remoteData =
         RemoteData.Success data ->
             El.column
                 []
-                (List.map toElement data)
+                (List.map
+                    toElement
+                    (Mbta.Api.getPrimaryData data)
+                )
 
 
 main : Program () Model Msg

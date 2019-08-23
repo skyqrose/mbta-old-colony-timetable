@@ -1,6 +1,7 @@
 module Main exposing (main)
 
 import AssocList as Dict exposing (Dict)
+import AssocList.Extra as Dict
 import Browser
 import Element as El exposing (Element)
 import Http
@@ -148,18 +149,33 @@ viewData routes stops schedules =
                 (\schedule -> schedule.directionId == Mbta.D1)
                 schedules
     in
-    El.row
-        []
-        [ drawTimetable inboundSchedules
-        , drawTimetable outboundSchedules
+    El.column
+        [ El.spacing 10 ]
+        [ viewTimetable inboundSchedules
+        , viewTimetable outboundSchedules
         ]
 
 
-drawTimetable : List Mbta.Schedule -> Element msg
-drawTimetable schedules =
+viewTimetable : List Mbta.Schedule -> Element msg
+viewTimetable schedules =
+    let
+        trips : Dict Mbta.TripId (List Mbta.Schedule)
+        trips =
+            Dict.groupBy .tripId schedules
+    in
+    El.row
+        []
+        (List.map
+            (\( tripId, schedulesOnTrip ) -> viewTripColumn tripId schedulesOnTrip)
+            (Dict.toList trips)
+        )
+
+
+viewTripColumn : Mbta.TripId -> List Mbta.Schedule -> Element msg
+viewTripColumn (Mbta.TripId tripId) schedules =
     El.column
         []
-        (List.map (El.text << Debug.toString) schedules)
+        (El.text tripId :: List.map (El.text << Debug.toString) schedules)
 
 
 main : Program () Model Msg

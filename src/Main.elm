@@ -30,10 +30,10 @@ apiHost : Mbta.Api.Host
 apiHost =
     Mbta.Api.Default { apiKey = Nothing }
 
+
 type alias RemoteDataApi primary =
-    RemoteData.RemoteData
-        Mbta.Api.ApiError
-        (Mbta.Api.Data primary)
+    RemoteData.RemoteData Mbta.Api.ApiError (Mbta.Api.Data primary)
+
 
 type alias Model =
     { routes : RemoteDataApi (List Mbta.Route)
@@ -111,33 +111,40 @@ view model =
 
 body : Model -> Element Msg
 body model =
-    El.row
-        []
-        [ viewData (El.text << .longName) model.routes
-        , viewData (El.text << Mbta.stopName) model.stops
-        , viewData (El.text << Debug.toString) model.schedules
-        ]
+    case ( model.routes, model.stops, model.schedules ) of
+        ( RemoteData.Success routes, RemoteData.Success stops, RemoteData.Success schedules ) ->
+            viewData
+                (Mbta.Api.getPrimaryData routes)
+                (Mbta.Api.getPrimaryData stops)
+                (Mbta.Api.getPrimaryData schedules)
 
-
-viewData : (resource -> Element msg) -> RemoteDataApi (List resource) -> Element msg
-viewData toElement remoteData =
-    case remoteData of
-        RemoteData.NotAsked ->
-            El.text "Not Asked"
-
-        RemoteData.Loading ->
+        ( RemoteData.Loading, _, _ ) ->
             El.text "Loading"
 
-        RemoteData.Failure e ->
-            El.text "Error"
+        ( _, RemoteData.Loading, _ ) ->
+            El.text "Loading"
 
-        RemoteData.Success data ->
-            El.column
-                []
-                (List.map
-                    toElement
-                    (Mbta.Api.getPrimaryData data)
-                )
+        ( _, _, RemoteData.Loading ) ->
+            El.text "Loading"
+
+        ( RemoteData.Failure e, _, _ ) ->
+            El.text (Debug.toString e)
+
+        ( _, RemoteData.Failure e, _ ) ->
+            El.text (Debug.toString e)
+
+        ( _, _, RemoteData.Failure e ) ->
+            El.text (Debug.toString e)
+
+        _ ->
+            El.text (Debug.toString model)
+
+
+viewData : List Mbta.Route -> List Mbta.Stop -> List Mbta.Schedule -> Element msg
+viewData routes stops schedules =
+    El.column
+        []
+        (List.map (El.text << Debug.toString) schedules)
 
 
 main : Program () Model Msg

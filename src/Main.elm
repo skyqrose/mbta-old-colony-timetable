@@ -142,6 +142,21 @@ body model =
 
 viewData : List Mbta.Route -> List Mbta.Stop -> List Mbta.Schedule -> Element msg
 viewData routes stops schedules =
+    let
+        ( inboundSchedules, outboundSchedules ) =
+            List.partition
+                (\schedule -> schedule.directionId == Mbta.D1)
+                schedules
+    in
+    El.row
+        []
+        [ drawTimetable inboundSchedules
+        , drawTimetable outboundSchedules
+        ]
+
+
+drawTimetable : List Mbta.Schedule -> Element msg
+drawTimetable schedules =
     El.column
         []
         (List.map (El.text << Debug.toString) schedules)

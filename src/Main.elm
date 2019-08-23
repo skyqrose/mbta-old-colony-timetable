@@ -58,7 +58,7 @@ init =
         , Mbta.Api.getStops
             ReceiveStops
             apiHost
-            []
+            [ Mbta.Api.include Mbta.Api.stopChildStops ]
             [ Mbta.Api.filterStopsByIds stopIds ]
         , Mbta.Api.getSchedules
             ReceiveSchedules
@@ -176,6 +176,25 @@ viewTripColumn (Mbta.TripId tripId) schedules =
     El.column
         []
         (El.text tripId :: List.map (El.text << Debug.toString) schedules)
+
+
+buildParentStationDict : List Mbta.Stop -> Dict Mbta.StopId Mbta.StopId
+buildParentStationDict stops =
+    stops
+        |> List.concatMap childIds
+        |> Dict.fromList
+
+
+childIds : Mbta.Stop -> List ( Mbta.StopId, Mbta.StopId )
+childIds stop =
+    case stop of
+        Mbta.Stop_1_Station station ->
+            List.map
+                (\childId -> ( childId, station.id ))
+                station.childStops
+
+        _ ->
+            []
 
 
 main : Program () Model Msg

@@ -9,6 +9,8 @@ import List.Extra
 import Mbta
 import Mbta.Api
 import RemoteData
+import Time
+import TimeZone
 
 
 routeIds : List Mbta.RouteId
@@ -26,6 +28,14 @@ stopIds =
     , Mbta.StopId "place-qnctr"
     , Mbta.StopId "place-brntn"
     ]
+
+
+timeZone : Time.Zone
+timeZone =
+    TimeZone.america__new_york ()
+
+noStopIndication : Element msg
+noStopIndication = El.text "-"
 
 
 apiHost : Mbta.Api.Host
@@ -195,15 +205,41 @@ viewTripColumn stopDict (Mbta.TripId tripId) schedules =
                         (\maybeSchedule ->
                             case maybeSchedule of
                                 Nothing ->
-                                    El.text "-"
+                                    noStopIndication
 
                                 Just schedule ->
-                                    case schedule.id of
-                                        Mbta.ScheduleId scheduleId ->
-                                            El.text scheduleId
+                                    case viewScheduleTime schedule of
+                                        Just timeString -> El.text timeString
+                                        Nothing -> noStopIndication
                         )
                )
         )
+
+
+viewScheduleTime : Mbta.Schedule -> Maybe String
+viewScheduleTime schedule =
+    let
+        maybeTime : Maybe Time.Posix
+        maybeTime =
+            case ( schedule.arrivalTime, schedule.departureTime ) of
+                ( _, Just departureTime ) ->
+                    Just departureTime
+
+                ( Just arrivalTime, _ ) ->
+                    Just arrivalTime
+
+                ( Nothing, Nothing ) ->
+                    Nothing
+    in
+    Maybe.map
+        (\time ->
+            String.concat
+                [ String.fromInt (Time.toHour timeZone time)
+                , ":"
+                , String.fromInt (Time.toMinute timeZone time)
+                ]
+        )
+        maybeTime
 
 
 buildParentStationDict : List Mbta.Stop -> Dict Mbta.StopId Mbta.StopId

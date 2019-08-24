@@ -5,6 +5,7 @@ import AssocList.Extra as Dict
 import Browser
 import Element as El exposing (Element)
 import Http
+import List.Extra
 import Mbta
 import Mbta.Api
 import RemoteData
@@ -148,16 +149,19 @@ viewData routes stops schedules =
             List.partition
                 (\schedule -> schedule.directionId == Mbta.D1)
                 schedules
+
+        stopDict =
+            buildParentStationDict stops
     in
     El.column
         [ El.spacing 10 ]
-        [ viewTimetable inboundSchedules
-        , viewTimetable outboundSchedules
+        [ viewTimetable stopDict inboundSchedules
+        , viewTimetable stopDict outboundSchedules
         ]
 
 
-viewTimetable : List Mbta.Schedule -> Element msg
-viewTimetable schedules =
+viewTimetable : Dict Mbta.StopId Mbta.StopId -> List Mbta.Schedule -> Element msg
+viewTimetable stopDict schedules =
     let
         trips : Dict Mbta.TripId (List Mbta.Schedule)
         trips =
@@ -166,16 +170,40 @@ viewTimetable schedules =
     El.row
         []
         (List.map
-            (\( tripId, schedulesOnTrip ) -> viewTripColumn tripId schedulesOnTrip)
+            (\( tripId, schedulesOnTrip ) -> viewTripColumn stopDict tripId schedulesOnTrip)
             (Dict.toList trips)
         )
 
 
-viewTripColumn : Mbta.TripId -> List Mbta.Schedule -> Element msg
-viewTripColumn (Mbta.TripId tripId) schedules =
+viewTripColumn :
+    Dict Mbta.StopId Mbta.StopId
+    -> Mbta.TripId
+    -> List Mbta.Schedule
+    -> Element msg
+viewTripColumn stopDict (Mbta.TripId tripId) schedules =
     El.column
         []
-        (El.text tripId :: List.map (El.text << Debug.toString) schedules)
+        (El.text tripId
+            :: (stopIds
+                    |> List.map
+                        (\stopId ->
+                            List.Extra.find
+                                (\schedule -> Dict.get schedule.stopId stopDict == Just stopId)
+                                schedules
+                        )
+                    |> List.map
+                        (\maybeSchedule ->
+                            case maybeSchedule of
+                                Nothing ->
+                                    El.text "-"
+
+                                Just schedule ->
+                                    case schedule.id of
+                                        Mbta.ScheduleId scheduleId ->
+                                            El.text scheduleId
+                        )
+               )
+        )
 
 
 buildParentStationDict : List Mbta.Stop -> Dict Mbta.StopId Mbta.StopId

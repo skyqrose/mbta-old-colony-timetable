@@ -34,8 +34,10 @@ timeZone : Time.Zone
 timeZone =
     TimeZone.america__new_york ()
 
+
 noStopIndication : Element msg
-noStopIndication = El.text "-"
+noStopIndication =
+    El.text "-"
 
 
 apiHost : Mbta.Api.Host
@@ -209,37 +211,41 @@ viewTripColumn stopDict (Mbta.TripId tripId) schedules =
 
                                 Just schedule ->
                                     case viewScheduleTime schedule of
-                                        Just timeString -> El.text timeString
-                                        Nothing -> noStopIndication
+                                        Just timeString ->
+                                            El.text timeString
+
+                                        Nothing ->
+                                            noStopIndication
                         )
                )
         )
 
 
+scheduleToTime : Mbta.Schedule -> Maybe Time.Posix
+scheduleToTime schedule =
+    case ( schedule.arrivalTime, schedule.departureTime ) of
+        ( _, Just departureTime ) ->
+            Just departureTime
+
+        ( Just arrivalTime, _ ) ->
+            Just arrivalTime
+
+        ( Nothing, Nothing ) ->
+            Nothing
+
+
 viewScheduleTime : Mbta.Schedule -> Maybe String
 viewScheduleTime schedule =
-    let
-        maybeTime : Maybe Time.Posix
-        maybeTime =
-            case ( schedule.arrivalTime, schedule.departureTime ) of
-                ( _, Just departureTime ) ->
-                    Just departureTime
-
-                ( Just arrivalTime, _ ) ->
-                    Just arrivalTime
-
-                ( Nothing, Nothing ) ->
-                    Nothing
-    in
-    Maybe.map
-        (\time ->
-            String.concat
-                [ String.fromInt (Time.toHour timeZone time)
-                , ":"
-                , String.fromInt (Time.toMinute timeZone time)
-                ]
-        )
-        maybeTime
+    schedule
+        |> scheduleToTime
+        |> Maybe.map
+            (\time ->
+                String.concat
+                    [ String.fromInt (Time.toHour timeZone time)
+                    , ":"
+                    , String.fromInt (Time.toMinute timeZone time)
+                    ]
+            )
 
 
 buildParentStationDict : List Mbta.Stop -> Dict Mbta.StopId Mbta.StopId

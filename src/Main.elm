@@ -181,9 +181,21 @@ viewTimetable stopDict schedules =
     in
     El.row
         []
-        (List.map
-            (\( tripId, schedulesOnTrip ) -> viewTripColumn stopDict tripId schedulesOnTrip)
-            (Dict.toList trips)
+        (trips
+            |> Dict.toList
+            |> List.sortBy
+                (\( tripId, schedulesOnTrip ) ->
+                    schedulesOnTrip
+                        |> List.Extra.find
+                            (\schedule ->
+                                Dict.get schedule.stopId stopDict == Just (Mbta.StopId "place-sstat")
+                            )
+                        |> Maybe.andThen scheduleToTime
+                        |> Maybe.map Time.posixToMillis
+                        |> Maybe.withDefault 0
+                )
+            |> List.map
+                (\( tripId, schedulesOnTrip ) -> viewTripColumn stopDict tripId schedulesOnTrip)
         )
 
 

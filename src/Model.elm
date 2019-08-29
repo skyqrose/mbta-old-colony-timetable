@@ -1,4 +1,4 @@
-module Model exposing (Model, Msg(..))
+module Model exposing (Model, Msg(..), routeIds, stopIds)
 
 import Mbta
 import Mbta.Api
@@ -20,3 +20,20 @@ type Msg
 
 type alias RemoteDataApi primary =
     RemoteData.RemoteData Mbta.Api.ApiError (Mbta.Api.Data primary)
+
+
+routeIds : List Mbta.RouteId
+routeIds =
+    [ Mbta.RouteId "CR-Greenbush"
+    , Mbta.RouteId "CR-Middleborough"
+    , Mbta.RouteId "CR-Kingston"
+    ]
+
+
+stopIds : List Mbta.StopId
+stopIds =
+    [ Mbta.StopId "place-sstat"
+    , Mbta.StopId "place-jfk"
+    , Mbta.StopId "place-qnctr"
+    , Mbta.StopId "place-brntn"
+    ]

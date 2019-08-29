@@ -164,16 +164,23 @@ viewData routes stops schedules =
 
         stopDict =
             buildParentStationDict stops
+
+        sortedStops =
+            List.filterMap
+                (\stopId ->
+                    List.Extra.find (\stop -> Mbta.stopId stop == stopId) stops
+                )
+                stopIds
     in
     El.column
         [ El.spacing 10 ]
-        [ viewTimetable stopDict inboundSchedules
-        , viewTimetable stopDict outboundSchedules
+        [ viewTimetable sortedStops stopDict inboundSchedules
+        , viewTimetable sortedStops stopDict outboundSchedules
         ]
 
 
-viewTimetable : Dict Mbta.StopId Mbta.StopId -> List Mbta.Schedule -> Element msg
-viewTimetable stopDict schedules =
+viewTimetable : List Mbta.Stop -> Dict Mbta.StopId Mbta.StopId -> List Mbta.Schedule -> Element msg
+viewTimetable stops stopDict schedules =
     let
         trips : Dict Mbta.TripId (List Mbta.Schedule)
         trips =
@@ -181,22 +188,49 @@ viewTimetable stopDict schedules =
     in
     El.row
         []
-        (trips
-            |> Dict.toList
-            |> List.sortBy
-                (\( tripId, schedulesOnTrip ) ->
-                    schedulesOnTrip
-                        |> List.Extra.find
-                            (\schedule ->
-                                Dict.get schedule.stopId stopDict == Just (Mbta.StopId "place-sstat")
-                            )
-                        |> Maybe.andThen scheduleToTime
-                        |> Maybe.map Time.posixToMillis
-                        |> Maybe.withDefault 0
-                )
-            |> List.map
-                (\( tripId, schedulesOnTrip ) -> viewTripColumn stopDict tripId schedulesOnTrip)
+        (viewStopHeader stops
+            :: (trips
+                    |> Dict.toList
+                    |> List.sortBy
+                        (\( tripId, schedulesOnTrip ) ->
+                            schedulesOnTrip
+                                |> List.Extra.find
+                                    (\schedule ->
+                                        Dict.get schedule.stopId stopDict == Just (Mbta.StopId "place-sstat")
+                                    )
+                                |> Maybe.andThen scheduleToTime
+                                |> Maybe.map Time.posixToMillis
+                                |> Maybe.withDefault 0
+                        )
+                    |> List.map
+                        (\( tripId, schedulesOnTrip ) -> viewTripColumn stopDict tripId schedulesOnTrip)
+               )
         )
+
+
+viewStopHeader : List Mbta.Stop -> Element msg
+viewStopHeader stops =
+    El.column
+        []
+        (List.concat
+            [ [ El.text "" ]
+            , List.map viewStopHeaderCell stops
+            , [ El.text "" ]
+            ]
+        )
+
+
+viewStopHeaderCell : Mbta.Stop -> Element msg
+viewStopHeaderCell stop =
+    El.column
+        []
+        [ El.text (Mbta.stopName stop)
+        , if Mbta.stopWheelchairAccessible stop == Mbta.Accessible_1_Accessible then
+            El.text "accessible"
+
+          else
+            El.text " "
+        ]
 
 
 viewTripColumn :

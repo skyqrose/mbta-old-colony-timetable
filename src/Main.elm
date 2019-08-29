@@ -76,7 +76,7 @@ init =
         , Mbta.Api.getSchedules
             ReceiveSchedules
             apiHost
-            []
+            [ Mbta.Api.include Mbta.Api.scheduleTrip ]
             [ Mbta.Api.filterSchedulesByRouteIds routeIds
             , Mbta.Api.filterSchedulesByStopIds stopIds
             ]
@@ -131,6 +131,7 @@ body model =
                 (Mbta.Api.getPrimaryData routes)
                 (Mbta.Api.getPrimaryData stops)
                 (Mbta.Api.getPrimaryData schedules)
+                (\tripId -> Mbta.Api.getIncludedTrip tripId schedules)
 
         ( RemoteData.Loading, _, _ ) ->
             El.text "Loading"
@@ -154,8 +155,8 @@ body model =
             El.text (Debug.toString model)
 
 
-viewData : List Mbta.Route -> List Mbta.Stop -> List Mbta.Schedule -> Element msg
-viewData routes stops schedules =
+viewData : List Mbta.Route -> List Mbta.Stop -> List Mbta.Schedule -> (Mbta.TripId -> Maybe Mbta.Trip) -> Element msg
+viewData routes stops schedules tripGetter =
     let
         ( inboundSchedules, outboundSchedules ) =
             List.partition
@@ -174,13 +175,13 @@ viewData routes stops schedules =
     in
     El.column
         [ El.spacing 10 ]
-        [ viewTimetable sortedStops stopDict inboundSchedules
-        , viewTimetable sortedStops stopDict outboundSchedules
+        [ viewTimetable sortedStops stopDict inboundSchedules tripGetter
+        , viewTimetable sortedStops stopDict outboundSchedules tripGetter
         ]
 
 
-viewTimetable : List Mbta.Stop -> Dict Mbta.StopId Mbta.StopId -> List Mbta.Schedule -> Element msg
-viewTimetable stops stopDict schedules =
+viewTimetable : List Mbta.Stop -> Dict Mbta.StopId Mbta.StopId -> List Mbta.Schedule -> (Mbta.TripId -> Maybe Mbta.Trip) -> Element msg
+viewTimetable stops stopDict schedules tripGetter =
     let
         trips : Dict Mbta.TripId (List Mbta.Schedule)
         trips =
@@ -203,7 +204,7 @@ viewTimetable stops stopDict schedules =
                                 |> Maybe.withDefault 0
                         )
                     |> List.map
-                        (\( tripId, schedulesOnTrip ) -> viewTripColumn stopDict tripId schedulesOnTrip)
+                        (\( tripId, schedulesOnTrip ) -> viewTripColumn stopDict (tripGetter tripId) schedulesOnTrip)
                )
         )
 
@@ -235,13 +236,13 @@ viewStopHeaderCell stop =
 
 viewTripColumn :
     Dict Mbta.StopId Mbta.StopId
-    -> Mbta.TripId
+    -> Maybe Mbta.Trip
     -> List Mbta.Schedule
     -> Element msg
-viewTripColumn stopDict (Mbta.TripId tripId) schedules =
+viewTripColumn stopDict trip schedules =
     El.column
         []
-        (El.text tripId
+        (tripDescriptor trip
             :: (stopIds
                     |> List.map
                         (\stopId ->
@@ -265,6 +266,16 @@ viewTripColumn stopDict (Mbta.TripId tripId) schedules =
                         )
                )
         )
+
+
+tripDescriptor : Maybe Mbta.Trip -> Element msg
+tripDescriptor maybeTrip =
+    case maybeTrip of
+        Nothing ->
+            El.text ""
+
+        Just trip ->
+            El.text trip.name
 
 
 scheduleToTime : Mbta.Schedule -> Maybe Time.Posix

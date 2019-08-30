@@ -14,13 +14,16 @@ import TimeZone
 
 
 noStopIndication : Element msg
-noStopIndication =
-    El.text "-"
+noStopIndication = El.text "-"
 
 
 timeZone : Time.Zone
 timeZone =
     TimeZone.america__new_york ()
+
+
+scheduleCellStyling : List (El.Attribute msg)
+scheduleCellStyling = [El.height (El.px 60)]
 
 
 view : Model -> Browser.Document Msg
@@ -101,7 +104,7 @@ viewTimetable stops stopDict schedules tripGetter =
             Dict.groupBy .tripId schedules
     in
     El.row
-        []
+        [El.spacing 15]
         (viewStopHeader stops
             :: (trips
                     |> Dict.toList
@@ -132,7 +135,6 @@ viewStopHeader stops =
         (List.concat
             [ [ El.text "" ]
             , List.map viewStopHeaderCell stops
-            , [ El.text "" ]
             ]
         )
 
@@ -140,7 +142,7 @@ viewStopHeader stops =
 viewStopHeaderCell : Mbta.Stop -> Element msg
 viewStopHeaderCell stop =
     El.column
-        []
+        scheduleCellStyling
         [ El.text (Mbta.stopName stop)
         , if Mbta.stopWheelchairAccessible stop == Mbta.Accessible_1_Accessible then
             El.text "accessible"
@@ -158,7 +160,7 @@ viewTripColumn :
 viewTripColumn stopDict trip schedules =
     El.column
         []
-        (tripDescriptor trip
+        (El.el scheduleCellStyling (tripDescriptor trip)
             :: (stopIds
                     |> List.map
                         (\stopId ->
@@ -170,15 +172,15 @@ viewTripColumn stopDict trip schedules =
                         (\maybeSchedule ->
                             case maybeSchedule of
                                 Nothing ->
-                                    noStopIndication
+                                    El.el scheduleCellStyling noStopIndication
 
                                 Just schedule ->
                                     case viewScheduleTime schedule of
                                         Just timeString ->
-                                            El.text timeString
+                                            El.el scheduleCellStyling (El.text timeString)
 
                                         Nothing ->
-                                            noStopIndication
+                                            El.el scheduleCellStyling noStopIndication
                         )
                )
         )

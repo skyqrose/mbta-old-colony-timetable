@@ -10,7 +10,7 @@ import View
 
 apiHost : Mbta.Api.Host
 apiHost =
-    Mbta.Api.Default { apiKey = Nothing }
+    Mbta.Api.Default { apiKey = Just "84f8e2ba4820455a8b507d886863afd4" }
 
 
 init : ( Model, Cmd Msg )

@@ -9,6 +9,7 @@ import Mbta
 import Mbta.Api
 import Model exposing (..)
 import RemoteData
+import String
 import Time
 import TimeZone
 
@@ -216,9 +217,9 @@ viewScheduleTime schedule =
         |> Maybe.map
             (\time ->
                 String.concat
-                    [ String.fromInt (Time.toHour timeZone time)
+                    [ time |> (Time.toHour timeZone) |> String.fromInt |> String.padLeft 2 '0'
                     , ":"
-                    , String.fromInt (Time.toMinute timeZone time)
+                    , time |> (Time.toMinute timeZone) |> String.fromInt |> String.padLeft 2 '0'
                     ]
             )
 

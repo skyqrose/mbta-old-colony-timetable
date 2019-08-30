@@ -121,8 +121,15 @@ viewTrip :
     -> Maybe Mbta.Trip
     -> List Mbta.Schedule
     -> ViewModel.Trip
-viewTrip stopDict trip schedules =
-    { name = Maybe.map .name trip
+viewTrip stopDict maybeTrip schedules =
+    { name = Maybe.map .name maybeTrip
+    , bikes =
+        case maybeTrip of
+            Just trip ->
+                trip.bikesAllowed == Mbta.Bikes_1_Allowed
+
+            Nothing ->
+                False
     , schedules =
         Model.stopIds
             |> List.map

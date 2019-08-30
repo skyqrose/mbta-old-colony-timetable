@@ -115,9 +115,17 @@ viewSchedule schedule =
 
 tripDescriptor : ViewModel.Trip -> Element msg
 tripDescriptor trip =
-    case trip.name of
-        Nothing ->
-            El.text "-"
+    El.column
+        scheduleCellStyling
+        [ case trip.name of
+            Nothing ->
+                El.text "-"
 
-        Just name ->
-            El.text name
+            Just name ->
+                El.text name
+        , if trip.bikes then
+            El.text "bikes"
+
+          else
+            El.text " "
+        ]

@@ -162,9 +162,9 @@ viewScheduleTime schedule =
         |> Maybe.map
             (\time ->
                 String.concat
-                    [ time |> (Time.toHour timeZone) |> String.fromInt |> String.padLeft 2 '0'
+                    [ time |> Time.toHour timeZone |> String.fromInt |> String.padLeft 2 '0'
                     , ":"
-                    , time |> (Time.toMinute timeZone) |> String.fromInt |> String.padLeft 2 '0'
+                    , time |> Time.toMinute timeZone |> String.fromInt |> String.padLeft 2 '0'
                     ]
             )
 

@@ -6,6 +6,11 @@ import Model exposing (Msg)
 import ViewModel
 
 
+scheduleCellStyling : List (El.Attribute msg)
+scheduleCellStyling =
+    [ El.height (El.px 60) ]
+
+
 view : ViewModel.ViewModel -> Browser.Document Msg
 view model =
     { title = "MBTA Old Colony Timetable - skyqrose"
@@ -61,7 +66,7 @@ type alias Schedule =
 viewTimetable : ViewModel.Timetable -> Element msg
 viewTimetable timetable =
     El.row
-        []
+        [ El.spacing 15 ]
         (viewStopHeaders timetable.stopHeaders :: List.map viewTripColumn timetable.trips)
 
 
@@ -72,7 +77,6 @@ viewStopHeaders stopHeaders =
         (List.concat
             [ [ El.text "" ]
             , List.map viewStopHeaderCell stopHeaders
-            , [ El.text "" ]
             ]
         )
 
@@ -80,7 +84,7 @@ viewStopHeaders stopHeaders =
 viewStopHeaderCell : ViewModel.StopHeader -> Element msg
 viewStopHeaderCell stopHeader =
     El.column
-        []
+        scheduleCellStyling
         [ El.text stopHeader.stopName
         , if stopHeader.accessible then
             El.text "accessible"
@@ -96,16 +100,17 @@ viewTripColumn trip =
         []
         (tripDescriptor trip
             :: List.map
-                (\schedule ->
-                    case schedule of
-                        Nothing ->
-                            El.text "-"
-
-                        Just time ->
-                            El.text time
-                )
+                viewSchedule
                 trip.schedules
         )
+
+
+viewSchedule : ViewModel.Schedule -> Element msg
+viewSchedule schedule =
+    schedule
+        |> Maybe.withDefault "-"
+        |> El.text
+        |> El.el scheduleCellStyling
 
 
 tripDescriptor : ViewModel.Trip -> Element msg

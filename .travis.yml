@@ -1,0 +1,15 @@
+language: elm
+elm: 0.19.0
+script: npm test && npm run build
+before_deploy:
+  - shopt -s extglob
+  - rm -r !(.|..|.git|CNAME|js|index.html)
+  - shopt -u extglob
+deploy:
+  provider: pages
+  skip_cleanup: true
+  repo: skyqrose/mbta-old-colony-timetable
+  target_branch: gh-pages
+  keep_history: true
+  allow_empty_commit: true
+  github_token: $GITHUB_TOKEN # set on travis-ci.com

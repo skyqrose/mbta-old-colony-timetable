@@ -2,8 +2,10 @@
 
 Combined timetable for the Greenbush, Middleborough/Lakeville, and Kingston/Plymouth lines
 
+Under Construction
+
 ## Setup
 
-* Clone and symlink [elm-mbta-api](https://github.com/skyqrose/elm-mbta-api) `ln -s path/to/elm-mbta-api elm-mbta-api`
+* `git submodule update --init`
 * npm install
 * npm start

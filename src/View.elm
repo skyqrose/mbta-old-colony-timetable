@@ -1,29 +1,12 @@
 module View exposing (view)
 
-import AssocList as Dict exposing (Dict)
-import AssocList.Extra as Dict
 import Browser
 import Element as El exposing (Element)
-import List.Extra
-import Mbta
-import Mbta.Api
-import Model exposing (..)
-import RemoteData
-import Time
-import TimeZone
+import Model exposing (Msg)
+import ViewModel
 
 
-noStopIndication : Element msg
-noStopIndication =
-    El.text "-"
-
-
-timeZone : Time.Zone
-timeZone =
-    TimeZone.america__new_york ()
-
-
-view : Model -> Browser.Document Msg
+view : ViewModel.ViewModel -> Browser.Document Msg
 view model =
     { title = "MBTA Old Colony Timetable - skyqrose"
     , body =
@@ -31,118 +14,75 @@ view model =
     }
 
 
-body : Model -> Element Msg
+body : ViewModel.ViewModel -> Element Msg
 body model =
-    case ( model.routes, model.stops, model.schedules ) of
-        ( RemoteData.Success routes, RemoteData.Success stops, RemoteData.Success schedules ) ->
-            viewData
-                (Mbta.Api.getPrimaryData routes)
-                (Mbta.Api.getPrimaryData stops)
-                (Mbta.Api.getPrimaryData schedules)
-                (\tripId -> Mbta.Api.getIncludedTrip tripId schedules)
-
-        ( RemoteData.Loading, _, _ ) ->
+    case model of
+        ViewModel.Loading ->
             El.text "Loading"
 
-        ( _, RemoteData.Loading, _ ) ->
-            El.text "Loading"
+        ViewModel.Error e ->
+            El.text e
 
-        ( _, _, RemoteData.Loading ) ->
-            El.text "Loading"
-
-        ( RemoteData.Failure e, _, _ ) ->
-            El.text (Debug.toString e)
-
-        ( _, RemoteData.Failure e, _ ) ->
-            El.text (Debug.toString e)
-
-        ( _, _, RemoteData.Failure e ) ->
-            El.text (Debug.toString e)
-
-        _ ->
-            El.text (Debug.toString model)
+        ViewModel.Success timetables ->
+            viewTimetables timetables
 
 
-viewData :
-    List Mbta.Route
-    -> List Mbta.Stop
-    -> List Mbta.Schedule
-    -> (Mbta.TripId -> Maybe Mbta.Trip)
-    -> Element msg
-viewData routes stops schedules tripGetter =
-    let
-        ( inboundSchedules, outboundSchedules ) =
-            List.partition
-                (\schedule -> schedule.directionId == Mbta.D1)
-                schedules
-
-        stopDict =
-            buildParentStationDict stops
-
-        sortedStops =
-            List.filterMap
-                (\stopId ->
-                    List.Extra.find (\stop -> Mbta.stopId stop == stopId) stops
-                )
-                stopIds
-    in
+viewTimetables : ViewModel.Timetables -> Element msg
+viewTimetables timetables =
     El.column
         [ El.spacing 10 ]
-        [ viewTimetable sortedStops stopDict inboundSchedules tripGetter
-        , viewTimetable sortedStops stopDict outboundSchedules tripGetter
+        [ viewTimetable timetables.d1
+        , viewTimetable timetables.d0
         ]
 
 
-viewTimetable : List Mbta.Stop -> Dict Mbta.StopId Mbta.StopId -> List Mbta.Schedule -> (Mbta.TripId -> Maybe Mbta.Trip) -> Element msg
-viewTimetable stops stopDict schedules tripGetter =
-    let
-        trips : Dict Mbta.TripId (List Mbta.Schedule)
-        trips =
-            Dict.groupBy .tripId schedules
-    in
+type alias Timetable =
+    { stopHeaders : List StopHeader
+    , trips : List Trip
+    }
+
+
+type alias StopHeader =
+    { stopName : String
+    , accessible : Bool
+    }
+
+
+type alias Trip =
+    { name : Maybe String
+    , schedules : List Schedule
+    }
+
+
+type alias Schedule =
+    Maybe String
+
+
+viewTimetable : ViewModel.Timetable -> Element msg
+viewTimetable timetable =
     El.row
         []
-        (viewStopHeader stops
-            :: (trips
-                    |> Dict.toList
-                    |> List.sortBy
-                        (\( tripId, schedulesOnTrip ) ->
-                            schedulesOnTrip
-                                |> List.Extra.find
-                                    (\schedule ->
-                                        Dict.get schedule.stopId stopDict
-                                            == Just (Mbta.StopId "place-sstat")
-                                    )
-                                |> Maybe.andThen scheduleToTime
-                                |> Maybe.map Time.posixToMillis
-                                |> Maybe.withDefault 0
-                        )
-                    |> List.map
-                        (\( tripId, schedulesOnTrip ) ->
-                            viewTripColumn stopDict (tripGetter tripId) schedulesOnTrip
-                        )
-               )
-        )
+        (viewStopHeaders timetable.stopHeaders :: List.map viewTripColumn timetable.trips)
 
 
-viewStopHeader : List Mbta.Stop -> Element msg
-viewStopHeader stops =
+viewStopHeaders : List ViewModel.StopHeader -> Element msg
+viewStopHeaders stopHeaders =
     El.column
         []
         (List.concat
             [ [ El.text "" ]
-            , List.map viewStopHeaderCell stops
+            , List.map viewStopHeaderCell stopHeaders
             , [ El.text "" ]
             ]
         )
 
 
-viewStopHeaderCell : Mbta.Stop -> Element msg
-viewStopHeaderCell stop =
+viewStopHeaderCell : ViewModel.StopHeader -> Element msg
+viewStopHeaderCell stopHeader =
     El.column
         []
-        [ El.text (Mbta.stopName stop)
-        , if Mbta.stopWheelchairAccessible stop == Mbta.Accessible_1_Accessible then
+        [ El.text stopHeader.stopName
+        , if stopHeader.accessible then
             El.text "accessible"
 
           else
@@ -150,91 +90,29 @@ viewStopHeaderCell stop =
         ]
 
 
-viewTripColumn :
-    Dict Mbta.StopId Mbta.StopId
-    -> Maybe Mbta.Trip
-    -> List Mbta.Schedule
-    -> Element msg
-viewTripColumn stopDict trip schedules =
+viewTripColumn : ViewModel.Trip -> Element msg
+viewTripColumn trip =
     El.column
         []
         (tripDescriptor trip
-            :: (stopIds
-                    |> List.map
-                        (\stopId ->
-                            List.Extra.find
-                                (\schedule -> Dict.get schedule.stopId stopDict == Just stopId)
-                                schedules
-                        )
-                    |> List.map
-                        (\maybeSchedule ->
-                            case maybeSchedule of
-                                Nothing ->
-                                    noStopIndication
+            :: List.map
+                (\schedule ->
+                    case schedule of
+                        Nothing ->
+                            El.text "-"
 
-                                Just schedule ->
-                                    case viewScheduleTime schedule of
-                                        Just timeString ->
-                                            El.text timeString
-
-                                        Nothing ->
-                                            noStopIndication
-                        )
-               )
+                        Just time ->
+                            El.text time
+                )
+                trip.schedules
         )
 
 
-tripDescriptor : Maybe Mbta.Trip -> Element msg
-tripDescriptor maybeTrip =
-    case maybeTrip of
+tripDescriptor : ViewModel.Trip -> Element msg
+tripDescriptor trip =
+    case trip.name of
         Nothing ->
-            El.text ""
+            El.text "-"
 
-        Just trip ->
-            El.text trip.name
-
-
-scheduleToTime : Mbta.Schedule -> Maybe Time.Posix
-scheduleToTime schedule =
-    case ( schedule.arrivalTime, schedule.departureTime ) of
-        ( _, Just departureTime ) ->
-            Just departureTime
-
-        ( Just arrivalTime, _ ) ->
-            Just arrivalTime
-
-        ( Nothing, Nothing ) ->
-            Nothing
-
-
-viewScheduleTime : Mbta.Schedule -> Maybe String
-viewScheduleTime schedule =
-    schedule
-        |> scheduleToTime
-        |> Maybe.map
-            (\time ->
-                String.concat
-                    [ String.fromInt (Time.toHour timeZone time)
-                    , ":"
-                    , String.fromInt (Time.toMinute timeZone time)
-                    ]
-            )
-
-
-buildParentStationDict : List Mbta.Stop -> Dict Mbta.StopId Mbta.StopId
-buildParentStationDict stops =
-    stops
-        |> List.concatMap childIds
-        |> Dict.fromList
-
-
-childIds : Mbta.Stop -> List ( Mbta.StopId, Mbta.StopId )
-childIds stop =
-    case stop of
-        Mbta.Stop_1_Station station ->
-            List.map
-                (\childId -> ( childId, station.id ))
-                station.childStops
-
-        _ ->
-            []
+        Just name ->
+            El.text name

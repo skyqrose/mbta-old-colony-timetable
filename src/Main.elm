@@ -1,6 +1,7 @@
 module Main exposing (main)
 
 import Browser
+import MakeViewModel
 import Mbta.Api
 import Model exposing (..)
 import RemoteData
@@ -69,7 +70,7 @@ main : Program () Model Msg
 main =
     Browser.document
         { init = \flags -> init
-        , view = View.view
+        , view = MakeViewModel.makeViewModel >> View.view
         , update = update
         , subscriptions = \model -> Sub.none
         }

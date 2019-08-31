@@ -3,6 +3,7 @@ module View exposing (view)
 import Browser
 import Element as El exposing (Element)
 import Element.Font as Font
+import Mbta
 import Model exposing (Msg)
 import ViewModel
 
@@ -137,13 +138,13 @@ tripDescriptor trip =
 tripFooter : ViewModel.Trip -> Element msg
 tripFooter trip =
     (case trip.route of
-        Just "CR-Middleborough" ->
+        Just (Mbta.RouteId "CR-Middleborough") ->
             "MID"
 
-        Just "CR-Kingston" ->
+        Just (Mbta.RouteId "CR-Kingston") ->
             "KIN"
 
-        Just "CR-Greenbush" ->
+        Just (Mbta.RouteId "CR-Greenbush") ->
             "GRN"
 
         Just _ ->

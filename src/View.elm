@@ -2,6 +2,7 @@ module View exposing (view)
 
 import Browser
 import Element as El exposing (Element)
+import Element.Font as Font
 import Model exposing (Msg)
 import ViewModel
 
@@ -66,7 +67,7 @@ type alias Schedule =
 viewTimetable : ViewModel.Timetable -> Element msg
 viewTimetable timetable =
     El.row
-        [ El.spacing 15 ]
+        [ El.spacing 15, El.padding 10 ]
         (viewStopHeaders timetable.stopHeaders :: List.map viewTripColumn timetable.trips)
 
 
@@ -77,6 +78,7 @@ viewStopHeaders stopHeaders =
         (List.concat
             [ [ El.text "" ]
             , List.map viewStopHeaderCell stopHeaders
+            , [ El.text "" ]
             ]
         )
 
@@ -98,10 +100,11 @@ viewTripColumn : ViewModel.Trip -> Element msg
 viewTripColumn trip =
     El.column
         []
-        (tripDescriptor trip
-            :: List.map
-                viewSchedule
-                trip.schedules
+        (List.concat
+            [ [ tripDescriptor trip ]
+            , List.map viewSchedule trip.schedules
+            , [ tripFooter trip ]
+            ]
         )
 
 
@@ -129,3 +132,25 @@ tripDescriptor trip =
           else
             El.text " "
         ]
+
+
+tripFooter : ViewModel.Trip -> Element msg
+tripFooter trip =
+    (case trip.route of
+        Just "CR-Middleborough" ->
+            "MID"
+
+        Just "CR-Kingston" ->
+            "KIN"
+
+        Just "CR-Greenbush" ->
+            "GRN"
+
+        Just _ ->
+            ""
+
+        Nothing ->
+            ""
+    )
+        |> El.text
+        |> El.el [ Font.variant Font.smallCaps ]

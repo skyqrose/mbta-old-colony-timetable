@@ -27,6 +27,7 @@ type alias StopHeader =
 
 type alias Trip =
     { name : Maybe String
+    , route : Maybe String
     , bikes : Bool
     , schedules : List Schedule
     }

@@ -1,5 +1,7 @@
 module ViewModel exposing (Schedule, StopHeader, Timetable, Timetables, Trip, ViewModel(..))
 
+import Mbta
+
 
 type ViewModel
     = Loading
@@ -27,6 +29,7 @@ type alias StopHeader =
 
 type alias Trip =
     { name : Maybe String
+    , route : Maybe Mbta.RouteId
     , bikes : Bool
     , schedules : List Schedule
     }

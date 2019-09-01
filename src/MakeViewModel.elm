@@ -123,6 +123,7 @@ viewTrip :
     -> ViewModel.Trip
 viewTrip stopDict maybeTrip schedules =
     { name = Maybe.map .name maybeTrip
+    , route = Maybe.map .routeId maybeTrip
     , bikes =
         case maybeTrip of
             Just trip ->

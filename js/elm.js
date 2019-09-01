@@ -10816,6 +10816,12 @@ var author$project$MakeViewModel$viewTrip = F3(
 					return $.name;
 				},
 				maybeTrip),
+			route: A2(
+				elm$core$Maybe$map,
+				function ($) {
+					return $.routeId;
+				},
+				maybeTrip),
 			schedules: A2(
 				elm$core$List$map,
 				elm$core$Maybe$andThen(author$project$MakeViewModel$viewScheduleTime),
@@ -16291,7 +16297,11 @@ var author$project$View$viewStopHeaders = function (stopHeaders) {
 					[
 						mdgriffith$elm_ui$Element$text('')
 					]),
-					A2(elm$core$List$map, author$project$View$viewStopHeaderCell, stopHeaders)
+					A2(elm$core$List$map, author$project$View$viewStopHeaderCell, stopHeaders),
+					_List_fromArray(
+					[
+						mdgriffith$elm_ui$Element$text('')
+					])
 				])));
 };
 var author$project$View$tripDescriptor = function (trip) {
@@ -16329,6 +16339,66 @@ var mdgriffith$elm_ui$Element$el = F2(
 				_List_fromArray(
 					[child])));
 	});
+var mdgriffith$elm_ui$Internal$Model$VariantActive = function (a) {
+	return {$: 'VariantActive', a: a};
+};
+var mdgriffith$elm_ui$Element$Font$smallCaps = mdgriffith$elm_ui$Internal$Model$VariantActive('smcp');
+var mdgriffith$elm_ui$Internal$Flag$fontVariant = mdgriffith$elm_ui$Internal$Flag$flag(48);
+var mdgriffith$elm_ui$Internal$Model$Class = F2(
+	function (a, b) {
+		return {$: 'Class', a: a, b: b};
+	});
+var mdgriffith$elm_ui$Internal$Model$StyleClass = F2(
+	function (a, b) {
+		return {$: 'StyleClass', a: a, b: b};
+	});
+var mdgriffith$elm_ui$Element$Font$variant = function (_var) {
+	switch (_var.$) {
+		case 'VariantActive':
+			var name = _var.a;
+			return A2(mdgriffith$elm_ui$Internal$Model$Class, mdgriffith$elm_ui$Internal$Flag$fontVariant, 'v-' + name);
+		case 'VariantOff':
+			var name = _var.a;
+			return A2(mdgriffith$elm_ui$Internal$Model$Class, mdgriffith$elm_ui$Internal$Flag$fontVariant, 'v-' + (name + '-off'));
+		default:
+			var name = _var.a;
+			var index = _var.b;
+			return A2(
+				mdgriffith$elm_ui$Internal$Model$StyleClass,
+				mdgriffith$elm_ui$Internal$Flag$fontVariant,
+				A3(
+					mdgriffith$elm_ui$Internal$Model$Single,
+					'v-' + (name + ('-' + elm$core$String$fromInt(index))),
+					'font-feature-settings',
+					'\"' + (name + ('\" ' + elm$core$String$fromInt(index)))));
+	}
+};
+var author$project$View$tripFooter = function (trip) {
+	return A2(
+		mdgriffith$elm_ui$Element$el,
+		_List_fromArray(
+			[
+				mdgriffith$elm_ui$Element$Font$variant(mdgriffith$elm_ui$Element$Font$smallCaps)
+			]),
+		mdgriffith$elm_ui$Element$text(
+			function () {
+				var _n0 = trip.route;
+				if (_n0.$ === 'Just') {
+					switch (_n0.a.a) {
+						case 'CR-Middleborough':
+							return 'MID';
+						case 'CR-Kingston':
+							return 'KIN';
+						case 'CR-Greenbush':
+							return 'GRN';
+						default:
+							return '';
+					}
+				} else {
+					return '';
+				}
+			}()));
+};
 var author$project$View$viewSchedule = function (schedule) {
 	return A2(
 		mdgriffith$elm_ui$Element$el,
@@ -16340,10 +16410,36 @@ var author$project$View$viewTripColumn = function (trip) {
 	return A2(
 		mdgriffith$elm_ui$Element$column,
 		_List_Nil,
-		A2(
-			elm$core$List$cons,
-			author$project$View$tripDescriptor(trip),
-			A2(elm$core$List$map, author$project$View$viewSchedule, trip.schedules)));
+		elm$core$List$concat(
+			_List_fromArray(
+				[
+					_List_fromArray(
+					[
+						author$project$View$tripDescriptor(trip)
+					]),
+					A2(elm$core$List$map, author$project$View$viewSchedule, trip.schedules),
+					_List_fromArray(
+					[
+						author$project$View$tripFooter(trip)
+					])
+				])));
+};
+var mdgriffith$elm_ui$Internal$Flag$padding = mdgriffith$elm_ui$Internal$Flag$flag(2);
+var mdgriffith$elm_ui$Internal$Model$PaddingStyle = F5(
+	function (a, b, c, d, e) {
+		return {$: 'PaddingStyle', a: a, b: b, c: c, d: d, e: e};
+	});
+var mdgriffith$elm_ui$Element$padding = function (x) {
+	return A2(
+		mdgriffith$elm_ui$Internal$Model$StyleClass,
+		mdgriffith$elm_ui$Internal$Flag$padding,
+		A5(
+			mdgriffith$elm_ui$Internal$Model$PaddingStyle,
+			'p-' + elm$core$String$fromInt(x),
+			x,
+			x,
+			x,
+			x));
 };
 var mdgriffith$elm_ui$Internal$Model$AsRow = {$: 'AsRow'};
 var mdgriffith$elm_ui$Internal$Model$asRow = mdgriffith$elm_ui$Internal$Model$AsRow;
@@ -16370,10 +16466,6 @@ var mdgriffith$elm_ui$Internal$Model$SpacingStyle = F3(
 	function (a, b, c) {
 		return {$: 'SpacingStyle', a: a, b: b, c: c};
 	});
-var mdgriffith$elm_ui$Internal$Model$StyleClass = F2(
-	function (a, b) {
-		return {$: 'StyleClass', a: a, b: b};
-	});
 var mdgriffith$elm_ui$Internal$Model$spacingName = F2(
 	function (x, y) {
 		return 'spacing-' + (elm$core$String$fromInt(x) + ('-' + elm$core$String$fromInt(y)));
@@ -16393,7 +16485,8 @@ var author$project$View$viewTimetable = function (timetable) {
 		mdgriffith$elm_ui$Element$row,
 		_List_fromArray(
 			[
-				mdgriffith$elm_ui$Element$spacing(15)
+				mdgriffith$elm_ui$Element$spacing(15),
+				mdgriffith$elm_ui$Element$padding(10)
 			]),
 		A2(
 			elm$core$List$cons,

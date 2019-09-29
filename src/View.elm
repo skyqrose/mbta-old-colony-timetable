@@ -3,6 +3,7 @@ module View exposing (view)
 import Browser
 import Element as El exposing (Element)
 import Element.Font as Font
+import Element.Region as Region
 import Mbta
 import Model exposing (Msg)
 import ViewModel
@@ -38,9 +39,21 @@ viewTimetables : ViewModel.Timetables -> Element msg
 viewTimetables timetables =
     El.column
         [ El.spacing 10 ]
-        [ viewTimetable timetables.d1
+        [ directionHeading "Inbound"
+        , viewTimetable timetables.d1
+        , directionHeading "Outbound"
         , viewTimetable timetables.d0
         ]
+
+
+directionHeading : String -> Element msg
+directionHeading text =
+    El.el
+        [ Region.heading 2
+        , El.centerX
+        , Font.size 24
+        ]
+        (El.text text)
 
 
 type alias Timetable =

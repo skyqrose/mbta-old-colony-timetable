@@ -81,7 +81,9 @@ type alias Schedule =
 viewTimetable : ViewModel.Timetable -> Element msg
 viewTimetable timetable =
     El.row
-        [ El.spacing 15, El.padding 10 ]
+        [ El.spacing 15
+        , El.padding 10
+        ]
         (viewStopHeaders timetable.stopHeaders :: List.map viewTripColumn timetable.trips)
 
 
@@ -103,7 +105,11 @@ viewStopHeaderCell stopHeader =
         scheduleCellStyling
         [ El.text stopHeader.stopName
         , if stopHeader.accessible then
-            El.text "accessible"
+            El.image
+                [ El.height (El.px 12) ]
+                { src = "/assets/accessible.svg"
+                , description = "accessible"
+                }
 
           else
             El.text " "
@@ -141,7 +147,13 @@ tripDescriptor trip =
             Just name ->
                 El.text name
         , if trip.bikes then
-            El.text "bikes"
+            El.image
+                [ El.height (El.px 20)
+                , El.centerX
+                ]
+                { src = "/assets/bike.svg"
+                , description = "bikes allowed"
+                }
 
           else
             El.text " "

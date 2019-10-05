@@ -16322,6 +16322,46 @@ var author$project$View$scheduleCellStyling = _List_fromArray(
 		mdgriffith$elm_ui$Element$px(60)),
 		mdgriffith$elm_ui$Element$padding(5)
 	]);
+var mdgriffith$elm_ui$Internal$Model$Rgba = F4(
+	function (a, b, c, d) {
+		return {$: 'Rgba', a: a, b: b, c: c, d: d};
+	});
+var mdgriffith$elm_ui$Element$rgb = F3(
+	function (r, g, b) {
+		return A4(mdgriffith$elm_ui$Internal$Model$Rgba, r, g, b, 1);
+	});
+var mdgriffith$elm_ui$Internal$Flag$bgColor = mdgriffith$elm_ui$Internal$Flag$flag(8);
+var mdgriffith$elm_ui$Internal$Model$Colored = F3(
+	function (a, b, c) {
+		return {$: 'Colored', a: a, b: b, c: c};
+	});
+var mdgriffith$elm_ui$Internal$Model$formatColorClass = function (_n0) {
+	var red = _n0.a;
+	var green = _n0.b;
+	var blue = _n0.c;
+	var alpha = _n0.d;
+	return mdgriffith$elm_ui$Internal$Model$floatClass(red) + ('-' + (mdgriffith$elm_ui$Internal$Model$floatClass(green) + ('-' + (mdgriffith$elm_ui$Internal$Model$floatClass(blue) + ('-' + mdgriffith$elm_ui$Internal$Model$floatClass(alpha))))));
+};
+var mdgriffith$elm_ui$Element$Background$color = function (clr) {
+	return A2(
+		mdgriffith$elm_ui$Internal$Model$StyleClass,
+		mdgriffith$elm_ui$Internal$Flag$bgColor,
+		A3(
+			mdgriffith$elm_ui$Internal$Model$Colored,
+			'bg-' + mdgriffith$elm_ui$Internal$Model$formatColorClass(clr),
+			'background-color',
+			clr));
+};
+var author$project$View$evenRowStyling = _List_fromArray(
+	[
+		mdgriffith$elm_ui$Element$Background$color(
+		A3(mdgriffith$elm_ui$Element$rgb, 1.0, 1.0, 1.0))
+	]);
+var author$project$View$oddRowStyling = _List_fromArray(
+	[
+		mdgriffith$elm_ui$Element$Background$color(
+		A3(mdgriffith$elm_ui$Element$rgb, 0.95, 0.95, 0.95))
+	]);
 var mdgriffith$elm_ui$Internal$Model$AsColumn = {$: 'AsColumn'};
 var mdgriffith$elm_ui$Internal$Model$asColumn = mdgriffith$elm_ui$Internal$Model$AsColumn;
 var mdgriffith$elm_ui$Internal$Model$Attr = function (a) {
@@ -16349,6 +16389,10 @@ var mdgriffith$elm_ui$Element$column = F2(
 						attrs))),
 			mdgriffith$elm_ui$Internal$Model$Unkeyed(children));
 	});
+var mdgriffith$elm_ui$Internal$Model$Fill = function (a) {
+	return {$: 'Fill', a: a};
+};
+var mdgriffith$elm_ui$Element$fill = mdgriffith$elm_ui$Internal$Model$Fill(1);
 var elm$html$Html$Attributes$alt = elm$html$Html$Attributes$stringProperty('alt');
 var elm$html$Html$Attributes$src = function (url) {
 	return A2(
@@ -16400,27 +16444,31 @@ var mdgriffith$elm_ui$Element$image = F2(
 						mdgriffith$elm_ui$Internal$Model$Unkeyed(_List_Nil))
 					])));
 	});
-var author$project$View$viewStopHeaderCell = function (stopHeader) {
-	return A2(
-		mdgriffith$elm_ui$Element$column,
-		author$project$View$scheduleCellStyling,
-		_List_fromArray(
-			[
-				mdgriffith$elm_ui$Element$text(stopHeader.stopName),
-				stopHeader.accessible ? A2(
-				mdgriffith$elm_ui$Element$image,
-				_List_fromArray(
-					[
-						mdgriffith$elm_ui$Element$height(
-						mdgriffith$elm_ui$Element$px(12))
-					]),
-				{description: 'accessible', src: '/assets/accessible.svg'}) : mdgriffith$elm_ui$Element$text(' ')
-			]));
-};
-var mdgriffith$elm_ui$Internal$Model$Fill = function (a) {
-	return {$: 'Fill', a: a};
-};
-var mdgriffith$elm_ui$Element$fill = mdgriffith$elm_ui$Internal$Model$Fill(1);
+var author$project$View$viewStopHeaderCell = F2(
+	function (i, stopHeader) {
+		return A2(
+			mdgriffith$elm_ui$Element$column,
+			_Utils_ap(
+				(!A2(elm$core$Basics$modBy, 2, i)) ? author$project$View$evenRowStyling : author$project$View$oddRowStyling,
+				_Utils_ap(
+					_List_fromArray(
+						[
+							mdgriffith$elm_ui$Element$width(mdgriffith$elm_ui$Element$fill)
+						]),
+					author$project$View$scheduleCellStyling)),
+			_List_fromArray(
+				[
+					mdgriffith$elm_ui$Element$text(stopHeader.stopName),
+					stopHeader.accessible ? A2(
+					mdgriffith$elm_ui$Element$image,
+					_List_fromArray(
+						[
+							mdgriffith$elm_ui$Element$height(
+							mdgriffith$elm_ui$Element$px(12))
+						]),
+					{description: 'accessible', src: '/assets/accessible.svg'}) : mdgriffith$elm_ui$Element$text(' ')
+				]));
+	});
 var mdgriffith$elm_ui$Internal$Model$BorderWidth = F5(
 	function (a, b, c, d, e) {
 		return {$: 'BorderWidth', a: a, b: b, c: c, d: d, e: e};
@@ -16487,7 +16535,7 @@ var author$project$View$viewStopHeaders = function (stopHeaders) {
 								])),
 						mdgriffith$elm_ui$Element$text(''))
 					]),
-					A2(elm$core$List$map, author$project$View$viewStopHeaderCell, stopHeaders),
+					A2(elm$core$List$indexedMap, author$project$View$viewStopHeaderCell, stopHeaders),
 					_List_fromArray(
 					[
 						A2(
@@ -16588,13 +16636,21 @@ var author$project$View$tripFooter = function (trip) {
 				}
 			}()));
 };
-var author$project$View$viewSchedule = function (schedule) {
-	return A2(
-		mdgriffith$elm_ui$Element$el,
-		author$project$View$scheduleCellStyling,
-		mdgriffith$elm_ui$Element$text(
-			A2(elm$core$Maybe$withDefault, '-', schedule)));
-};
+var author$project$View$viewSchedule = F2(
+	function (i, schedule) {
+		return A2(
+			mdgriffith$elm_ui$Element$el,
+			_Utils_ap(
+				(!A2(elm$core$Basics$modBy, 2, i)) ? author$project$View$evenRowStyling : author$project$View$oddRowStyling,
+				_Utils_ap(
+					_List_fromArray(
+						[
+							mdgriffith$elm_ui$Element$width(mdgriffith$elm_ui$Element$fill)
+						]),
+					author$project$View$scheduleCellStyling)),
+			mdgriffith$elm_ui$Element$text(
+				A2(elm$core$Maybe$withDefault, '-', schedule)));
+	});
 var author$project$View$viewTripColumn = function (trip) {
 	return A2(
 		mdgriffith$elm_ui$Element$column,
@@ -16610,7 +16666,7 @@ var author$project$View$viewTripColumn = function (trip) {
 					[
 						author$project$View$tripDescriptor(trip)
 					]),
-					A2(elm$core$List$map, author$project$View$viewSchedule, trip.schedules),
+					A2(elm$core$List$indexedMap, author$project$View$viewSchedule, trip.schedules),
 					_List_fromArray(
 					[
 						author$project$View$tripFooter(trip)
@@ -16717,10 +16773,6 @@ var mdgriffith$elm_ui$Internal$Model$StaticRootAndDynamic = F2(
 	});
 var mdgriffith$elm_ui$Internal$Model$AllowHover = {$: 'AllowHover'};
 var mdgriffith$elm_ui$Internal$Model$Layout = {$: 'Layout'};
-var mdgriffith$elm_ui$Internal$Model$Rgba = F4(
-	function (a, b, c, d) {
-		return {$: 'Rgba', a: a, b: b, c: c, d: d};
-	});
 var mdgriffith$elm_ui$Internal$Model$focusDefaultStyle = {
 	backgroundColor: elm$core$Maybe$Nothing,
 	borderColor: elm$core$Maybe$Nothing,
@@ -16855,13 +16907,8 @@ var mdgriffith$elm_ui$Internal$Model$renderRoot = F3(
 					_List_fromArray(
 						[child]))));
 	});
-var mdgriffith$elm_ui$Internal$Flag$bgColor = mdgriffith$elm_ui$Internal$Flag$flag(8);
 var mdgriffith$elm_ui$Internal$Flag$fontColor = mdgriffith$elm_ui$Internal$Flag$flag(14);
 var mdgriffith$elm_ui$Internal$Flag$fontFamily = mdgriffith$elm_ui$Internal$Flag$flag(5);
-var mdgriffith$elm_ui$Internal$Model$Colored = F3(
-	function (a, b, c) {
-		return {$: 'Colored', a: a, b: b, c: c};
-	});
 var mdgriffith$elm_ui$Internal$Model$FontFamily = F2(
 	function (a, b) {
 		return {$: 'FontFamily', a: a, b: b};
@@ -16869,13 +16916,6 @@ var mdgriffith$elm_ui$Internal$Model$FontFamily = F2(
 var mdgriffith$elm_ui$Internal$Model$SansSerif = {$: 'SansSerif'};
 var mdgriffith$elm_ui$Internal$Model$Typeface = function (a) {
 	return {$: 'Typeface', a: a};
-};
-var mdgriffith$elm_ui$Internal$Model$formatColorClass = function (_n0) {
-	var red = _n0.a;
-	var green = _n0.b;
-	var blue = _n0.c;
-	var alpha = _n0.d;
-	return mdgriffith$elm_ui$Internal$Model$floatClass(red) + ('-' + (mdgriffith$elm_ui$Internal$Model$floatClass(green) + ('-' + (mdgriffith$elm_ui$Internal$Model$floatClass(blue) + ('-' + mdgriffith$elm_ui$Internal$Model$floatClass(alpha))))));
 };
 var elm$core$String$words = _String_words;
 var mdgriffith$elm_ui$Internal$Model$renderFontClassName = F2(

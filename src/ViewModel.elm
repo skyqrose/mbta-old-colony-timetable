@@ -1,12 +1,35 @@
-module ViewModel exposing (Schedule, StopHeader, Timetable, Timetables, Trip, ViewModel(..))
+module ViewModel exposing
+    ( Schedule
+    , ServiceButton
+    , ServiceButtons
+    , StopHeader
+    , Timetable
+    , Timetables
+    , Trip
+    , ViewModel(..)
+    )
 
 import Mbta
+import Model
 
 
 type ViewModel
-    = Loading
+    = LoadingServices
+    | ServicesLoaded ServiceButtons
+    | LoadingSchedules ServiceButtons
+    | SchedulesLoaded ServiceButtons Timetables
     | Error String
-    | Success Timetables
+
+
+type alias ServiceButtons =
+    List ServiceButton
+
+
+type alias ServiceButton =
+    { serviceKey : Model.ServiceKey
+    , text : String
+    , isSelected : Bool
+    }
 
 
 type alias Timetables =

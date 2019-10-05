@@ -2,6 +2,7 @@ module MakeViewModel exposing (makeViewModel)
 
 import AssocList as Dict exposing (Dict)
 import AssocList.Extra as Dict
+import Helpers
 import List.Extra
 import Mbta
 import Mbta.Api
@@ -14,36 +15,106 @@ import ViewModel
 
 makeViewModel : Model.Model -> ViewModel.ViewModel
 makeViewModel model =
-    case ( model.routes, model.stops, model.schedules ) of
-        ( RemoteData.Success routes, RemoteData.Success stops, RemoteData.Success schedules ) ->
-            ViewModel.Success
-                (viewTimetables
-                    (Mbta.Api.getPrimaryData routes)
-                    (Mbta.Api.getPrimaryData stops)
-                    (Mbta.Api.getPrimaryData schedules)
-                    (\tripId -> Mbta.Api.getIncludedTrip tripId schedules)
-                )
+    case model.services of
+        RemoteData.Loading ->
+            ViewModel.LoadingServices
 
-        ( RemoteData.Loading, _, _ ) ->
-            ViewModel.Loading
-
-        ( _, RemoteData.Loading, _ ) ->
-            ViewModel.Loading
-
-        ( _, _, RemoteData.Loading ) ->
-            ViewModel.Loading
-
-        ( RemoteData.Failure e, _, _ ) ->
+        RemoteData.Failure e ->
             ViewModel.Error (Debug.toString e)
 
-        ( _, RemoteData.Failure e, _ ) ->
-            ViewModel.Error (Debug.toString e)
+        RemoteData.Success services ->
+            let
+                serviceButtons =
+                    viewServiceButtons
+                        (Mbta.Api.getPrimaryData services)
+                        model.selectedServiceKey
+            in
+            case model.schedules of
+                RemoteData.NotAsked ->
+                    ViewModel.ServicesLoaded serviceButtons
 
-        ( _, _, RemoteData.Failure e ) ->
-            ViewModel.Error (Debug.toString e)
+                RemoteData.Loading ->
+                    ViewModel.LoadingSchedules serviceButtons
 
-        _ ->
+                RemoteData.Failure e ->
+                    ViewModel.Error (Debug.toString e)
+
+                RemoteData.Success schedules ->
+                    case ( model.routes, model.stops ) of
+                        ( RemoteData.Success routes, RemoteData.Success stops ) ->
+                            ViewModel.SchedulesLoaded
+                                serviceButtons
+                                (viewTimetables
+                                    (Mbta.Api.getPrimaryData routes)
+                                    (Mbta.Api.getPrimaryData stops)
+                                    (Mbta.Api.getPrimaryData schedules)
+                                    (\tripId -> Mbta.Api.getIncludedTrip tripId schedules)
+                                )
+
+                        ( RemoteData.Failure e, _ ) ->
+                            ViewModel.Error (Debug.toString e)
+
+                        ( _, RemoteData.Failure e ) ->
+                            ViewModel.Error (Debug.toString e)
+
+                        ( RemoteData.Loading, _ ) ->
+                            ViewModel.LoadingSchedules serviceButtons
+
+                        ( _, RemoteData.Loading ) ->
+                            ViewModel.LoadingSchedules serviceButtons
+
+                        _ ->
+                            ViewModel.Error (Debug.toString model)
+
+        RemoteData.NotAsked ->
             ViewModel.Error (Debug.toString model)
+
+
+viewServiceButtons :
+    List Mbta.Service
+    -> Maybe Model.ServiceKey
+    -> ViewModel.ServiceButtons
+viewServiceButtons services selectedServiceKey =
+    services
+        |> List.map Model.serviceKey
+        |> Helpers.uniq
+        |> sortServiceButtons
+        |> List.map (viewServiceButton selectedServiceKey)
+
+
+{-| Sorts to Weekday, Saturday, Sunday, others
+ties are broken by start date
+-}
+sortServiceButtons : List Model.ServiceKey -> List Model.ServiceKey
+sortServiceButtons serviceKeys =
+    List.sortBy
+        (\serviceKey ->
+            ( case serviceKey.name of
+                Just "Weekday" ->
+                    0
+
+                Just "Saturday" ->
+                    1
+
+                Just "Sunday" ->
+                    2
+
+                _ ->
+                    3
+            , Mbta.serviceDateToIso8601 serviceKey.startDate
+            )
+        )
+        serviceKeys
+
+
+viewServiceButton : Maybe Model.ServiceKey -> Model.ServiceKey -> ViewModel.ServiceButton
+viewServiceButton selectedServiceKey serviceKey =
+    { serviceKey = serviceKey
+    , text =
+        serviceKey.name
+            |> Maybe.withDefault "Service"
+    , isSelected = selectedServiceKey == Just serviceKey
+    }
 
 
 viewTimetables :

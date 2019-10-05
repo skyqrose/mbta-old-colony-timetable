@@ -5,6 +5,7 @@ import Element as El exposing (Element, rgb)
 import Element.Background as Background
 import Element.Border as Border
 import Element.Font as Font
+import Element.Input as Input
 import Element.Region as Region
 import Mbta
 import Model exposing (Msg)
@@ -18,6 +19,11 @@ scheduleCellStyling =
     ]
 
 
+shadedColor : El.Color
+shadedColor =
+    rgb 0.95 0.95 0.95
+
+
 evenRowStyling : List (El.Attribute msg)
 evenRowStyling =
     [ Background.color (rgb 1.0 1.0 1.0) ]
@@ -25,7 +31,7 @@ evenRowStyling =
 
 oddRowStyling : List (El.Attribute msg)
 oddRowStyling =
-    [ Background.color (rgb 0.95 0.95 0.95) ]
+    [ Background.color shadedColor ]
 
 
 view : ViewModel.ViewModel -> Browser.Document Msg
@@ -39,14 +45,56 @@ view model =
 body : ViewModel.ViewModel -> Element Msg
 body model =
     case model of
-        ViewModel.Loading ->
-            El.text "Loading"
+        ViewModel.LoadingServices ->
+            El.text "Loading services"
+
+        ViewModel.ServicesLoaded serviceButtons ->
+            El.column
+                []
+                [ viewServiceButtons serviceButtons ]
+
+        ViewModel.LoadingSchedules serviceButtons ->
+            El.column
+                []
+                [ viewServiceButtons serviceButtons
+                , El.text "Loading"
+                ]
+
+        ViewModel.SchedulesLoaded serviceButtons timetables ->
+            El.column
+                []
+                [ viewServiceButtons serviceButtons
+                , viewTimetables timetables
+                ]
 
         ViewModel.Error e ->
             El.text e
 
-        ViewModel.Success timetables ->
-            viewTimetables timetables
+
+viewServiceButtons : ViewModel.ServiceButtons -> Element Msg
+viewServiceButtons serviceButtons =
+    El.row
+        []
+        (List.map
+            (\serviceButton ->
+                Input.button
+                    ([ El.padding 5
+                     , Border.width 1
+                     , Border.rounded 10
+                     ]
+                        ++ (if serviceButton.isSelected then
+                                [ Background.color shadedColor ]
+
+                            else
+                                []
+                           )
+                    )
+                    { onPress = Just (Model.SelectServiceKey serviceButton.serviceKey)
+                    , label = El.text serviceButton.text
+                    }
+            )
+            serviceButtons
+        )
 
 
 viewTimetables : ViewModel.Timetables -> Element msg

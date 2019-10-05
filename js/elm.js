@@ -16746,7 +16746,15 @@ var author$project$View$viewTimetable = function (timetable) {
 			]),
 		_List_fromArray(
 			[
-				author$project$View$directionHeading('Inbound'),
+				author$project$View$directionHeading(
+				function () {
+					var _n0 = timetable.directionId;
+					if (_n0.$ === 'D1') {
+						return 'Inbound';
+					} else {
+						return 'Outbound';
+					}
+				}()),
 				author$project$View$viewTable(timetable)
 			]));
 };

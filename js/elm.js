@@ -232,6 +232,87 @@ var _JsArray_appendN = F3(function(n, dest, source)
 
 
 
+var _List_Nil_UNUSED = { $: 0 };
+var _List_Nil = { $: '[]' };
+
+function _List_Cons_UNUSED(hd, tl) { return { $: 1, a: hd, b: tl }; }
+function _List_Cons(hd, tl) { return { $: '::', a: hd, b: tl }; }
+
+
+var _List_cons = F2(_List_Cons);
+
+function _List_fromArray(arr)
+{
+	var out = _List_Nil;
+	for (var i = arr.length; i--; )
+	{
+		out = _List_Cons(arr[i], out);
+	}
+	return out;
+}
+
+function _List_toArray(xs)
+{
+	for (var out = []; xs.b; xs = xs.b) // WHILE_CONS
+	{
+		out.push(xs.a);
+	}
+	return out;
+}
+
+var _List_map2 = F3(function(f, xs, ys)
+{
+	for (var arr = []; xs.b && ys.b; xs = xs.b, ys = ys.b) // WHILE_CONSES
+	{
+		arr.push(A2(f, xs.a, ys.a));
+	}
+	return _List_fromArray(arr);
+});
+
+var _List_map3 = F4(function(f, xs, ys, zs)
+{
+	for (var arr = []; xs.b && ys.b && zs.b; xs = xs.b, ys = ys.b, zs = zs.b) // WHILE_CONSES
+	{
+		arr.push(A3(f, xs.a, ys.a, zs.a));
+	}
+	return _List_fromArray(arr);
+});
+
+var _List_map4 = F5(function(f, ws, xs, ys, zs)
+{
+	for (var arr = []; ws.b && xs.b && ys.b && zs.b; ws = ws.b, xs = xs.b, ys = ys.b, zs = zs.b) // WHILE_CONSES
+	{
+		arr.push(A4(f, ws.a, xs.a, ys.a, zs.a));
+	}
+	return _List_fromArray(arr);
+});
+
+var _List_map5 = F6(function(f, vs, ws, xs, ys, zs)
+{
+	for (var arr = []; vs.b && ws.b && xs.b && ys.b && zs.b; vs = vs.b, ws = ws.b, xs = xs.b, ys = ys.b, zs = zs.b) // WHILE_CONSES
+	{
+		arr.push(A5(f, vs.a, ws.a, xs.a, ys.a, zs.a));
+	}
+	return _List_fromArray(arr);
+});
+
+var _List_sortBy = F2(function(f, xs)
+{
+	return _List_fromArray(_List_toArray(xs).sort(function(a, b) {
+		return _Utils_cmp(f(a), f(b));
+	}));
+});
+
+var _List_sortWith = F2(function(f, xs)
+{
+	return _List_fromArray(_List_toArray(xs).sort(function(a, b) {
+		var ord = A2(f, a, b);
+		return ord === elm$core$Basics$EQ ? 0 : ord === elm$core$Basics$LT ? -1 : 1;
+	}));
+});
+
+
+
 // LOG
 
 var _Debug_log_UNUSED = F2(function(tag, value)
@@ -709,87 +790,6 @@ function _Utils_ap(xs, ys)
 	}
 	return root;
 }
-
-
-
-var _List_Nil_UNUSED = { $: 0 };
-var _List_Nil = { $: '[]' };
-
-function _List_Cons_UNUSED(hd, tl) { return { $: 1, a: hd, b: tl }; }
-function _List_Cons(hd, tl) { return { $: '::', a: hd, b: tl }; }
-
-
-var _List_cons = F2(_List_Cons);
-
-function _List_fromArray(arr)
-{
-	var out = _List_Nil;
-	for (var i = arr.length; i--; )
-	{
-		out = _List_Cons(arr[i], out);
-	}
-	return out;
-}
-
-function _List_toArray(xs)
-{
-	for (var out = []; xs.b; xs = xs.b) // WHILE_CONS
-	{
-		out.push(xs.a);
-	}
-	return out;
-}
-
-var _List_map2 = F3(function(f, xs, ys)
-{
-	for (var arr = []; xs.b && ys.b; xs = xs.b, ys = ys.b) // WHILE_CONSES
-	{
-		arr.push(A2(f, xs.a, ys.a));
-	}
-	return _List_fromArray(arr);
-});
-
-var _List_map3 = F4(function(f, xs, ys, zs)
-{
-	for (var arr = []; xs.b && ys.b && zs.b; xs = xs.b, ys = ys.b, zs = zs.b) // WHILE_CONSES
-	{
-		arr.push(A3(f, xs.a, ys.a, zs.a));
-	}
-	return _List_fromArray(arr);
-});
-
-var _List_map4 = F5(function(f, ws, xs, ys, zs)
-{
-	for (var arr = []; ws.b && xs.b && ys.b && zs.b; ws = ws.b, xs = xs.b, ys = ys.b, zs = zs.b) // WHILE_CONSES
-	{
-		arr.push(A4(f, ws.a, xs.a, ys.a, zs.a));
-	}
-	return _List_fromArray(arr);
-});
-
-var _List_map5 = F6(function(f, vs, ws, xs, ys, zs)
-{
-	for (var arr = []; vs.b && ws.b && xs.b && ys.b && zs.b; vs = vs.b, ws = ws.b, xs = xs.b, ys = ys.b, zs = zs.b) // WHILE_CONSES
-	{
-		arr.push(A5(f, vs.a, ws.a, xs.a, ys.a, zs.a));
-	}
-	return _List_fromArray(arr);
-});
-
-var _List_sortBy = F2(function(f, xs)
-{
-	return _List_fromArray(_List_toArray(xs).sort(function(a, b) {
-		return _Utils_cmp(f(a), f(b));
-	}));
-});
-
-var _List_sortWith = F2(function(f, xs)
-{
-	return _List_fromArray(_List_toArray(xs).sort(function(a, b) {
-		var ord = A2(f, a, b);
-		return ord === elm$core$Basics$EQ ? 0 : ord === elm$core$Basics$LT ? -1 : 1;
-	}));
-});
 
 
 
@@ -4780,14 +4780,9 @@ var author$project$Main$apiHost = author$project$Mbta$Api$Default(
 	{
 		apiKey: elm$core$Maybe$Just('84f8e2ba4820455a8b507d886863afd4')
 	});
-var author$project$Mbta$Api$Filter = function (a) {
-	return {$: 'Filter', a: a};
+var author$project$Mbta$Api$Relationship = function (a) {
+	return {$: 'Relationship', a: a};
 };
-var elm$core$Basics$identity = function (x) {
-	return x;
-};
-var elm$core$Basics$EQ = {$: 'EQ'};
-var elm$core$Basics$LT = {$: 'LT'};
 var elm$core$Elm$JsArray$foldr = _JsArray_foldr;
 var elm$core$Array$foldr = F3(
 	function (func, baseCase, _n0) {
@@ -4809,6 +4804,9 @@ var elm$core$Array$foldr = F3(
 			A3(elm$core$Elm$JsArray$foldr, func, baseCase, tail),
 			tree);
 	});
+var elm$core$Basics$EQ = {$: 'EQ'};
+var elm$core$Basics$LT = {$: 'LT'};
+var elm$core$List$cons = _List_cons;
 var elm$core$Array$toList = function (array) {
 	return A3(elm$core$Array$foldr, elm$core$List$cons, _List_Nil, array);
 };
@@ -4865,7 +4863,19 @@ var elm$core$Set$toList = function (_n0) {
 	var dict = _n0.a;
 	return elm$core$Dict$keys(dict);
 };
-var elm$core$List$cons = _List_cons;
+var elm$core$Basics$append = _Utils_append;
+var elm$core$Basics$identity = function (x) {
+	return x;
+};
+var author$project$Mbta$Api$andIts = F2(
+	function (_n0, _n1) {
+		var string1 = _n0.a;
+		var string2 = _n1.a;
+		return author$project$Mbta$Api$Relationship(string2 + ('.' + string1));
+	});
+var author$project$Mbta$Api$Filter = function (a) {
+	return {$: 'Filter', a: a};
+};
 var elm$core$Basics$add = _Basics_add;
 var elm$core$Basics$gt = _Utils_gt;
 var elm$core$List$foldl = F3(
@@ -4985,6 +4995,9 @@ var author$project$Mbta$Api$stopIdToString = function (_n0) {
 };
 var author$project$Mbta$Api$filterSchedulesByStopIds = function (stopIds) {
 	return A3(author$project$Mbta$Api$filterByList, 'stop', author$project$Mbta$Api$stopIdToString, stopIds);
+};
+var author$project$Mbta$Api$filterServicesByRouteIds = function (routeIds) {
+	return A3(author$project$Mbta$Api$filterByList, 'route', author$project$Mbta$Api$routeIdToString, routeIds);
 };
 var author$project$Mbta$Api$filterStopsByIds = function (stopIds) {
 	return A3(author$project$Mbta$Api$filterByList, 'id', author$project$Mbta$Api$stopIdToString, stopIds);
@@ -5311,7 +5324,6 @@ var elm$json$Json$Decode$OneOf = function (a) {
 	return {$: 'OneOf', a: a};
 };
 var elm$core$Basics$and = _Basics_and;
-var elm$core$Basics$append = _Utils_append;
 var elm$core$Basics$or = _Basics_or;
 var elm$core$Char$toCode = _Char_toCode;
 var elm$core$Char$isLower = function (_char) {
@@ -9876,6 +9888,10 @@ var author$project$Mbta$Api$getSchedules = F4(
 	function (toMsg, host, includes, filters) {
 		return A6(author$project$Mbta$Api$getList, toMsg, host, author$project$Mbta$Decode$schedule, 'schedules', includes, filters);
 	});
+var author$project$Mbta$Api$getServices = F4(
+	function (toMsg, host, includes, filters) {
+		return A6(author$project$Mbta$Api$getList, toMsg, host, author$project$Mbta$Decode$service, 'services', includes, filters);
+	});
 var author$project$Mbta$Api$getStops = F4(
 	function (toMsg, host, includes, filters) {
 		return A6(author$project$Mbta$Api$getList, toMsg, host, author$project$Mbta$Decode$stop, 'stops', includes, filters);
@@ -9884,16 +9900,17 @@ var author$project$Mbta$Api$include = function (_n0) {
 	var s = _n0.a;
 	return author$project$Mbta$Api$Include(s);
 };
-var author$project$Mbta$Api$Relationship = function (a) {
-	return {$: 'Relationship', a: a};
-};
 var author$project$Mbta$Api$scheduleTrip = author$project$Mbta$Api$Relationship('trip');
 var author$project$Mbta$Api$stopChildStops = author$project$Mbta$Api$Relationship('child_stops');
+var author$project$Mbta$Api$tripService = author$project$Mbta$Api$Relationship('service');
 var author$project$Model$ReceiveRoutes = function (a) {
 	return {$: 'ReceiveRoutes', a: a};
 };
 var author$project$Model$ReceiveSchedules = function (a) {
 	return {$: 'ReceiveSchedules', a: a};
+};
+var author$project$Model$ReceiveServices = function (a) {
+	return {$: 'ReceiveServices', a: a};
 };
 var author$project$Model$ReceiveStops = function (a) {
 	return {$: 'ReceiveStops', a: a};
@@ -9913,8 +9930,9 @@ var author$project$Model$stopIds = _List_fromArray(
 	]);
 var elm$core$Platform$Cmd$batch = _Platform_batch;
 var krisajenkins$remotedata$RemoteData$Loading = {$: 'Loading'};
+var krisajenkins$remotedata$RemoteData$NotAsked = {$: 'NotAsked'};
 var author$project$Main$init = _Utils_Tuple2(
-	{routes: krisajenkins$remotedata$RemoteData$Loading, schedules: krisajenkins$remotedata$RemoteData$Loading, stops: krisajenkins$remotedata$RemoteData$Loading},
+	{routes: krisajenkins$remotedata$RemoteData$Loading, schedules: krisajenkins$remotedata$RemoteData$NotAsked, selectedServiceKey: elm$core$Maybe$Nothing, services: krisajenkins$remotedata$RemoteData$Loading, stops: krisajenkins$remotedata$RemoteData$Loading},
 	elm$core$Platform$Cmd$batch(
 		_List_fromArray(
 			[
@@ -9940,12 +9958,22 @@ var author$project$Main$init = _Utils_Tuple2(
 						author$project$Mbta$Api$filterStopsByIds(author$project$Model$stopIds)
 					])),
 				A4(
+				author$project$Mbta$Api$getServices,
+				author$project$Model$ReceiveServices,
+				author$project$Main$apiHost,
+				_List_Nil,
+				_List_fromArray(
+					[
+						author$project$Mbta$Api$filterServicesByRouteIds(author$project$Model$routeIds)
+					])),
+				A4(
 				author$project$Mbta$Api$getSchedules,
 				author$project$Model$ReceiveSchedules,
 				author$project$Main$apiHost,
 				_List_fromArray(
 					[
-						author$project$Mbta$Api$include(author$project$Mbta$Api$scheduleTrip)
+						author$project$Mbta$Api$include(
+						A2(author$project$Mbta$Api$andIts, author$project$Mbta$Api$tripService, author$project$Mbta$Api$scheduleTrip))
 					]),
 				_List_fromArray(
 					[
@@ -9953,6 +9981,107 @@ var author$project$Main$init = _Utils_Tuple2(
 						author$project$Mbta$Api$filterSchedulesByStopIds(author$project$Model$stopIds)
 					]))
 			])));
+var pzp1997$assoc_list$AssocList$get = F2(
+	function (targetKey, _n0) {
+		get:
+		while (true) {
+			var alist = _n0.a;
+			if (!alist.b) {
+				return elm$core$Maybe$Nothing;
+			} else {
+				var _n2 = alist.a;
+				var key = _n2.a;
+				var value = _n2.b;
+				var rest = alist.b;
+				if (_Utils_eq(key, targetKey)) {
+					return elm$core$Maybe$Just(value);
+				} else {
+					var $temp$targetKey = targetKey,
+						$temp$_n0 = pzp1997$assoc_list$AssocList$D(rest);
+					targetKey = $temp$targetKey;
+					_n0 = $temp$_n0;
+					continue get;
+				}
+			}
+		}
+	});
+var author$project$Mbta$Api$getIncludedService = F2(
+	function (serviceId, _n0) {
+		var data = _n0.a;
+		return A2(pzp1997$assoc_list$AssocList$get, serviceId, data.included.services);
+	});
+var author$project$Mbta$Api$getIncludedTrip = F2(
+	function (tripId, _n0) {
+		var data = _n0.a;
+		return A2(pzp1997$assoc_list$AssocList$get, tripId, data.included.trips);
+	});
+var author$project$Mbta$Api$getPrimaryData = function (_n0) {
+	var data = _n0.a;
+	return data.primaryData;
+};
+var author$project$Model$serviceKey = function (service) {
+	return {addedDates: service.addedDates, description: service.description, endDate: service.endDate, name: service.name, removedDates: service.removedDates, serviceType: service.serviceType, startDate: service.startDate, typicality: service.typicality, validDays: service.validDays};
+};
+var elm$core$Result$toMaybe = function (result) {
+	if (result.$ === 'Ok') {
+		var v = result.a;
+		return elm$core$Maybe$Just(v);
+	} else {
+		return elm$core$Maybe$Nothing;
+	}
+};
+var author$project$Main$serviceKeyFromSchedulesResult = function (schedulesResult) {
+	return A2(
+		elm$core$Maybe$andThen,
+		function (data) {
+			var schedules = author$project$Mbta$Api$getPrimaryData(data);
+			return A2(
+				elm$core$Maybe$map,
+				author$project$Model$serviceKey,
+				A2(
+					elm$core$Maybe$andThen,
+					function (serviceId) {
+						return A2(author$project$Mbta$Api$getIncludedService, serviceId, data);
+					},
+					A2(
+						elm$core$Maybe$map,
+						function ($) {
+							return $.serviceId;
+						},
+						A2(
+							elm$core$Maybe$andThen,
+							function (tripId) {
+								return A2(author$project$Mbta$Api$getIncludedTrip, tripId, data);
+							},
+							A2(
+								elm$core$Maybe$map,
+								function ($) {
+									return $.tripId;
+								},
+								elm$core$List$head(schedules))))));
+		},
+		elm$core$Result$toMaybe(schedulesResult));
+};
+var author$project$Mbta$serviceDateToIso8601 = function (_n0) {
+	var iso8601 = _n0.a;
+	return iso8601;
+};
+var author$project$Mbta$Api$filterByOne = F3(
+	function (key, toString, value) {
+		return author$project$Mbta$Api$Filter(
+			_List_fromArray(
+				[
+					_Utils_Tuple2(
+					key,
+					_List_fromArray(
+						[
+							toString(value)
+						]))
+				]));
+	});
+var author$project$Mbta$Api$filterSchedulesByServiceDate = function (serviceDate) {
+	return A3(author$project$Mbta$Api$filterByOne, 'date', author$project$Mbta$serviceDateToIso8601, serviceDate);
+};
 var elm$core$Platform$Cmd$none = elm$core$Platform$Cmd$batch(_List_Nil);
 var krisajenkins$remotedata$RemoteData$Failure = function (a) {
 	return {$: 'Failure', a: a};
@@ -9990,16 +10119,125 @@ var author$project$Main$update = F2(
 							stops: krisajenkins$remotedata$RemoteData$fromResult(stopsResult)
 						}),
 					elm$core$Platform$Cmd$none);
-			default:
+			case 'ReceiveServices':
+				var servicesResult = msg.a;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{
+							services: krisajenkins$remotedata$RemoteData$fromResult(servicesResult)
+						}),
+					elm$core$Platform$Cmd$none);
+			case 'ReceiveSchedules':
 				var schedulesResult = msg.a;
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
 						{
-							schedules: krisajenkins$remotedata$RemoteData$fromResult(schedulesResult)
+							schedules: krisajenkins$remotedata$RemoteData$fromResult(schedulesResult),
+							selectedServiceKey: function () {
+								var _n1 = model.selectedServiceKey;
+								if (_n1.$ === 'Nothing') {
+									return author$project$Main$serviceKeyFromSchedulesResult(schedulesResult);
+								} else {
+									return model.selectedServiceKey;
+								}
+							}()
 						}),
 					elm$core$Platform$Cmd$none);
+			default:
+				var serviceKey = msg.a;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{
+							selectedServiceKey: elm$core$Maybe$Just(serviceKey)
+						}),
+					A4(
+						author$project$Mbta$Api$getSchedules,
+						author$project$Model$ReceiveSchedules,
+						author$project$Main$apiHost,
+						_List_fromArray(
+							[
+								author$project$Mbta$Api$include(author$project$Mbta$Api$scheduleTrip)
+							]),
+						_List_fromArray(
+							[
+								author$project$Mbta$Api$filterSchedulesByRouteIds(author$project$Model$routeIds),
+								author$project$Mbta$Api$filterSchedulesByStopIds(author$project$Model$stopIds),
+								author$project$Mbta$Api$filterSchedulesByServiceDate(serviceKey.startDate)
+							])));
 		}
+	});
+var elm$core$List$member = F2(
+	function (x, xs) {
+		return A2(
+			elm$core$List$any,
+			function (a) {
+				return _Utils_eq(a, x);
+			},
+			xs);
+	});
+var author$project$Helpers$uniq = function (a) {
+	return elm$core$List$reverse(
+		A3(
+			elm$core$List$foldl,
+			F2(
+				function (_new, acc) {
+					return A2(elm$core$List$member, _new, acc) ? acc : A2(elm$core$List$cons, _new, acc);
+				}),
+			_List_Nil,
+			a));
+};
+var elm$core$List$sortBy = _List_sortBy;
+var author$project$MakeViewModel$sortServiceButtons = function (serviceKeys) {
+	return A2(
+		elm$core$List$sortBy,
+		function (serviceKey) {
+			return _Utils_Tuple2(
+				function () {
+					var _n0 = serviceKey.name;
+					_n0$3:
+					while (true) {
+						if (_n0.$ === 'Just') {
+							switch (_n0.a) {
+								case 'Weekday':
+									return 0;
+								case 'Saturday':
+									return 1;
+								case 'Sunday':
+									return 2;
+								default:
+									break _n0$3;
+							}
+						} else {
+							break _n0$3;
+						}
+					}
+					return 3;
+				}(),
+				author$project$Mbta$serviceDateToIso8601(serviceKey.startDate));
+		},
+		serviceKeys);
+};
+var author$project$MakeViewModel$viewServiceButton = F2(
+	function (selectedServiceKey, serviceKey) {
+		return {
+			isSelected: _Utils_eq(
+				selectedServiceKey,
+				elm$core$Maybe$Just(serviceKey)),
+			serviceKey: serviceKey,
+			text: A2(elm$core$Maybe$withDefault, 'Service', serviceKey.name)
+		};
+	});
+var author$project$MakeViewModel$viewServiceButtons = F2(
+	function (services, selectedServiceKey) {
+		return A2(
+			elm$core$List$map,
+			author$project$MakeViewModel$viewServiceButton(selectedServiceKey),
+			author$project$MakeViewModel$sortServiceButtons(
+				author$project$Helpers$uniq(
+					A2(elm$core$List$map, author$project$Model$serviceKey, services))));
 	});
 var author$project$MakeViewModel$childIds = function (stop) {
 	if (stop.$ === 'Stop_1_Station') {
@@ -10162,7 +10400,6 @@ var justinmimbs$timezone_data$TimeZone$Specification$dropChangesBeforeEpoch = fu
 		}
 	}
 };
-var elm$core$List$sortBy = _List_sortBy;
 var justinmimbs$timezone_data$RataDie$weekdayNumber = function (rd) {
 	var _n0 = A2(elm$core$Basics$modBy, 7, rd);
 	if (!_n0) {
@@ -10775,30 +11012,6 @@ var author$project$MakeViewModel$viewScheduleTime = function (schedule) {
 		},
 		author$project$MakeViewModel$scheduleToTime(schedule));
 };
-var pzp1997$assoc_list$AssocList$get = F2(
-	function (targetKey, _n0) {
-		get:
-		while (true) {
-			var alist = _n0.a;
-			if (!alist.b) {
-				return elm$core$Maybe$Nothing;
-			} else {
-				var _n2 = alist.a;
-				var key = _n2.a;
-				var value = _n2.b;
-				var rest = alist.b;
-				if (_Utils_eq(key, targetKey)) {
-					return elm$core$Maybe$Just(value);
-				} else {
-					var $temp$targetKey = targetKey,
-						$temp$_n0 = pzp1997$assoc_list$AssocList$D(rest);
-					targetKey = $temp$targetKey;
-					_n0 = $temp$_n0;
-					continue get;
-				}
-			}
-		}
-	});
 var author$project$MakeViewModel$viewTrip = F3(
 	function (stopDict, maybeTrip, schedules) {
 		return {
@@ -10984,47 +11197,66 @@ var author$project$MakeViewModel$viewTimetables = F4(
 			d1: A5(author$project$MakeViewModel$viewTimetable, author$project$Mbta$D1, stops, stopDict, inboundSchedules, tripGetter)
 		};
 	});
-var author$project$Mbta$Api$getIncludedTrip = F2(
-	function (tripId, _n0) {
-		var data = _n0.a;
-		return A2(pzp1997$assoc_list$AssocList$get, tripId, data.included.trips);
-	});
-var author$project$Mbta$Api$getPrimaryData = function (_n0) {
-	var data = _n0.a;
-	return data.primaryData;
-};
 var author$project$ViewModel$Error = function (a) {
 	return {$: 'Error', a: a};
 };
-var author$project$ViewModel$Loading = {$: 'Loading'};
-var author$project$ViewModel$Success = function (a) {
-	return {$: 'Success', a: a};
+var author$project$ViewModel$LoadingSchedules = function (a) {
+	return {$: 'LoadingSchedules', a: a};
+};
+var author$project$ViewModel$LoadingServices = {$: 'LoadingServices'};
+var author$project$ViewModel$SchedulesLoaded = F2(
+	function (a, b) {
+		return {$: 'SchedulesLoaded', a: a, b: b};
+	});
+var author$project$ViewModel$ServicesLoaded = function (a) {
+	return {$: 'ServicesLoaded', a: a};
 };
 var elm$core$Debug$toString = _Debug_toString;
 var author$project$MakeViewModel$makeViewModel = function (model) {
-	var _n0 = _Utils_Tuple3(model.routes, model.stops, model.schedules);
-	_n0$2:
-	while (true) {
-		_n0$3:
-		while (true) {
-			_n0$4:
-			while (true) {
-				_n0$5:
-				while (true) {
-					_n0$6:
+	var _n0 = model.services;
+	switch (_n0.$) {
+		case 'Loading':
+			return author$project$ViewModel$LoadingServices;
+		case 'Failure':
+			var e = _n0.a;
+			return author$project$ViewModel$Error(
+				elm$core$Debug$toString(e));
+		case 'Success':
+			var services = _n0.a;
+			var serviceButtons = A2(
+				author$project$MakeViewModel$viewServiceButtons,
+				author$project$Mbta$Api$getPrimaryData(services),
+				model.selectedServiceKey);
+			var _n1 = model.schedules;
+			switch (_n1.$) {
+				case 'NotAsked':
+					return author$project$ViewModel$ServicesLoaded(serviceButtons);
+				case 'Loading':
+					return author$project$ViewModel$LoadingSchedules(serviceButtons);
+				case 'Failure':
+					var e = _n1.a;
+					return author$project$ViewModel$Error(
+						elm$core$Debug$toString(e));
+				default:
+					var schedules = _n1.a;
+					var _n2 = _Utils_Tuple2(model.routes, model.stops);
+					_n2$2:
 					while (true) {
-						_n0$7:
+						_n2$3:
 						while (true) {
-							switch (_n0.a.$) {
-								case 'Success':
-									switch (_n0.b.$) {
+							_n2$4:
+							while (true) {
+								_n2$5:
+								while (true) {
+									switch (_n2.a.$) {
 										case 'Success':
-											switch (_n0.c.$) {
+											switch (_n2.b.$) {
 												case 'Success':
-													var routes = _n0.a.a;
-													var stops = _n0.b.a;
-													var schedules = _n0.c.a;
-													return author$project$ViewModel$Success(
+													var routes = _n2.a.a;
+													var stops = _n2.b.a;
+													return A2(
+														author$project$ViewModel$SchedulesLoaded,
+														serviceButtons,
 														A4(
 															author$project$MakeViewModel$viewTimetables,
 															author$project$Mbta$Api$getPrimaryData(routes),
@@ -11033,111 +11265,98 @@ var author$project$MakeViewModel$makeViewModel = function (model) {
 															function (tripId) {
 																return A2(author$project$Mbta$Api$getIncludedTrip, tripId, schedules);
 															}));
-												case 'Loading':
-													break _n0$3;
 												case 'Failure':
-													break _n0$6;
+													break _n2$2;
+												case 'Loading':
+													break _n2$4;
 												default:
-													break _n0$7;
+													break _n2$5;
 											}
-										case 'Loading':
-											break _n0$2;
 										case 'Failure':
-											switch (_n0.c.$) {
-												case 'Loading':
-													break _n0$3;
+											var e = _n2.a.a;
+											return author$project$ViewModel$Error(
+												elm$core$Debug$toString(e));
+										case 'Loading':
+											switch (_n2.b.$) {
 												case 'Failure':
-													break _n0$5;
+													break _n2$2;
+												case 'Loading':
+													break _n2$3;
 												default:
-													break _n0$5;
+													break _n2$3;
 											}
 										default:
-											switch (_n0.c.$) {
-												case 'Loading':
-													break _n0$3;
+											switch (_n2.b.$) {
 												case 'Failure':
-													break _n0$6;
+													break _n2$2;
+												case 'Loading':
+													break _n2$4;
 												default:
-													break _n0$7;
+													break _n2$5;
 											}
 									}
-								case 'Loading':
-									var _n1 = _n0.a;
-									return author$project$ViewModel$Loading;
-								case 'Failure':
-									switch (_n0.b.$) {
-										case 'Loading':
-											break _n0$2;
-										case 'Failure':
-											switch (_n0.c.$) {
-												case 'Loading':
-													break _n0$3;
-												case 'Failure':
-													break _n0$4;
-												default:
-													break _n0$4;
-											}
-										default:
-											switch (_n0.c.$) {
-												case 'Loading':
-													break _n0$3;
-												case 'Failure':
-													break _n0$4;
-												default:
-													break _n0$4;
-											}
-									}
-								default:
-									switch (_n0.b.$) {
-										case 'Loading':
-											break _n0$2;
-										case 'Failure':
-											switch (_n0.c.$) {
-												case 'Loading':
-													break _n0$3;
-												case 'Failure':
-													break _n0$5;
-												default:
-													break _n0$5;
-											}
-										default:
-											switch (_n0.c.$) {
-												case 'Loading':
-													break _n0$3;
-												case 'Failure':
-													break _n0$6;
-												default:
-													break _n0$7;
-											}
-									}
+								}
+								return author$project$ViewModel$Error(
+									elm$core$Debug$toString(model));
 							}
+							var _n4 = _n2.b;
+							return author$project$ViewModel$LoadingSchedules(serviceButtons);
 						}
-						return author$project$ViewModel$Error(
-							elm$core$Debug$toString(model));
+						var _n3 = _n2.a;
+						return author$project$ViewModel$LoadingSchedules(serviceButtons);
 					}
-					var e = _n0.c.a;
+					var e = _n2.b.a;
 					return author$project$ViewModel$Error(
 						elm$core$Debug$toString(e));
-				}
-				var e = _n0.b.a;
-				return author$project$ViewModel$Error(
-					elm$core$Debug$toString(e));
 			}
-			var e = _n0.a.a;
+		default:
 			return author$project$ViewModel$Error(
-				elm$core$Debug$toString(e));
-		}
-		var _n3 = _n0.c;
-		return author$project$ViewModel$Loading;
+				elm$core$Debug$toString(model));
 	}
-	var _n2 = _n0.b;
-	return author$project$ViewModel$Loading;
 };
-var mdgriffith$elm_ui$Internal$Model$AlignX = function (a) {
-	return {$: 'AlignX', a: a};
+var author$project$Model$SelectServiceKey = function (a) {
+	return {$: 'SelectServiceKey', a: a};
 };
-var mdgriffith$elm_ui$Internal$Model$CenterX = {$: 'CenterX'};
-var mdgriffith$elm_ui$Element$centerX = mdgriffith$elm_ui$Internal$Model$AlignX(mdgriffith$elm_ui$Internal$Model$CenterX);
+var mdgriffith$elm_ui$Internal$Model$Rgba = F4(
+	function (a, b, c, d) {
+		return {$: 'Rgba', a: a, b: b, c: c, d: d};
+	});
+var mdgriffith$elm_ui$Element$rgb = F3(
+	function (r, g, b) {
+		return A4(mdgriffith$elm_ui$Internal$Model$Rgba, r, g, b, 1);
+	});
+var author$project$View$shadedColor = A3(mdgriffith$elm_ui$Element$rgb, 0.95, 0.95, 0.95);
+var elm$core$Bitwise$shiftLeftBy = _Bitwise_shiftLeftBy;
+var mdgriffith$elm_ui$Internal$Flag$Flag = function (a) {
+	return {$: 'Flag', a: a};
+};
+var mdgriffith$elm_ui$Internal$Flag$Second = function (a) {
+	return {$: 'Second', a: a};
+};
+var mdgriffith$elm_ui$Internal$Flag$flag = function (i) {
+	return (i > 31) ? mdgriffith$elm_ui$Internal$Flag$Second(1 << (i - 32)) : mdgriffith$elm_ui$Internal$Flag$Flag(1 << i);
+};
+var mdgriffith$elm_ui$Internal$Flag$padding = mdgriffith$elm_ui$Internal$Flag$flag(2);
+var mdgriffith$elm_ui$Internal$Model$PaddingStyle = F5(
+	function (a, b, c, d, e) {
+		return {$: 'PaddingStyle', a: a, b: b, c: c, d: d, e: e};
+	});
+var mdgriffith$elm_ui$Internal$Model$StyleClass = F2(
+	function (a, b) {
+		return {$: 'StyleClass', a: a, b: b};
+	});
+var mdgriffith$elm_ui$Element$padding = function (x) {
+	return A2(
+		mdgriffith$elm_ui$Internal$Model$StyleClass,
+		mdgriffith$elm_ui$Internal$Flag$padding,
+		A5(
+			mdgriffith$elm_ui$Internal$Model$PaddingStyle,
+			'p-' + elm$core$String$fromInt(x),
+			x,
+			x,
+			x,
+			x));
+};
 var mdgriffith$elm_ui$Internal$Model$Height = function (a) {
 	return {$: 'Height', a: a};
 };
@@ -11151,8 +11370,8 @@ var mdgriffith$elm_ui$Element$width = mdgriffith$elm_ui$Internal$Model$Width;
 var mdgriffith$elm_ui$Internal$Model$Unkeyed = function (a) {
 	return {$: 'Unkeyed', a: a};
 };
-var mdgriffith$elm_ui$Internal$Model$AsEl = {$: 'AsEl'};
-var mdgriffith$elm_ui$Internal$Model$asEl = mdgriffith$elm_ui$Internal$Model$AsEl;
+var mdgriffith$elm_ui$Internal$Model$AsRow = {$: 'AsRow'};
+var mdgriffith$elm_ui$Internal$Model$asRow = mdgriffith$elm_ui$Internal$Model$AsRow;
 var mdgriffith$elm_ui$Internal$Model$Generic = {$: 'Generic'};
 var mdgriffith$elm_ui$Internal$Model$div = mdgriffith$elm_ui$Internal$Model$Generic;
 var mdgriffith$elm_ui$Internal$Flag$Field = F2(
@@ -11265,6 +11484,8 @@ var mdgriffith$elm_ui$Internal$Model$addKeyedChildren = F3(
 							inFront)));
 		}
 	});
+var mdgriffith$elm_ui$Internal$Model$AsEl = {$: 'AsEl'};
+var mdgriffith$elm_ui$Internal$Model$asEl = mdgriffith$elm_ui$Internal$Model$AsEl;
 var mdgriffith$elm_ui$Internal$Model$AsParagraph = {$: 'AsParagraph'};
 var mdgriffith$elm_ui$Internal$Model$asParagraph = mdgriffith$elm_ui$Internal$Model$AsParagraph;
 var elm$virtual_dom$VirtualDom$toHandlerInt = function (handler) {
@@ -11299,16 +11520,6 @@ var elm$virtual_dom$VirtualDom$keyedNode = function (tag) {
 var elm$virtual_dom$VirtualDom$node = function (tag) {
 	return _VirtualDom_node(
 		_VirtualDom_noScript(tag));
-};
-var elm$core$Bitwise$shiftLeftBy = _Bitwise_shiftLeftBy;
-var mdgriffith$elm_ui$Internal$Flag$Flag = function (a) {
-	return {$: 'Flag', a: a};
-};
-var mdgriffith$elm_ui$Internal$Flag$Second = function (a) {
-	return {$: 'Second', a: a};
-};
-var mdgriffith$elm_ui$Internal$Flag$flag = function (i) {
-	return (i > 31) ? mdgriffith$elm_ui$Internal$Flag$Second(1 << (i - 32)) : mdgriffith$elm_ui$Internal$Flag$Flag(1 << i);
 };
 var mdgriffith$elm_ui$Internal$Flag$alignBottom = mdgriffith$elm_ui$Internal$Flag$flag(41);
 var mdgriffith$elm_ui$Internal$Flag$alignRight = mdgriffith$elm_ui$Internal$Flag$flag(40);
@@ -16240,22 +16451,30 @@ var mdgriffith$elm_ui$Internal$Model$element = F4(
 				mdgriffith$elm_ui$Internal$Model$NoNearbyChildren,
 				elm$core$List$reverse(attributes)));
 	});
-var mdgriffith$elm_ui$Element$el = F2(
-	function (attrs, child) {
+var mdgriffith$elm_ui$Internal$Model$Attr = function (a) {
+	return {$: 'Attr', a: a};
+};
+var mdgriffith$elm_ui$Internal$Model$htmlClass = function (cls) {
+	return mdgriffith$elm_ui$Internal$Model$Attr(
+		elm$html$Html$Attributes$class(cls));
+};
+var mdgriffith$elm_ui$Element$row = F2(
+	function (attrs, children) {
 		return A4(
 			mdgriffith$elm_ui$Internal$Model$element,
-			mdgriffith$elm_ui$Internal$Model$asEl,
+			mdgriffith$elm_ui$Internal$Model$asRow,
 			mdgriffith$elm_ui$Internal$Model$div,
 			A2(
 				elm$core$List$cons,
-				mdgriffith$elm_ui$Element$width(mdgriffith$elm_ui$Element$shrink),
+				mdgriffith$elm_ui$Internal$Model$htmlClass(mdgriffith$elm_ui$Internal$Style$classes.contentLeft + (' ' + mdgriffith$elm_ui$Internal$Style$classes.contentCenterY)),
 				A2(
 					elm$core$List$cons,
-					mdgriffith$elm_ui$Element$height(mdgriffith$elm_ui$Element$shrink),
-					attrs)),
-			mdgriffith$elm_ui$Internal$Model$Unkeyed(
-				_List_fromArray(
-					[child])));
+					mdgriffith$elm_ui$Element$width(mdgriffith$elm_ui$Element$shrink),
+					A2(
+						elm$core$List$cons,
+						mdgriffith$elm_ui$Element$height(mdgriffith$elm_ui$Element$shrink),
+						attrs))),
+			mdgriffith$elm_ui$Internal$Model$Unkeyed(children));
 	});
 var mdgriffith$elm_ui$Internal$Model$Text = function (a) {
 	return {$: 'Text', a: a};
@@ -16263,73 +16482,6 @@ var mdgriffith$elm_ui$Internal$Model$Text = function (a) {
 var mdgriffith$elm_ui$Element$text = function (content) {
 	return mdgriffith$elm_ui$Internal$Model$Text(content);
 };
-var mdgriffith$elm_ui$Internal$Flag$fontSize = mdgriffith$elm_ui$Internal$Flag$flag(4);
-var mdgriffith$elm_ui$Internal$Model$FontSize = function (a) {
-	return {$: 'FontSize', a: a};
-};
-var mdgriffith$elm_ui$Internal$Model$StyleClass = F2(
-	function (a, b) {
-		return {$: 'StyleClass', a: a, b: b};
-	});
-var mdgriffith$elm_ui$Element$Font$size = function (i) {
-	return A2(
-		mdgriffith$elm_ui$Internal$Model$StyleClass,
-		mdgriffith$elm_ui$Internal$Flag$fontSize,
-		mdgriffith$elm_ui$Internal$Model$FontSize(i));
-};
-var mdgriffith$elm_ui$Internal$Model$Describe = function (a) {
-	return {$: 'Describe', a: a};
-};
-var mdgriffith$elm_ui$Internal$Model$Heading = function (a) {
-	return {$: 'Heading', a: a};
-};
-var mdgriffith$elm_ui$Element$Region$heading = A2(elm$core$Basics$composeL, mdgriffith$elm_ui$Internal$Model$Describe, mdgriffith$elm_ui$Internal$Model$Heading);
-var author$project$View$directionHeading = function (text) {
-	return A2(
-		mdgriffith$elm_ui$Element$el,
-		_List_fromArray(
-			[
-				mdgriffith$elm_ui$Element$Region$heading(2),
-				mdgriffith$elm_ui$Element$centerX,
-				mdgriffith$elm_ui$Element$Font$size(24)
-			]),
-		mdgriffith$elm_ui$Element$text(text));
-};
-var mdgriffith$elm_ui$Internal$Flag$padding = mdgriffith$elm_ui$Internal$Flag$flag(2);
-var mdgriffith$elm_ui$Internal$Model$PaddingStyle = F5(
-	function (a, b, c, d, e) {
-		return {$: 'PaddingStyle', a: a, b: b, c: c, d: d, e: e};
-	});
-var mdgriffith$elm_ui$Element$padding = function (x) {
-	return A2(
-		mdgriffith$elm_ui$Internal$Model$StyleClass,
-		mdgriffith$elm_ui$Internal$Flag$padding,
-		A5(
-			mdgriffith$elm_ui$Internal$Model$PaddingStyle,
-			'p-' + elm$core$String$fromInt(x),
-			x,
-			x,
-			x,
-			x));
-};
-var mdgriffith$elm_ui$Internal$Model$Px = function (a) {
-	return {$: 'Px', a: a};
-};
-var mdgriffith$elm_ui$Element$px = mdgriffith$elm_ui$Internal$Model$Px;
-var author$project$View$scheduleCellStyling = _List_fromArray(
-	[
-		mdgriffith$elm_ui$Element$height(
-		mdgriffith$elm_ui$Element$px(60)),
-		mdgriffith$elm_ui$Element$padding(5)
-	]);
-var mdgriffith$elm_ui$Internal$Model$Rgba = F4(
-	function (a, b, c, d) {
-		return {$: 'Rgba', a: a, b: b, c: c, d: d};
-	});
-var mdgriffith$elm_ui$Element$rgb = F3(
-	function (r, g, b) {
-		return A4(mdgriffith$elm_ui$Internal$Model$Rgba, r, g, b, 1);
-	});
 var mdgriffith$elm_ui$Internal$Flag$bgColor = mdgriffith$elm_ui$Internal$Flag$flag(8);
 var mdgriffith$elm_ui$Internal$Model$Colored = F3(
 	function (a, b, c) {
@@ -16352,6 +16504,260 @@ var mdgriffith$elm_ui$Element$Background$color = function (clr) {
 			'background-color',
 			clr));
 };
+var mdgriffith$elm_ui$Internal$Flag$borderRound = mdgriffith$elm_ui$Internal$Flag$flag(17);
+var mdgriffith$elm_ui$Element$Border$rounded = function (radius) {
+	return A2(
+		mdgriffith$elm_ui$Internal$Model$StyleClass,
+		mdgriffith$elm_ui$Internal$Flag$borderRound,
+		A3(
+			mdgriffith$elm_ui$Internal$Model$Single,
+			'br-' + elm$core$String$fromInt(radius),
+			'border-radius',
+			elm$core$String$fromInt(radius) + 'px'));
+};
+var mdgriffith$elm_ui$Internal$Model$BorderWidth = F5(
+	function (a, b, c, d, e) {
+		return {$: 'BorderWidth', a: a, b: b, c: c, d: d, e: e};
+	});
+var mdgriffith$elm_ui$Element$Border$width = function (v) {
+	return A2(
+		mdgriffith$elm_ui$Internal$Model$StyleClass,
+		mdgriffith$elm_ui$Internal$Flag$borderWidth,
+		A5(
+			mdgriffith$elm_ui$Internal$Model$BorderWidth,
+			'b-' + elm$core$String$fromInt(v),
+			v,
+			v,
+			v,
+			v));
+};
+var elm$json$Json$Encode$bool = _Json_wrap;
+var elm$html$Html$Attributes$boolProperty = F2(
+	function (key, bool) {
+		return A2(
+			_VirtualDom_property,
+			key,
+			elm$json$Json$Encode$bool(bool));
+	});
+var elm$html$Html$Attributes$disabled = elm$html$Html$Attributes$boolProperty('disabled');
+var elm$html$Html$Attributes$tabindex = function (n) {
+	return A2(
+		_VirtualDom_attribute,
+		'tabIndex',
+		elm$core$String$fromInt(n));
+};
+var mdgriffith$elm_ui$Internal$Flag$cursor = mdgriffith$elm_ui$Internal$Flag$flag(21);
+var mdgriffith$elm_ui$Internal$Model$Class = F2(
+	function (a, b) {
+		return {$: 'Class', a: a, b: b};
+	});
+var mdgriffith$elm_ui$Element$pointer = A2(mdgriffith$elm_ui$Internal$Model$Class, mdgriffith$elm_ui$Internal$Flag$cursor, mdgriffith$elm_ui$Internal$Style$classes.cursorPointer);
+var elm$virtual_dom$VirtualDom$Normal = function (a) {
+	return {$: 'Normal', a: a};
+};
+var elm$virtual_dom$VirtualDom$on = _VirtualDom_on;
+var elm$html$Html$Events$on = F2(
+	function (event, decoder) {
+		return A2(
+			elm$virtual_dom$VirtualDom$on,
+			event,
+			elm$virtual_dom$VirtualDom$Normal(decoder));
+	});
+var elm$html$Html$Events$onClick = function (msg) {
+	return A2(
+		elm$html$Html$Events$on,
+		'click',
+		elm$json$Json$Decode$succeed(msg));
+};
+var mdgriffith$elm_ui$Element$Events$onClick = A2(elm$core$Basics$composeL, mdgriffith$elm_ui$Internal$Model$Attr, elm$html$Html$Events$onClick);
+var mdgriffith$elm_ui$Element$Input$hasFocusStyle = function (attr) {
+	if (((attr.$ === 'StyleClass') && (attr.b.$ === 'PseudoSelector')) && (attr.b.a.$ === 'Focus')) {
+		var _n1 = attr.b;
+		var _n2 = _n1.a;
+		return true;
+	} else {
+		return false;
+	}
+};
+var mdgriffith$elm_ui$Internal$Model$NoAttribute = {$: 'NoAttribute'};
+var mdgriffith$elm_ui$Element$Input$focusDefault = function (attrs) {
+	return A2(elm$core$List$any, mdgriffith$elm_ui$Element$Input$hasFocusStyle, attrs) ? mdgriffith$elm_ui$Internal$Model$NoAttribute : mdgriffith$elm_ui$Internal$Model$htmlClass('focusable');
+};
+var mdgriffith$elm_ui$Element$Input$enter = 'Enter';
+var elm$virtual_dom$VirtualDom$MayPreventDefault = function (a) {
+	return {$: 'MayPreventDefault', a: a};
+};
+var elm$html$Html$Events$preventDefaultOn = F2(
+	function (event, decoder) {
+		return A2(
+			elm$virtual_dom$VirtualDom$on,
+			event,
+			elm$virtual_dom$VirtualDom$MayPreventDefault(decoder));
+	});
+var mdgriffith$elm_ui$Element$Input$onKey = F2(
+	function (desiredCode, msg) {
+		var decode = function (code) {
+			return _Utils_eq(code, desiredCode) ? elm$json$Json$Decode$succeed(msg) : elm$json$Json$Decode$fail('Not the enter key');
+		};
+		var isKey = A2(
+			elm$json$Json$Decode$andThen,
+			decode,
+			A2(elm$json$Json$Decode$field, 'key', elm$json$Json$Decode$string));
+		return mdgriffith$elm_ui$Internal$Model$Attr(
+			A2(
+				elm$html$Html$Events$preventDefaultOn,
+				'keyup',
+				A2(
+					elm$json$Json$Decode$map,
+					function (fired) {
+						return _Utils_Tuple2(fired, true);
+					},
+					isKey)));
+	});
+var mdgriffith$elm_ui$Element$Input$onEnter = function (msg) {
+	return A2(mdgriffith$elm_ui$Element$Input$onKey, mdgriffith$elm_ui$Element$Input$enter, msg);
+};
+var mdgriffith$elm_ui$Internal$Model$Button = {$: 'Button'};
+var mdgriffith$elm_ui$Internal$Model$Describe = function (a) {
+	return {$: 'Describe', a: a};
+};
+var mdgriffith$elm_ui$Element$Input$button = F2(
+	function (attrs, _n0) {
+		var onPress = _n0.onPress;
+		var label = _n0.label;
+		return A4(
+			mdgriffith$elm_ui$Internal$Model$element,
+			mdgriffith$elm_ui$Internal$Model$asEl,
+			mdgriffith$elm_ui$Internal$Model$div,
+			A2(
+				elm$core$List$cons,
+				mdgriffith$elm_ui$Element$width(mdgriffith$elm_ui$Element$shrink),
+				A2(
+					elm$core$List$cons,
+					mdgriffith$elm_ui$Element$height(mdgriffith$elm_ui$Element$shrink),
+					A2(
+						elm$core$List$cons,
+						mdgriffith$elm_ui$Internal$Model$htmlClass(mdgriffith$elm_ui$Internal$Style$classes.contentCenterX + (' ' + (mdgriffith$elm_ui$Internal$Style$classes.contentCenterY + (' ' + (mdgriffith$elm_ui$Internal$Style$classes.seButton + (' ' + mdgriffith$elm_ui$Internal$Style$classes.noTextSelection)))))),
+						A2(
+							elm$core$List$cons,
+							mdgriffith$elm_ui$Element$pointer,
+							A2(
+								elm$core$List$cons,
+								mdgriffith$elm_ui$Element$Input$focusDefault(attrs),
+								A2(
+									elm$core$List$cons,
+									mdgriffith$elm_ui$Internal$Model$Describe(mdgriffith$elm_ui$Internal$Model$Button),
+									A2(
+										elm$core$List$cons,
+										mdgriffith$elm_ui$Internal$Model$Attr(
+											elm$html$Html$Attributes$tabindex(0)),
+										function () {
+											if (onPress.$ === 'Nothing') {
+												return A2(
+													elm$core$List$cons,
+													mdgriffith$elm_ui$Internal$Model$Attr(
+														elm$html$Html$Attributes$disabled(true)),
+													attrs);
+											} else {
+												var msg = onPress.a;
+												return A2(
+													elm$core$List$cons,
+													mdgriffith$elm_ui$Element$Events$onClick(msg),
+													A2(
+														elm$core$List$cons,
+														mdgriffith$elm_ui$Element$Input$onEnter(msg),
+														attrs));
+											}
+										}()))))))),
+			mdgriffith$elm_ui$Internal$Model$Unkeyed(
+				_List_fromArray(
+					[label])));
+	});
+var author$project$View$viewServiceButtons = function (serviceButtons) {
+	return A2(
+		mdgriffith$elm_ui$Element$row,
+		_List_Nil,
+		A2(
+			elm$core$List$map,
+			function (serviceButton) {
+				return A2(
+					mdgriffith$elm_ui$Element$Input$button,
+					_Utils_ap(
+						_List_fromArray(
+							[
+								mdgriffith$elm_ui$Element$padding(5),
+								mdgriffith$elm_ui$Element$Border$width(1),
+								mdgriffith$elm_ui$Element$Border$rounded(10)
+							]),
+						serviceButton.isSelected ? _List_fromArray(
+							[
+								mdgriffith$elm_ui$Element$Background$color(author$project$View$shadedColor)
+							]) : _List_Nil),
+					{
+						label: mdgriffith$elm_ui$Element$text(serviceButton.text),
+						onPress: elm$core$Maybe$Just(
+							author$project$Model$SelectServiceKey(serviceButton.serviceKey))
+					});
+			},
+			serviceButtons));
+};
+var mdgriffith$elm_ui$Internal$Model$AlignX = function (a) {
+	return {$: 'AlignX', a: a};
+};
+var mdgriffith$elm_ui$Internal$Model$CenterX = {$: 'CenterX'};
+var mdgriffith$elm_ui$Element$centerX = mdgriffith$elm_ui$Internal$Model$AlignX(mdgriffith$elm_ui$Internal$Model$CenterX);
+var mdgriffith$elm_ui$Element$el = F2(
+	function (attrs, child) {
+		return A4(
+			mdgriffith$elm_ui$Internal$Model$element,
+			mdgriffith$elm_ui$Internal$Model$asEl,
+			mdgriffith$elm_ui$Internal$Model$div,
+			A2(
+				elm$core$List$cons,
+				mdgriffith$elm_ui$Element$width(mdgriffith$elm_ui$Element$shrink),
+				A2(
+					elm$core$List$cons,
+					mdgriffith$elm_ui$Element$height(mdgriffith$elm_ui$Element$shrink),
+					attrs)),
+			mdgriffith$elm_ui$Internal$Model$Unkeyed(
+				_List_fromArray(
+					[child])));
+	});
+var mdgriffith$elm_ui$Internal$Flag$fontSize = mdgriffith$elm_ui$Internal$Flag$flag(4);
+var mdgriffith$elm_ui$Internal$Model$FontSize = function (a) {
+	return {$: 'FontSize', a: a};
+};
+var mdgriffith$elm_ui$Element$Font$size = function (i) {
+	return A2(
+		mdgriffith$elm_ui$Internal$Model$StyleClass,
+		mdgriffith$elm_ui$Internal$Flag$fontSize,
+		mdgriffith$elm_ui$Internal$Model$FontSize(i));
+};
+var mdgriffith$elm_ui$Internal$Model$Heading = function (a) {
+	return {$: 'Heading', a: a};
+};
+var mdgriffith$elm_ui$Element$Region$heading = A2(elm$core$Basics$composeL, mdgriffith$elm_ui$Internal$Model$Describe, mdgriffith$elm_ui$Internal$Model$Heading);
+var author$project$View$directionHeading = function (text) {
+	return A2(
+		mdgriffith$elm_ui$Element$el,
+		_List_fromArray(
+			[
+				mdgriffith$elm_ui$Element$Region$heading(2),
+				mdgriffith$elm_ui$Element$centerX,
+				mdgriffith$elm_ui$Element$Font$size(24)
+			]),
+		mdgriffith$elm_ui$Element$text(text));
+};
+var mdgriffith$elm_ui$Internal$Model$Px = function (a) {
+	return {$: 'Px', a: a};
+};
+var mdgriffith$elm_ui$Element$px = mdgriffith$elm_ui$Internal$Model$Px;
+var author$project$View$scheduleCellStyling = _List_fromArray(
+	[
+		mdgriffith$elm_ui$Element$height(
+		mdgriffith$elm_ui$Element$px(60)),
+		mdgriffith$elm_ui$Element$padding(5)
+	]);
 var author$project$View$evenRowStyling = _List_fromArray(
 	[
 		mdgriffith$elm_ui$Element$Background$color(
@@ -16359,18 +16765,10 @@ var author$project$View$evenRowStyling = _List_fromArray(
 	]);
 var author$project$View$oddRowStyling = _List_fromArray(
 	[
-		mdgriffith$elm_ui$Element$Background$color(
-		A3(mdgriffith$elm_ui$Element$rgb, 0.95, 0.95, 0.95))
+		mdgriffith$elm_ui$Element$Background$color(author$project$View$shadedColor)
 	]);
 var mdgriffith$elm_ui$Internal$Model$AsColumn = {$: 'AsColumn'};
 var mdgriffith$elm_ui$Internal$Model$asColumn = mdgriffith$elm_ui$Internal$Model$AsColumn;
-var mdgriffith$elm_ui$Internal$Model$Attr = function (a) {
-	return {$: 'Attr', a: a};
-};
-var mdgriffith$elm_ui$Internal$Model$htmlClass = function (cls) {
-	return mdgriffith$elm_ui$Internal$Model$Attr(
-		elm$html$Html$Attributes$class(cls));
-};
 var mdgriffith$elm_ui$Element$column = F2(
 	function (attrs, children) {
 		return A4(
@@ -16469,22 +16867,6 @@ var author$project$View$viewStopHeaderCell = F2(
 					{description: 'accessible', src: '/assets/accessible.svg'}) : mdgriffith$elm_ui$Element$text(' ')
 				]));
 	});
-var mdgriffith$elm_ui$Internal$Model$BorderWidth = F5(
-	function (a, b, c, d, e) {
-		return {$: 'BorderWidth', a: a, b: b, c: c, d: d, e: e};
-	});
-var mdgriffith$elm_ui$Element$Border$width = function (v) {
-	return A2(
-		mdgriffith$elm_ui$Internal$Model$StyleClass,
-		mdgriffith$elm_ui$Internal$Flag$borderWidth,
-		A5(
-			mdgriffith$elm_ui$Internal$Model$BorderWidth,
-			'b-' + elm$core$String$fromInt(v),
-			v,
-			v,
-			v,
-			v));
-};
 var mdgriffith$elm_ui$Element$Border$widthXY = F2(
 	function (x, y) {
 		return A2(
@@ -16519,10 +16901,6 @@ var mdgriffith$elm_ui$Internal$Model$VariantActive = function (a) {
 };
 var mdgriffith$elm_ui$Element$Font$smallCaps = mdgriffith$elm_ui$Internal$Model$VariantActive('smcp');
 var mdgriffith$elm_ui$Internal$Flag$fontVariant = mdgriffith$elm_ui$Internal$Flag$flag(48);
-var mdgriffith$elm_ui$Internal$Model$Class = F2(
-	function (a, b) {
-		return {$: 'Class', a: a, b: b};
-	});
 var mdgriffith$elm_ui$Element$Font$variant = function (_var) {
 	switch (_var.$) {
 		case 'VariantActive':
@@ -16686,26 +17064,6 @@ var author$project$View$viewTripColumn = function (trip) {
 					])
 				])));
 };
-var mdgriffith$elm_ui$Internal$Model$AsRow = {$: 'AsRow'};
-var mdgriffith$elm_ui$Internal$Model$asRow = mdgriffith$elm_ui$Internal$Model$AsRow;
-var mdgriffith$elm_ui$Element$row = F2(
-	function (attrs, children) {
-		return A4(
-			mdgriffith$elm_ui$Internal$Model$element,
-			mdgriffith$elm_ui$Internal$Model$asRow,
-			mdgriffith$elm_ui$Internal$Model$div,
-			A2(
-				elm$core$List$cons,
-				mdgriffith$elm_ui$Internal$Model$htmlClass(mdgriffith$elm_ui$Internal$Style$classes.contentLeft + (' ' + mdgriffith$elm_ui$Internal$Style$classes.contentCenterY)),
-				A2(
-					elm$core$List$cons,
-					mdgriffith$elm_ui$Element$width(mdgriffith$elm_ui$Element$shrink),
-					A2(
-						elm$core$List$cons,
-						mdgriffith$elm_ui$Element$height(mdgriffith$elm_ui$Element$shrink),
-						attrs))),
-			mdgriffith$elm_ui$Internal$Model$Unkeyed(children));
-	});
 var author$project$View$viewTable = function (timetable) {
 	return A2(
 		mdgriffith$elm_ui$Element$row,
@@ -16774,14 +17132,41 @@ var author$project$View$viewTimetables = function (timetables) {
 };
 var author$project$View$body = function (model) {
 	switch (model.$) {
-		case 'Loading':
-			return mdgriffith$elm_ui$Element$text('Loading');
-		case 'Error':
+		case 'LoadingServices':
+			return mdgriffith$elm_ui$Element$text('Loading services');
+		case 'ServicesLoaded':
+			var serviceButtons = model.a;
+			return A2(
+				mdgriffith$elm_ui$Element$column,
+				_List_Nil,
+				_List_fromArray(
+					[
+						author$project$View$viewServiceButtons(serviceButtons)
+					]));
+		case 'LoadingSchedules':
+			var serviceButtons = model.a;
+			return A2(
+				mdgriffith$elm_ui$Element$column,
+				_List_Nil,
+				_List_fromArray(
+					[
+						author$project$View$viewServiceButtons(serviceButtons),
+						mdgriffith$elm_ui$Element$text('Loading')
+					]));
+		case 'SchedulesLoaded':
+			var serviceButtons = model.a;
+			var timetables = model.b;
+			return A2(
+				mdgriffith$elm_ui$Element$column,
+				_List_Nil,
+				_List_fromArray(
+					[
+						author$project$View$viewServiceButtons(serviceButtons),
+						author$project$View$viewTimetables(timetables)
+					]));
+		default:
 			var e = model.a;
 			return mdgriffith$elm_ui$Element$text(e);
-		default:
-			var timetables = model.a;
-			return author$project$View$viewTimetables(timetables);
 	}
 };
 var mdgriffith$elm_ui$Internal$Model$OnlyDynamic = F2(

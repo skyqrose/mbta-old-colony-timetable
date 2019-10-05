@@ -10901,8 +10901,8 @@ var skyqrose$assoc_list_extra$AssocList$Extra$groupBy = F2(
 			pzp1997$assoc_list$AssocList$empty,
 			list);
 	});
-var author$project$MakeViewModel$viewTimetable = F4(
-	function (stops, stopDict, schedules, tripGetter) {
+var author$project$MakeViewModel$viewTimetable = F5(
+	function (directionId, stops, stopDict, schedules, tripGetter) {
 		var trips = A2(
 			skyqrose$assoc_list_extra$AssocList$Extra$groupBy,
 			function ($) {
@@ -10910,6 +10910,7 @@ var author$project$MakeViewModel$viewTimetable = F4(
 			},
 			schedules);
 		return {
+			directionId: directionId,
 			stopHeaders: author$project$MakeViewModel$viewStopHeaders(stops),
 			trips: A2(
 				elm$core$List$map,
@@ -10979,8 +10980,8 @@ var author$project$MakeViewModel$viewTimetables = F4(
 		var inboundSchedules = _n0.a;
 		var outboundSchedules = _n0.b;
 		return {
-			d0: A4(author$project$MakeViewModel$viewTimetable, stops, stopDict, outboundSchedules, tripGetter),
-			d1: A4(author$project$MakeViewModel$viewTimetable, stops, stopDict, inboundSchedules, tripGetter)
+			d0: A5(author$project$MakeViewModel$viewTimetable, author$project$Mbta$D0, stops, stopDict, outboundSchedules, tripGetter),
+			d1: A5(author$project$MakeViewModel$viewTimetable, author$project$Mbta$D1, stops, stopDict, inboundSchedules, tripGetter)
 		};
 	});
 var author$project$Mbta$Api$getIncludedTrip = F2(
@@ -16636,7 +16637,7 @@ var mdgriffith$elm_ui$Element$row = F2(
 						attrs))),
 			mdgriffith$elm_ui$Internal$Model$Unkeyed(children));
 	});
-var author$project$View$viewTimetable = function (timetable) {
+var author$project$View$viewTable = function (timetable) {
 	return A2(
 		mdgriffith$elm_ui$Element$row,
 		_List_fromArray(
@@ -16667,7 +16668,7 @@ var mdgriffith$elm_ui$Element$spacing = function (x) {
 			x,
 			x));
 };
-var author$project$View$viewTimetables = function (timetables) {
+var author$project$View$viewTimetable = function (timetable) {
 	return A2(
 		mdgriffith$elm_ui$Element$column,
 		_List_fromArray(
@@ -16677,8 +16678,20 @@ var author$project$View$viewTimetables = function (timetables) {
 		_List_fromArray(
 			[
 				author$project$View$directionHeading('Inbound'),
+				author$project$View$viewTable(timetable)
+			]));
+};
+var author$project$View$viewTimetables = function (timetables) {
+	return A2(
+		mdgriffith$elm_ui$Element$column,
+		_List_fromArray(
+			[
+				mdgriffith$elm_ui$Element$padding(10),
+				mdgriffith$elm_ui$Element$spacing(20)
+			]),
+		_List_fromArray(
+			[
 				author$project$View$viewTimetable(timetables.d1),
-				author$project$View$directionHeading('Outbound'),
 				author$project$View$viewTimetable(timetables.d0)
 			]));
 };

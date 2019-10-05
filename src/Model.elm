@@ -9,6 +9,7 @@ type alias Model =
     { routes : RemoteDataApi (List Mbta.Route)
     , stops : RemoteDataApi (List Mbta.Stop)
     , schedules : RemoteDataApi (List Mbta.Schedule)
+    , services : RemoteDataApi (List Mbta.Service)
     }
 
 
@@ -16,6 +17,7 @@ type Msg
     = ReceiveRoutes (Mbta.Api.ApiResult (List Mbta.Route))
     | ReceiveStops (Mbta.Api.ApiResult (List Mbta.Stop))
     | ReceiveSchedules (Mbta.Api.ApiResult (List Mbta.Schedule))
+    | ReceiveServices (Mbta.Api.ApiResult (List Mbta.Service))
 
 
 type alias RemoteDataApi primary =

@@ -2,6 +2,7 @@ module Main exposing (main)
 
 import Browser
 import MakeViewModel
+import Mbta
 import Mbta.Api
 import Model exposing (..)
 import RemoteData
@@ -37,6 +38,20 @@ init =
             apiHost
             []
             [ Mbta.Api.filterServicesByRouteIds routeIds ]
+        , Mbta.Api.getSchedules
+            ReceiveSchedules
+            apiHost
+            [ Mbta.Api.include
+                (Mbta.Api.scheduleTrip
+                    -- Include the service so we can use it to select an initial serviceKey
+                    |> Mbta.Api.andIts Mbta.Api.tripService
+                )
+            ]
+            [ Mbta.Api.filterSchedulesByRouteIds routeIds
+            , Mbta.Api.filterSchedulesByStopIds stopIds
+
+            -- Implicilty filters to today's schedule
+            ]
         ]
     )
 
@@ -68,6 +83,14 @@ update msg model =
         ReceiveSchedules schedulesResult ->
             ( { model
                 | schedules = RemoteData.fromResult schedulesResult
+                , selectedServiceKey =
+                    -- If we haven't selected any services (like for the first fetch), select the one for the day we just got
+                    case model.selectedServiceKey of
+                        Nothing ->
+                            serviceKeyFromSchedulesResult schedulesResult
+
+                        Just _ ->
+                            model.selectedServiceKey
               }
             , Cmd.none
             )
@@ -84,6 +107,28 @@ update msg model =
                 , Mbta.Api.filterSchedulesByStopIds stopIds
                 , Mbta.Api.filterSchedulesByServiceDate serviceKey.startDate
                 ]
+            )
+
+
+{-| Requires trips and services to be included
+-}
+serviceKeyFromSchedulesResult : Mbta.Api.ApiResult (List Mbta.Schedule) -> Maybe ServiceKey
+serviceKeyFromSchedulesResult schedulesResult =
+    schedulesResult
+        |> Result.toMaybe
+        |> Maybe.andThen
+            (\data ->
+                let
+                    schedules =
+                        Mbta.Api.getPrimaryData data
+                in
+                schedules
+                    |> List.head
+                    |> Maybe.map .tripId
+                    |> Maybe.andThen (\tripId -> Mbta.Api.getIncludedTrip tripId data)
+                    |> Maybe.map .serviceId
+                    |> Maybe.andThen (\serviceId -> Mbta.Api.getIncludedService serviceId data)
+                    |> Maybe.map Model.serviceKey
             )
 
 

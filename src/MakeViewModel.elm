@@ -27,37 +27,42 @@ makeViewModel model =
                 serviceButtons =
                     viewServiceButtons (Mbta.Api.getPrimaryData services)
             in
-            case ( model.routes, model.stops, model.schedules ) of
-                ( RemoteData.Success routes, RemoteData.Success stops, RemoteData.Success schedules ) ->
-                    ViewModel.SchedulesLoaded
-                        serviceButtons
-                        (viewTimetables
-                            (Mbta.Api.getPrimaryData routes)
-                            (Mbta.Api.getPrimaryData stops)
-                            (Mbta.Api.getPrimaryData schedules)
-                            (\tripId -> Mbta.Api.getIncludedTrip tripId schedules)
-                        )
+            case model.schedules of
+                RemoteData.NotAsked ->
+                    ViewModel.ServicesLoaded serviceButtons
 
-                ( RemoteData.Loading, _, _ ) ->
+                RemoteData.Loading ->
                     ViewModel.LoadingSchedules serviceButtons
 
-                ( _, RemoteData.Loading, _ ) ->
-                    ViewModel.LoadingSchedules serviceButtons
-
-                ( _, _, RemoteData.Loading ) ->
-                    ViewModel.LoadingSchedules serviceButtons
-
-                ( RemoteData.Failure e, _, _ ) ->
+                RemoteData.Failure e ->
                     ViewModel.Error (Debug.toString e)
 
-                ( _, RemoteData.Failure e, _ ) ->
-                    ViewModel.Error (Debug.toString e)
+                RemoteData.Success schedules ->
+                    case ( model.routes, model.stops ) of
+                        ( RemoteData.Success routes, RemoteData.Success stops ) ->
+                            ViewModel.SchedulesLoaded
+                                serviceButtons
+                                (viewTimetables
+                                    (Mbta.Api.getPrimaryData routes)
+                                    (Mbta.Api.getPrimaryData stops)
+                                    (Mbta.Api.getPrimaryData schedules)
+                                    (\tripId -> Mbta.Api.getIncludedTrip tripId schedules)
+                                )
 
-                ( _, _, RemoteData.Failure e ) ->
-                    ViewModel.Error (Debug.toString e)
+                        ( RemoteData.Failure e, _ ) ->
+                            ViewModel.Error (Debug.toString e)
 
-                _ ->
-                    ViewModel.Error (Debug.toString model)
+                        ( _, RemoteData.Failure e ) ->
+                            ViewModel.Error (Debug.toString e)
+
+                        ( RemoteData.Loading, _ ) ->
+                            ViewModel.LoadingSchedules serviceButtons
+
+                        ( _, RemoteData.Loading ) ->
+                            ViewModel.LoadingSchedules serviceButtons
+
+                        _ ->
+                            ViewModel.Error (Debug.toString model)
 
         RemoteData.NotAsked ->
             ViewModel.Error (Debug.toString model)

@@ -62,19 +62,20 @@ viewTimetables routes stops schedules tripGetter =
         stopDict =
             buildParentStationDict stops
     in
-    { d0 = viewTimetable stops stopDict outboundSchedules tripGetter
-    , d1 = viewTimetable stops stopDict inboundSchedules tripGetter
+    { d0 = viewTimetable Mbta.D0 stops stopDict outboundSchedules tripGetter
+    , d1 = viewTimetable Mbta.D1 stops stopDict inboundSchedules tripGetter
     }
 
 
-viewTimetable : List Mbta.Stop -> Dict Mbta.StopId Mbta.StopId -> List Mbta.Schedule -> (Mbta.TripId -> Maybe Mbta.Trip) -> ViewModel.Timetable
-viewTimetable stops stopDict schedules tripGetter =
+viewTimetable : Mbta.DirectionId -> List Mbta.Stop -> Dict Mbta.StopId Mbta.StopId -> List Mbta.Schedule -> (Mbta.TripId -> Maybe Mbta.Trip) -> ViewModel.Timetable
+viewTimetable directionId stops stopDict schedules tripGetter =
     let
         trips : Dict Mbta.TripId (List Mbta.Schedule)
         trips =
             Dict.groupBy .tripId schedules
     in
-    { stopHeaders = viewStopHeaders stops
+    { directionId = directionId
+    , stopHeaders = viewStopHeaders stops
     , trips =
         trips
             |> Dict.toList

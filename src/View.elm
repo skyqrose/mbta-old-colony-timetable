@@ -41,10 +41,10 @@ body model =
 viewTimetables : ViewModel.Timetables -> Element msg
 viewTimetables timetables =
     El.column
-        [ El.spacing 10 ]
-        [ directionHeading "Inbound"
-        , viewTimetable timetables.d1
-        , directionHeading "Outbound"
+        [ El.padding 10
+        , El.spacing 20
+        ]
+        [ viewTimetable timetables.d1
         , viewTimetable timetables.d0
         ]
 
@@ -59,30 +59,17 @@ directionHeading text =
         (El.text text)
 
 
-type alias Timetable =
-    { stopHeaders : List StopHeader
-    , trips : List Trip
-    }
-
-
-type alias StopHeader =
-    { stopName : String
-    , accessible : Bool
-    }
-
-
-type alias Trip =
-    { name : Maybe String
-    , schedules : List Schedule
-    }
-
-
-type alias Schedule =
-    Maybe String
-
-
 viewTimetable : ViewModel.Timetable -> Element msg
 viewTimetable timetable =
+    El.column
+        [ El.spacing 10 ]
+        [ directionHeading "Inbound"
+        , viewTable timetable
+        ]
+
+
+viewTable : ViewModel.Timetable -> Element msg
+viewTable timetable =
     El.row
         [ El.padding 10
         ]

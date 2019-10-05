@@ -16,7 +16,8 @@ type alias Timetables =
 
 
 type alias Timetable =
-    { stopHeaders : List StopHeader
+    { directionId : Mbta.DirectionId
+    , stopHeaders : List StopHeader
     , trips : List Trip
     }
 

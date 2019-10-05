@@ -1,7 +1,8 @@
 module View exposing (view)
 
 import Browser
-import Element as El exposing (Element)
+import Element as El exposing (Element, rgb)
+import Element.Background as Background
 import Element.Border as Border
 import Element.Font as Font
 import Element.Region as Region
@@ -15,6 +16,16 @@ scheduleCellStyling =
     [ El.height (El.px 60)
     , El.padding 5
     ]
+
+
+evenRowStyling : List (El.Attribute msg)
+evenRowStyling =
+    [ Background.color (rgb 1.0 1.0 1.0) ]
+
+
+oddRowStyling : List (El.Attribute msg)
+oddRowStyling =
+    [ Background.color (rgb 0.95 0.95 0.95) ]
 
 
 view : ViewModel.ViewModel -> Browser.Document Msg
@@ -94,7 +105,7 @@ viewStopHeaders directionId stopHeaders =
                     )
                     (El.text "")
               ]
-            , List.map viewStopHeaderCell stopHeaders
+            , List.indexedMap viewStopHeaderCell stopHeaders
             , [ El.el
                     (scheduleCellStyling ++ [ Font.variant Font.smallCaps ])
                     (El.text
@@ -111,10 +122,18 @@ viewStopHeaders directionId stopHeaders =
         )
 
 
-viewStopHeaderCell : ViewModel.StopHeader -> Element msg
-viewStopHeaderCell stopHeader =
+viewStopHeaderCell : Int -> ViewModel.StopHeader -> Element msg
+viewStopHeaderCell i stopHeader =
     El.column
-        scheduleCellStyling
+        ((if modBy 2 i == 0 then
+            evenRowStyling
+
+          else
+            oddRowStyling
+         )
+            ++ [ El.width El.fill ]
+            ++ scheduleCellStyling
+        )
         [ El.text stopHeader.stopName
         , if stopHeader.accessible then
             El.image
@@ -140,18 +159,27 @@ viewTripColumn trip =
         ]
         (List.concat
             [ [ tripDescriptor trip ]
-            , List.map viewSchedule trip.schedules
+            , List.indexedMap viewSchedule trip.schedules
             , [ tripFooter trip ]
             ]
         )
 
 
-viewSchedule : ViewModel.Schedule -> Element msg
-viewSchedule schedule =
+viewSchedule : Int -> ViewModel.Schedule -> Element msg
+viewSchedule i schedule =
     schedule
         |> Maybe.withDefault "-"
         |> El.text
-        |> El.el scheduleCellStyling
+        |> El.el
+            ((if modBy 2 i == 0 then
+                evenRowStyling
+
+              else
+                oddRowStyling
+             )
+                ++ [ El.width El.fill ]
+                ++ scheduleCellStyling
+            )
 
 
 tripDescriptor : ViewModel.Trip -> Element msg

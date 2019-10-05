@@ -16514,37 +16514,80 @@ var mdgriffith$elm_ui$Element$Border$widthEach = function (_n0) {
 			bottom,
 			left));
 };
-var author$project$View$viewStopHeaders = function (stopHeaders) {
-	return A2(
-		mdgriffith$elm_ui$Element$column,
-		_List_Nil,
-		elm$core$List$concat(
-			_List_fromArray(
-				[
-					_List_fromArray(
-					[
-						A2(
-						mdgriffith$elm_ui$Element$el,
-						_Utils_ap(
-							author$project$View$scheduleCellStyling,
-							_List_fromArray(
-								[
-									mdgriffith$elm_ui$Element$width(mdgriffith$elm_ui$Element$fill),
-									mdgriffith$elm_ui$Element$Border$widthEach(
-									{bottom: 1, left: 0, right: 0, top: 0})
-								])),
-						mdgriffith$elm_ui$Element$text(''))
-					]),
-					A2(elm$core$List$indexedMap, author$project$View$viewStopHeaderCell, stopHeaders),
-					_List_fromArray(
-					[
-						A2(
-						mdgriffith$elm_ui$Element$el,
-						author$project$View$scheduleCellStyling,
-						mdgriffith$elm_ui$Element$text(''))
-					])
-				])));
+var mdgriffith$elm_ui$Internal$Model$VariantActive = function (a) {
+	return {$: 'VariantActive', a: a};
 };
+var mdgriffith$elm_ui$Element$Font$smallCaps = mdgriffith$elm_ui$Internal$Model$VariantActive('smcp');
+var mdgriffith$elm_ui$Internal$Flag$fontVariant = mdgriffith$elm_ui$Internal$Flag$flag(48);
+var mdgriffith$elm_ui$Internal$Model$Class = F2(
+	function (a, b) {
+		return {$: 'Class', a: a, b: b};
+	});
+var mdgriffith$elm_ui$Element$Font$variant = function (_var) {
+	switch (_var.$) {
+		case 'VariantActive':
+			var name = _var.a;
+			return A2(mdgriffith$elm_ui$Internal$Model$Class, mdgriffith$elm_ui$Internal$Flag$fontVariant, 'v-' + name);
+		case 'VariantOff':
+			var name = _var.a;
+			return A2(mdgriffith$elm_ui$Internal$Model$Class, mdgriffith$elm_ui$Internal$Flag$fontVariant, 'v-' + (name + '-off'));
+		default:
+			var name = _var.a;
+			var index = _var.b;
+			return A2(
+				mdgriffith$elm_ui$Internal$Model$StyleClass,
+				mdgriffith$elm_ui$Internal$Flag$fontVariant,
+				A3(
+					mdgriffith$elm_ui$Internal$Model$Single,
+					'v-' + (name + ('-' + elm$core$String$fromInt(index))),
+					'font-feature-settings',
+					'\"' + (name + ('\" ' + elm$core$String$fromInt(index)))));
+	}
+};
+var author$project$View$viewStopHeaders = F2(
+	function (directionId, stopHeaders) {
+		return A2(
+			mdgriffith$elm_ui$Element$column,
+			_List_Nil,
+			elm$core$List$concat(
+				_List_fromArray(
+					[
+						_List_fromArray(
+						[
+							A2(
+							mdgriffith$elm_ui$Element$el,
+							_Utils_ap(
+								author$project$View$scheduleCellStyling,
+								_List_fromArray(
+									[
+										mdgriffith$elm_ui$Element$width(mdgriffith$elm_ui$Element$fill),
+										mdgriffith$elm_ui$Element$Border$widthEach(
+										{bottom: 1, left: 0, right: 0, top: 0})
+									])),
+							mdgriffith$elm_ui$Element$text(''))
+						]),
+						A2(elm$core$List$indexedMap, author$project$View$viewStopHeaderCell, stopHeaders),
+						_List_fromArray(
+						[
+							A2(
+							mdgriffith$elm_ui$Element$el,
+							_Utils_ap(
+								author$project$View$scheduleCellStyling,
+								_List_fromArray(
+									[
+										mdgriffith$elm_ui$Element$Font$variant(mdgriffith$elm_ui$Element$Font$smallCaps)
+									])),
+							mdgriffith$elm_ui$Element$text(
+								function () {
+									if (directionId.$ === 'D0') {
+										return 'To';
+									} else {
+										return 'From';
+									}
+								}()))
+						])
+					])));
+	});
 var author$project$View$tripDescriptor = function (trip) {
 	return A2(
 		mdgriffith$elm_ui$Element$column,
@@ -16577,36 +16620,6 @@ var author$project$View$tripDescriptor = function (trip) {
 					]),
 				{description: 'bikes allowed', src: '/assets/bike.svg'}) : mdgriffith$elm_ui$Element$text(' ')
 			]));
-};
-var mdgriffith$elm_ui$Internal$Model$VariantActive = function (a) {
-	return {$: 'VariantActive', a: a};
-};
-var mdgriffith$elm_ui$Element$Font$smallCaps = mdgriffith$elm_ui$Internal$Model$VariantActive('smcp');
-var mdgriffith$elm_ui$Internal$Flag$fontVariant = mdgriffith$elm_ui$Internal$Flag$flag(48);
-var mdgriffith$elm_ui$Internal$Model$Class = F2(
-	function (a, b) {
-		return {$: 'Class', a: a, b: b};
-	});
-var mdgriffith$elm_ui$Element$Font$variant = function (_var) {
-	switch (_var.$) {
-		case 'VariantActive':
-			var name = _var.a;
-			return A2(mdgriffith$elm_ui$Internal$Model$Class, mdgriffith$elm_ui$Internal$Flag$fontVariant, 'v-' + name);
-		case 'VariantOff':
-			var name = _var.a;
-			return A2(mdgriffith$elm_ui$Internal$Model$Class, mdgriffith$elm_ui$Internal$Flag$fontVariant, 'v-' + (name + '-off'));
-		default:
-			var name = _var.a;
-			var index = _var.b;
-			return A2(
-				mdgriffith$elm_ui$Internal$Model$StyleClass,
-				mdgriffith$elm_ui$Internal$Flag$fontVariant,
-				A3(
-					mdgriffith$elm_ui$Internal$Model$Single,
-					'v-' + (name + ('-' + elm$core$String$fromInt(index))),
-					'font-feature-settings',
-					'\"' + (name + ('\" ' + elm$core$String$fromInt(index)))));
-	}
 };
 var author$project$View$tripFooter = function (trip) {
 	return A2(
@@ -16702,7 +16715,7 @@ var author$project$View$viewTable = function (timetable) {
 			]),
 		A2(
 			elm$core$List$cons,
-			author$project$View$viewStopHeaders(timetable.stopHeaders),
+			A2(author$project$View$viewStopHeaders, timetable.directionId, timetable.stopHeaders),
 			A2(elm$core$List$map, author$project$View$viewTripColumn, timetable.trips)));
 };
 var mdgriffith$elm_ui$Internal$Flag$spacing = mdgriffith$elm_ui$Internal$Flag$flag(3);

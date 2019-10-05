@@ -73,11 +73,11 @@ viewTable timetable =
     El.row
         [ El.padding 10
         ]
-        (viewStopHeaders timetable.stopHeaders :: List.map viewTripColumn timetable.trips)
+        (viewStopHeaders timetable.directionId timetable.stopHeaders :: List.map viewTripColumn timetable.trips)
 
 
-viewStopHeaders : List ViewModel.StopHeader -> Element msg
-viewStopHeaders stopHeaders =
+viewStopHeaders : Mbta.DirectionId -> List ViewModel.StopHeader -> Element msg
+viewStopHeaders directionId stopHeaders =
     El.column
         []
         (List.concat
@@ -95,7 +95,18 @@ viewStopHeaders stopHeaders =
                     (El.text "")
               ]
             , List.map viewStopHeaderCell stopHeaders
-            , [ El.el scheduleCellStyling (El.text "") ]
+            , [ El.el
+                    (scheduleCellStyling ++ [ Font.variant Font.smallCaps ])
+                    (El.text
+                        (case directionId of
+                            Mbta.D0 ->
+                                "To"
+
+                            Mbta.D1 ->
+                                "From"
+                        )
+                    )
+              ]
             ]
         )
 

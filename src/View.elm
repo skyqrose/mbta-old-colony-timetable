@@ -5,6 +5,7 @@ import Element as El exposing (Element, rgb)
 import Element.Background as Background
 import Element.Border as Border
 import Element.Font as Font
+import Element.Input as Input
 import Element.Region as Region
 import Mbta
 import Model exposing (Msg)
@@ -69,7 +70,16 @@ viewServiceButtons : ViewModel.ServiceButtons -> Element msg
 viewServiceButtons serviceButtons =
     El.row
         []
-        (List.map (El.text << .text) serviceButtons)
+        (List.map
+            (\serviceButton ->
+                Input.button
+                    []
+                    { onPress = Nothing
+                    , label = El.text serviceButton.text
+                    }
+            )
+            serviceButtons
+        )
 
 
 viewTimetables : ViewModel.Timetables -> Element msg

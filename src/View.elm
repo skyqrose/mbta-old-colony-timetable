@@ -19,6 +19,11 @@ scheduleCellStyling =
     ]
 
 
+shadedColor : El.Color
+shadedColor =
+    rgb 0.95 0.95 0.95
+
+
 evenRowStyling : List (El.Attribute msg)
 evenRowStyling =
     [ Background.color (rgb 1.0 1.0 1.0) ]
@@ -26,7 +31,7 @@ evenRowStyling =
 
 oddRowStyling : List (El.Attribute msg)
 oddRowStyling =
-    [ Background.color (rgb 0.95 0.95 0.95) ]
+    [ Background.color shadedColor ]
 
 
 view : ViewModel.ViewModel -> Browser.Document Msg
@@ -73,7 +78,17 @@ viewServiceButtons serviceButtons =
         (List.map
             (\serviceButton ->
                 Input.button
-                    []
+                    ([ El.padding 5
+                     , Border.width 1
+                     , Border.rounded 10
+                     ]
+                        ++ (if serviceButton.isSelected then
+                                [ Background.color shadedColor ]
+
+                            else
+                                []
+                           )
+                    )
                     { onPress = Just (Model.SelectServiceKey serviceButton.serviceKey)
                     , label = El.text serviceButton.text
                     }

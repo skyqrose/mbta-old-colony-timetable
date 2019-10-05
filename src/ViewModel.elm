@@ -28,6 +28,7 @@ type alias ServiceButtons =
 type alias ServiceButton =
     { serviceKey : Model.ServiceKey
     , text : String
+    , isSelected : Bool
     }
 
 

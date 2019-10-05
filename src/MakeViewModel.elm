@@ -25,7 +25,9 @@ makeViewModel model =
         RemoteData.Success services ->
             let
                 serviceButtons =
-                    viewServiceButtons (Mbta.Api.getPrimaryData services)
+                    viewServiceButtons
+                        (Mbta.Api.getPrimaryData services)
+                        model.selectedServiceKey
             in
             case model.schedules of
                 RemoteData.NotAsked ->
@@ -68,20 +70,24 @@ makeViewModel model =
             ViewModel.Error (Debug.toString model)
 
 
-viewServiceButtons : List Mbta.Service -> ViewModel.ServiceButtons
-viewServiceButtons services =
+viewServiceButtons :
+    List Mbta.Service
+    -> Maybe Model.ServiceKey
+    -> ViewModel.ServiceButtons
+viewServiceButtons services selectedServiceKey =
     services
         |> List.map Model.serviceKey
         |> Helpers.uniq
-        |> List.map viewServiceButton
+        |> List.map (viewServiceButton selectedServiceKey)
 
 
-viewServiceButton : Model.ServiceKey -> ViewModel.ServiceButton
-viewServiceButton serviceKey =
+viewServiceButton : Maybe Model.ServiceKey -> Model.ServiceKey -> ViewModel.ServiceButton
+viewServiceButton selectedServiceKey serviceKey =
     { serviceKey = serviceKey
     , text =
         serviceKey.name
             |> Maybe.withDefault "Service"
+    , isSelected = selectedServiceKey == Just serviceKey
     }
 
 

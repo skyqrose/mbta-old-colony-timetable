@@ -16294,6 +16294,23 @@ var author$project$View$directionHeading = function (text) {
 			]),
 		mdgriffith$elm_ui$Element$text(text));
 };
+var mdgriffith$elm_ui$Internal$Flag$padding = mdgriffith$elm_ui$Internal$Flag$flag(2);
+var mdgriffith$elm_ui$Internal$Model$PaddingStyle = F5(
+	function (a, b, c, d, e) {
+		return {$: 'PaddingStyle', a: a, b: b, c: c, d: d, e: e};
+	});
+var mdgriffith$elm_ui$Element$padding = function (x) {
+	return A2(
+		mdgriffith$elm_ui$Internal$Model$StyleClass,
+		mdgriffith$elm_ui$Internal$Flag$padding,
+		A5(
+			mdgriffith$elm_ui$Internal$Model$PaddingStyle,
+			'p-' + elm$core$String$fromInt(x),
+			x,
+			x,
+			x,
+			x));
+};
 var mdgriffith$elm_ui$Internal$Model$Px = function (a) {
 	return {$: 'Px', a: a};
 };
@@ -16301,7 +16318,8 @@ var mdgriffith$elm_ui$Element$px = mdgriffith$elm_ui$Internal$Model$Px;
 var author$project$View$scheduleCellStyling = _List_fromArray(
 	[
 		mdgriffith$elm_ui$Element$height(
-		mdgriffith$elm_ui$Element$px(60))
+		mdgriffith$elm_ui$Element$px(60)),
+		mdgriffith$elm_ui$Element$padding(5)
 	]);
 var mdgriffith$elm_ui$Internal$Model$AsColumn = {$: 'AsColumn'};
 var mdgriffith$elm_ui$Internal$Model$asColumn = mdgriffith$elm_ui$Internal$Model$AsColumn;
@@ -16398,6 +16416,55 @@ var author$project$View$viewStopHeaderCell = function (stopHeader) {
 				{description: 'accessible', src: '/assets/accessible.svg'}) : mdgriffith$elm_ui$Element$text(' ')
 			]));
 };
+var mdgriffith$elm_ui$Internal$Model$Fill = function (a) {
+	return {$: 'Fill', a: a};
+};
+var mdgriffith$elm_ui$Element$fill = mdgriffith$elm_ui$Internal$Model$Fill(1);
+var mdgriffith$elm_ui$Internal$Model$BorderWidth = F5(
+	function (a, b, c, d, e) {
+		return {$: 'BorderWidth', a: a, b: b, c: c, d: d, e: e};
+	});
+var mdgriffith$elm_ui$Element$Border$width = function (v) {
+	return A2(
+		mdgriffith$elm_ui$Internal$Model$StyleClass,
+		mdgriffith$elm_ui$Internal$Flag$borderWidth,
+		A5(
+			mdgriffith$elm_ui$Internal$Model$BorderWidth,
+			'b-' + elm$core$String$fromInt(v),
+			v,
+			v,
+			v,
+			v));
+};
+var mdgriffith$elm_ui$Element$Border$widthXY = F2(
+	function (x, y) {
+		return A2(
+			mdgriffith$elm_ui$Internal$Model$StyleClass,
+			mdgriffith$elm_ui$Internal$Flag$borderWidth,
+			A5(
+				mdgriffith$elm_ui$Internal$Model$BorderWidth,
+				'b-' + (elm$core$String$fromInt(x) + ('-' + elm$core$String$fromInt(y))),
+				y,
+				x,
+				y,
+				x));
+	});
+var mdgriffith$elm_ui$Element$Border$widthEach = function (_n0) {
+	var bottom = _n0.bottom;
+	var top = _n0.top;
+	var left = _n0.left;
+	var right = _n0.right;
+	return (_Utils_eq(top, bottom) && _Utils_eq(left, right)) ? (_Utils_eq(top, right) ? mdgriffith$elm_ui$Element$Border$width(top) : A2(mdgriffith$elm_ui$Element$Border$widthXY, left, top)) : A2(
+		mdgriffith$elm_ui$Internal$Model$StyleClass,
+		mdgriffith$elm_ui$Internal$Flag$borderWidth,
+		A5(
+			mdgriffith$elm_ui$Internal$Model$BorderWidth,
+			'b-' + (elm$core$String$fromInt(top) + ('-' + (elm$core$String$fromInt(right) + ('-' + (elm$core$String$fromInt(bottom) + ('-' + elm$core$String$fromInt(left))))))),
+			top,
+			right,
+			bottom,
+			left));
+};
 var author$project$View$viewStopHeaders = function (stopHeaders) {
 	return A2(
 		mdgriffith$elm_ui$Element$column,
@@ -16407,19 +16474,39 @@ var author$project$View$viewStopHeaders = function (stopHeaders) {
 				[
 					_List_fromArray(
 					[
-						mdgriffith$elm_ui$Element$text('')
+						A2(
+						mdgriffith$elm_ui$Element$el,
+						_Utils_ap(
+							author$project$View$scheduleCellStyling,
+							_List_fromArray(
+								[
+									mdgriffith$elm_ui$Element$width(mdgriffith$elm_ui$Element$fill),
+									mdgriffith$elm_ui$Element$Border$widthEach(
+									{bottom: 1, left: 0, right: 0, top: 0})
+								])),
+						mdgriffith$elm_ui$Element$text(''))
 					]),
 					A2(elm$core$List$map, author$project$View$viewStopHeaderCell, stopHeaders),
 					_List_fromArray(
 					[
-						mdgriffith$elm_ui$Element$text('')
+						A2(
+						mdgriffith$elm_ui$Element$el,
+						author$project$View$scheduleCellStyling,
+						mdgriffith$elm_ui$Element$text(''))
 					])
 				])));
 };
 var author$project$View$tripDescriptor = function (trip) {
 	return A2(
 		mdgriffith$elm_ui$Element$column,
-		author$project$View$scheduleCellStyling,
+		_Utils_ap(
+			author$project$View$scheduleCellStyling,
+			_List_fromArray(
+				[
+					mdgriffith$elm_ui$Element$width(mdgriffith$elm_ui$Element$fill),
+					mdgriffith$elm_ui$Element$Border$widthEach(
+					{bottom: 1, left: 0, right: 0, top: 0})
+				])),
 		_List_fromArray(
 			[
 				function () {
@@ -16475,10 +16562,12 @@ var mdgriffith$elm_ui$Element$Font$variant = function (_var) {
 var author$project$View$tripFooter = function (trip) {
 	return A2(
 		mdgriffith$elm_ui$Element$el,
-		_List_fromArray(
-			[
-				mdgriffith$elm_ui$Element$Font$variant(mdgriffith$elm_ui$Element$Font$smallCaps)
-			]),
+		_Utils_ap(
+			author$project$View$scheduleCellStyling,
+			_List_fromArray(
+				[
+					mdgriffith$elm_ui$Element$Font$variant(mdgriffith$elm_ui$Element$Font$smallCaps)
+				])),
 		mdgriffith$elm_ui$Element$text(
 			function () {
 				var _n0 = trip.route;
@@ -16508,7 +16597,11 @@ var author$project$View$viewSchedule = function (schedule) {
 var author$project$View$viewTripColumn = function (trip) {
 	return A2(
 		mdgriffith$elm_ui$Element$column,
-		_List_Nil,
+		_List_fromArray(
+			[
+				mdgriffith$elm_ui$Element$Border$widthEach(
+				{bottom: 0, left: 1, right: 0, top: 0})
+			]),
 		elm$core$List$concat(
 			_List_fromArray(
 				[
@@ -16522,23 +16615,6 @@ var author$project$View$viewTripColumn = function (trip) {
 						author$project$View$tripFooter(trip)
 					])
 				])));
-};
-var mdgriffith$elm_ui$Internal$Flag$padding = mdgriffith$elm_ui$Internal$Flag$flag(2);
-var mdgriffith$elm_ui$Internal$Model$PaddingStyle = F5(
-	function (a, b, c, d, e) {
-		return {$: 'PaddingStyle', a: a, b: b, c: c, d: d, e: e};
-	});
-var mdgriffith$elm_ui$Element$padding = function (x) {
-	return A2(
-		mdgriffith$elm_ui$Internal$Model$StyleClass,
-		mdgriffith$elm_ui$Internal$Flag$padding,
-		A5(
-			mdgriffith$elm_ui$Internal$Model$PaddingStyle,
-			'p-' + elm$core$String$fromInt(x),
-			x,
-			x,
-			x,
-			x));
 };
 var mdgriffith$elm_ui$Internal$Model$AsRow = {$: 'AsRow'};
 var mdgriffith$elm_ui$Internal$Model$asRow = mdgriffith$elm_ui$Internal$Model$AsRow;
@@ -16560,6 +16636,18 @@ var mdgriffith$elm_ui$Element$row = F2(
 						attrs))),
 			mdgriffith$elm_ui$Internal$Model$Unkeyed(children));
 	});
+var author$project$View$viewTimetable = function (timetable) {
+	return A2(
+		mdgriffith$elm_ui$Element$row,
+		_List_fromArray(
+			[
+				mdgriffith$elm_ui$Element$padding(10)
+			]),
+		A2(
+			elm$core$List$cons,
+			author$project$View$viewStopHeaders(timetable.stopHeaders),
+			A2(elm$core$List$map, author$project$View$viewTripColumn, timetable.trips)));
+};
 var mdgriffith$elm_ui$Internal$Flag$spacing = mdgriffith$elm_ui$Internal$Flag$flag(3);
 var mdgriffith$elm_ui$Internal$Model$SpacingStyle = F3(
 	function (a, b, c) {
@@ -16578,19 +16666,6 @@ var mdgriffith$elm_ui$Element$spacing = function (x) {
 			A2(mdgriffith$elm_ui$Internal$Model$spacingName, x, x),
 			x,
 			x));
-};
-var author$project$View$viewTimetable = function (timetable) {
-	return A2(
-		mdgriffith$elm_ui$Element$row,
-		_List_fromArray(
-			[
-				mdgriffith$elm_ui$Element$spacing(15),
-				mdgriffith$elm_ui$Element$padding(10)
-			]),
-		A2(
-			elm$core$List$cons,
-			author$project$View$viewStopHeaders(timetable.stopHeaders),
-			A2(elm$core$List$map, author$project$View$viewTripColumn, timetable.trips)));
 };
 var author$project$View$viewTimetables = function (timetables) {
 	return A2(

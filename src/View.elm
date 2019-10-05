@@ -74,7 +74,14 @@ viewTimetable : ViewModel.Timetable -> Element msg
 viewTimetable timetable =
     El.column
         [ El.spacing 10 ]
-        [ directionHeading "Inbound"
+        [ directionHeading
+            (case timetable.directionId of
+                Mbta.D1 ->
+                    "Inbound"
+
+                Mbta.D0 ->
+                    "Outbound"
+            )
         , viewTable timetable
         ]
 

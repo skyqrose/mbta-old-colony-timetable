@@ -17,8 +17,8 @@ init : ( Model, Cmd Msg )
 init =
     ( { routes = RemoteData.Loading
       , stops = RemoteData.Loading
-      , schedules = RemoteData.Loading
       , services = RemoteData.Loading
+      , schedules = RemoteData.Loading
       , selectedServiceKey = Nothing
       }
     , Cmd.batch
@@ -32,6 +32,11 @@ init =
             apiHost
             [ Mbta.Api.include Mbta.Api.stopChildStops ]
             [ Mbta.Api.filterStopsByIds stopIds ]
+        , Mbta.Api.getServices
+            ReceiveServices
+            apiHost
+            []
+            [ Mbta.Api.filterServicesByRouteIds routeIds ]
         , Mbta.Api.getSchedules
             ReceiveSchedules
             apiHost
@@ -39,11 +44,6 @@ init =
             [ Mbta.Api.filterSchedulesByRouteIds routeIds
             , Mbta.Api.filterSchedulesByStopIds stopIds
             ]
-        , Mbta.Api.getServices
-            ReceiveServices
-            apiHost
-            []
-            [ Mbta.Api.filterServicesByRouteIds routeIds ]
         ]
     )
 
@@ -65,16 +65,16 @@ update msg model =
             , Cmd.none
             )
 
-        ReceiveSchedules schedulesResult ->
+        ReceiveServices servicesResult ->
             ( { model
-                | schedules = RemoteData.fromResult schedulesResult
+                | services = RemoteData.fromResult servicesResult
               }
             , Cmd.none
             )
 
-        ReceiveServices servicesResult ->
+        ReceiveSchedules schedulesResult ->
             ( { model
-                | services = RemoteData.fromResult servicesResult
+                | schedules = RemoteData.fromResult schedulesResult
               }
             , Cmd.none
             )

@@ -15,8 +15,8 @@ import RemoteData
 type alias Model =
     { routes : RemoteDataApi (List Mbta.Route)
     , stops : RemoteDataApi (List Mbta.Stop)
-    , schedules : RemoteDataApi (List Mbta.Schedule)
     , services : RemoteDataApi (List Mbta.Service)
+    , schedules : RemoteDataApi (List Mbta.Schedule)
     , selectedServiceKey : Maybe ServiceKey
     }
 
@@ -24,8 +24,8 @@ type alias Model =
 type Msg
     = ReceiveRoutes (Mbta.Api.ApiResult (List Mbta.Route))
     | ReceiveStops (Mbta.Api.ApiResult (List Mbta.Stop))
-    | ReceiveSchedules (Mbta.Api.ApiResult (List Mbta.Schedule))
     | ReceiveServices (Mbta.Api.ApiResult (List Mbta.Service))
+    | ReceiveSchedules (Mbta.Api.ApiResult (List Mbta.Schedule))
     | SelectServiceKey ServiceKey
 
 

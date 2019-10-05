@@ -2,6 +2,7 @@ module MakeViewModel exposing (makeViewModel)
 
 import AssocList as Dict exposing (Dict)
 import AssocList.Extra as Dict
+import Helpers
 import List.Extra
 import Mbta
 import Mbta.Api
@@ -65,8 +66,8 @@ makeViewModel model =
 viewServiceButtons : List Mbta.Service -> ViewModel.ServiceButtons
 viewServiceButtons services =
     services
-        |> Dict.groupBy Model.serviceKey
-        |> Dict.keys
+        |> List.map Model.serviceKey
+        |> Helpers.uniq
         |> List.map viewServiceButton
 
 

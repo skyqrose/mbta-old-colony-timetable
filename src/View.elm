@@ -43,16 +43,33 @@ body model =
             El.text "Loading services"
 
         ViewModel.ServicesLoaded serviceButtons ->
-            El.text "Services loaded"
+            El.column
+                []
+                [ viewServiceButtons serviceButtons ]
 
         ViewModel.LoadingSchedules serviceButtons ->
-            El.text "Loading schedules"
+            El.column
+                []
+                [ viewServiceButtons serviceButtons
+                , El.text "Loading"
+                ]
 
         ViewModel.SchedulesLoaded serviceButtons timetables ->
-            viewTimetables timetables
+            El.column
+                []
+                [ viewServiceButtons serviceButtons
+                , viewTimetables timetables
+                ]
 
         ViewModel.Error e ->
             El.text e
+
+
+viewServiceButtons : ViewModel.ServiceButtons -> Element msg
+viewServiceButtons serviceButtons =
+    El.row
+        []
+        (List.map El.text serviceButtons)
 
 
 viewTimetables : ViewModel.Timetables -> Element msg

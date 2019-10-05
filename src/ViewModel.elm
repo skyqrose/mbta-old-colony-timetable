@@ -1,4 +1,13 @@
-module ViewModel exposing (Schedule, StopHeader, Timetable, Timetables, Trip, ViewModel(..))
+module ViewModel exposing
+    ( Schedule
+    , ServiceButton
+    , ServiceButtons
+    , StopHeader
+    , Timetable
+    , Timetables
+    , Trip
+    , ViewModel(..)
+    )
 
 import Mbta
 
@@ -12,7 +21,11 @@ type ViewModel
 
 
 type alias ServiceButtons =
-    List String
+    List ServiceButton
+
+
+type alias ServiceButton =
+    String
 
 
 type alias Timetables =

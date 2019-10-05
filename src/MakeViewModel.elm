@@ -22,9 +22,14 @@ makeViewModel model =
             ViewModel.Error (Debug.toString e)
 
         RemoteData.Success services ->
+            let
+                serviceButtons =
+                    viewServiceButtons (Mbta.Api.getPrimaryData services)
+            in
             case ( model.routes, model.stops, model.schedules ) of
                 ( RemoteData.Success routes, RemoteData.Success stops, RemoteData.Success schedules ) ->
-                    ViewModel.SchedulesLoaded []
+                    ViewModel.SchedulesLoaded
+                        serviceButtons
                         (viewTimetables
                             (Mbta.Api.getPrimaryData routes)
                             (Mbta.Api.getPrimaryData stops)
@@ -33,13 +38,13 @@ makeViewModel model =
                         )
 
                 ( RemoteData.Loading, _, _ ) ->
-                    ViewModel.LoadingSchedules []
+                    ViewModel.LoadingSchedules serviceButtons
 
                 ( _, RemoteData.Loading, _ ) ->
-                    ViewModel.LoadingSchedules []
+                    ViewModel.LoadingSchedules serviceButtons
 
                 ( _, _, RemoteData.Loading ) ->
-                    ViewModel.LoadingSchedules []
+                    ViewModel.LoadingSchedules serviceButtons
 
                 ( RemoteData.Failure e, _, _ ) ->
                     ViewModel.Error (Debug.toString e)
@@ -55,6 +60,11 @@ makeViewModel model =
 
         RemoteData.NotAsked ->
             ViewModel.Error (Debug.toString model)
+
+
+viewServiceButtons : List Mbta.Service -> ViewModel.ServiceButtons
+viewServiceButtons services =
+    List.map (.id >> (\(Mbta.ServiceId serviceId) -> serviceId)) services
 
 
 viewTimetables :

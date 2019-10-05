@@ -1,4 +1,11 @@
-module Model exposing (Model, Msg(..), routeIds, stopIds)
+module Model exposing
+    ( Model
+    , Msg(..)
+    , ServiceKey
+    , routeIds
+    , serviceKey
+    , stopIds
+    )
 
 import Mbta
 import Mbta.Api
@@ -54,4 +61,18 @@ type alias ServiceKey =
     , validDays : List Int
     , addedDates : List Mbta.ChangedDate
     , removedDates : List Mbta.ChangedDate
+    }
+
+
+serviceKey : Mbta.Service -> ServiceKey
+serviceKey service =
+    { description = service.description
+    , serviceType = service.serviceType
+    , name = service.name
+    , typicality = service.typicality
+    , startDate = service.startDate
+    , endDate = service.endDate
+    , validDays = service.validDays
+    , addedDates = service.addedDates
+    , removedDates = service.removedDates
     }

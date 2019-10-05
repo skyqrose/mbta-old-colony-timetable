@@ -64,7 +64,19 @@ makeViewModel model =
 
 viewServiceButtons : List Mbta.Service -> ViewModel.ServiceButtons
 viewServiceButtons services =
-    List.map (.id >> (\(Mbta.ServiceId serviceId) -> serviceId)) services
+    services
+        |> Dict.groupBy Model.serviceKey
+        |> Dict.keys
+        |> List.map viewServiceButton
+
+
+viewServiceButton : Model.ServiceKey -> ViewModel.ServiceButton
+viewServiceButton serviceKey =
+    { serviceKey = serviceKey
+    , text =
+        serviceKey.name
+            |> Maybe.withDefault "Service"
+    }
 
 
 viewTimetables :

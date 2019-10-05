@@ -69,7 +69,7 @@ viewServiceButtons : ViewModel.ServiceButtons -> Element msg
 viewServiceButtons serviceButtons =
     El.row
         []
-        (List.map El.text serviceButtons)
+        (List.map (El.text << .text) serviceButtons)
 
 
 viewTimetables : ViewModel.Timetables -> Element msg

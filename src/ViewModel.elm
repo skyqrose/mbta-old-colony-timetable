@@ -10,6 +10,7 @@ module ViewModel exposing
     )
 
 import Mbta
+import Model
 
 
 type ViewModel
@@ -25,7 +26,9 @@ type alias ServiceButtons =
 
 
 type alias ServiceButton =
-    String
+    { serviceKey : Model.ServiceKey
+    , text : String
+    }
 
 
 type alias Timetables =

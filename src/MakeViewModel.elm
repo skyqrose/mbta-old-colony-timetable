@@ -73,7 +73,33 @@ viewServiceButtons services =
     services
         |> List.map Model.serviceKey
         |> Helpers.uniq
+        |> sortServiceButtons
         |> List.map viewServiceButton
+
+
+{-| Sorts to Weekday, Saturday, Sunday, others
+ties are broken by start date
+-}
+sortServiceButtons : List Model.ServiceKey -> List Model.ServiceKey
+sortServiceButtons serviceKeys =
+    List.sortBy
+        (\serviceKey ->
+            ( case serviceKey.name of
+                Just "Weekday" ->
+                    0
+
+                Just "Saturday" ->
+                    1
+
+                Just "Sunday" ->
+                    2
+
+                _ ->
+                    3
+            , Mbta.serviceDateToIso8601 serviceKey.startDate
+            )
+        )
+        serviceKeys
 
 
 viewServiceButton : Model.ServiceKey -> ViewModel.ServiceButton

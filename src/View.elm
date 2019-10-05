@@ -66,7 +66,7 @@ body model =
             El.text e
 
 
-viewServiceButtons : ViewModel.ServiceButtons -> Element msg
+viewServiceButtons : ViewModel.ServiceButtons -> Element Msg
 viewServiceButtons serviceButtons =
     El.row
         []
@@ -74,7 +74,7 @@ viewServiceButtons serviceButtons =
             (\serviceButton ->
                 Input.button
                     []
-                    { onPress = Nothing
+                    { onPress = Just (Model.SelectServiceKey serviceButton.serviceKey)
                     , label = El.text serviceButton.text
                     }
             )

@@ -26,6 +26,7 @@ type Msg
     | ReceiveStops (Mbta.Api.ApiResult (List Mbta.Stop))
     | ReceiveSchedules (Mbta.Api.ApiResult (List Mbta.Schedule))
     | ReceiveServices (Mbta.Api.ApiResult (List Mbta.Service))
+    | SelectServiceKey ServiceKey
 
 
 type alias RemoteDataApi primary =

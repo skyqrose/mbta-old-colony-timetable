@@ -79,6 +79,13 @@ update msg model =
             , Cmd.none
             )
 
+        SelectServiceKey serviceKey ->
+            ( { model
+                | selectedServiceKey = Just serviceKey
+              }
+            , Cmd.none
+            )
+
 
 main : Program () Model Msg
 main =

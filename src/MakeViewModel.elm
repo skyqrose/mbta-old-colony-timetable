@@ -16,7 +16,7 @@ makeViewModel : Model.Model -> ViewModel.ViewModel
 makeViewModel model =
     case ( model.routes, model.stops, model.schedules ) of
         ( RemoteData.Success routes, RemoteData.Success stops, RemoteData.Success schedules ) ->
-            ViewModel.Success
+            ViewModel.SchedulesLoaded []
                 (viewTimetables
                     (Mbta.Api.getPrimaryData routes)
                     (Mbta.Api.getPrimaryData stops)
@@ -25,13 +25,13 @@ makeViewModel model =
                 )
 
         ( RemoteData.Loading, _, _ ) ->
-            ViewModel.Loading
+            ViewModel.LoadingSchedules []
 
         ( _, RemoteData.Loading, _ ) ->
-            ViewModel.Loading
+            ViewModel.LoadingSchedules []
 
         ( _, _, RemoteData.Loading ) ->
-            ViewModel.Loading
+            ViewModel.LoadingSchedules []
 
         ( RemoteData.Failure e, _, _ ) ->
             ViewModel.Error (Debug.toString e)

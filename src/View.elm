@@ -39,14 +39,20 @@ view model =
 body : ViewModel.ViewModel -> Element Msg
 body model =
     case model of
-        ViewModel.Loading ->
-            El.text "Loading"
+        ViewModel.LoadingServices ->
+            El.text "Loading services"
+
+        ViewModel.ServicesLoaded serviceButtons ->
+            El.text "Services loaded"
+
+        ViewModel.LoadingSchedules serviceButtons ->
+            El.text "Loading schedules"
+
+        ViewModel.SchedulesLoaded serviceButtons timetables ->
+            viewTimetables timetables
 
         ViewModel.Error e ->
             El.text e
-
-        ViewModel.Success timetables ->
-            viewTimetables timetables
 
 
 viewTimetables : ViewModel.Timetables -> Element msg

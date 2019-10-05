@@ -4,9 +4,15 @@ import Mbta
 
 
 type ViewModel
-    = Loading
+    = LoadingServices
+    | ServicesLoaded ServiceButtons
+    | LoadingSchedules ServiceButtons
+    | SchedulesLoaded ServiceButtons Timetables
     | Error String
-    | Success Timetables
+
+
+type alias ServiceButtons =
+    List String
 
 
 type alias Timetables =

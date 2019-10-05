@@ -19,6 +19,7 @@ init =
       , stops = RemoteData.Loading
       , schedules = RemoteData.Loading
       , services = RemoteData.Loading
+      , selectedServiceKey = Nothing
       }
     , Cmd.batch
         [ Mbta.Api.getRoutes

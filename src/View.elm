@@ -2,6 +2,7 @@ module View exposing (view)
 
 import Browser
 import Element as El exposing (Element)
+import Element.Border as Border
 import Element.Font as Font
 import Element.Region as Region
 import Mbta
@@ -11,7 +12,9 @@ import ViewModel
 
 scheduleCellStyling : List (El.Attribute msg)
 scheduleCellStyling =
-    [ El.height (El.px 60) ]
+    [ El.height (El.px 60)
+    , El.padding 5
+    ]
 
 
 view : ViewModel.ViewModel -> Browser.Document Msg
@@ -81,8 +84,7 @@ type alias Schedule =
 viewTimetable : ViewModel.Timetable -> Element msg
 viewTimetable timetable =
     El.row
-        [ El.spacing 15
-        , El.padding 10
+        [ El.padding 10
         ]
         (viewStopHeaders timetable.stopHeaders :: List.map viewTripColumn timetable.trips)
 
@@ -92,9 +94,21 @@ viewStopHeaders stopHeaders =
     El.column
         []
         (List.concat
-            [ [ El.text "" ]
+            [ [ El.el
+                    (scheduleCellStyling
+                        ++ [ El.width El.fill
+                           , Border.widthEach
+                                { bottom = 1
+                                , left = 0
+                                , right = 0
+                                , top = 0
+                                }
+                           ]
+                    )
+                    (El.text "")
+              ]
             , List.map viewStopHeaderCell stopHeaders
-            , [ El.text "" ]
+            , [ El.el scheduleCellStyling (El.text "") ]
             ]
         )
 
@@ -119,7 +133,13 @@ viewStopHeaderCell stopHeader =
 viewTripColumn : ViewModel.Trip -> Element msg
 viewTripColumn trip =
     El.column
-        []
+        [ Border.widthEach
+            { bottom = 0
+            , left = 1
+            , right = 0
+            , top = 0
+            }
+        ]
         (List.concat
             [ [ tripDescriptor trip ]
             , List.map viewSchedule trip.schedules
@@ -139,7 +159,16 @@ viewSchedule schedule =
 tripDescriptor : ViewModel.Trip -> Element msg
 tripDescriptor trip =
     El.column
-        scheduleCellStyling
+        (scheduleCellStyling
+            ++ [ El.width El.fill
+               , Border.widthEach
+                    { bottom = 1
+                    , left = 0
+                    , right = 0
+                    , top = 0
+                    }
+               ]
+        )
         [ case trip.name of
             Nothing ->
                 El.text "-"
@@ -179,4 +208,4 @@ tripFooter trip =
             ""
     )
         |> El.text
-        |> El.el [ Font.variant Font.smallCaps ]
+        |> El.el (scheduleCellStyling ++ [ Font.variant Font.smallCaps ])

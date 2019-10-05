@@ -14,35 +14,46 @@ import ViewModel
 
 makeViewModel : Model.Model -> ViewModel.ViewModel
 makeViewModel model =
-    case ( model.routes, model.stops, model.schedules ) of
-        ( RemoteData.Success routes, RemoteData.Success stops, RemoteData.Success schedules ) ->
-            ViewModel.SchedulesLoaded []
-                (viewTimetables
-                    (Mbta.Api.getPrimaryData routes)
-                    (Mbta.Api.getPrimaryData stops)
-                    (Mbta.Api.getPrimaryData schedules)
-                    (\tripId -> Mbta.Api.getIncludedTrip tripId schedules)
-                )
+    case model.services of
+        RemoteData.Loading ->
+            ViewModel.LoadingServices
 
-        ( RemoteData.Loading, _, _ ) ->
-            ViewModel.LoadingSchedules []
-
-        ( _, RemoteData.Loading, _ ) ->
-            ViewModel.LoadingSchedules []
-
-        ( _, _, RemoteData.Loading ) ->
-            ViewModel.LoadingSchedules []
-
-        ( RemoteData.Failure e, _, _ ) ->
+        RemoteData.Failure e ->
             ViewModel.Error (Debug.toString e)
 
-        ( _, RemoteData.Failure e, _ ) ->
-            ViewModel.Error (Debug.toString e)
+        RemoteData.Success services ->
+            case ( model.routes, model.stops, model.schedules ) of
+                ( RemoteData.Success routes, RemoteData.Success stops, RemoteData.Success schedules ) ->
+                    ViewModel.SchedulesLoaded []
+                        (viewTimetables
+                            (Mbta.Api.getPrimaryData routes)
+                            (Mbta.Api.getPrimaryData stops)
+                            (Mbta.Api.getPrimaryData schedules)
+                            (\tripId -> Mbta.Api.getIncludedTrip tripId schedules)
+                        )
 
-        ( _, _, RemoteData.Failure e ) ->
-            ViewModel.Error (Debug.toString e)
+                ( RemoteData.Loading, _, _ ) ->
+                    ViewModel.LoadingSchedules []
 
-        _ ->
+                ( _, RemoteData.Loading, _ ) ->
+                    ViewModel.LoadingSchedules []
+
+                ( _, _, RemoteData.Loading ) ->
+                    ViewModel.LoadingSchedules []
+
+                ( RemoteData.Failure e, _, _ ) ->
+                    ViewModel.Error (Debug.toString e)
+
+                ( _, RemoteData.Failure e, _ ) ->
+                    ViewModel.Error (Debug.toString e)
+
+                ( _, _, RemoteData.Failure e ) ->
+                    ViewModel.Error (Debug.toString e)
+
+                _ ->
+                    ViewModel.Error (Debug.toString model)
+
+        RemoteData.NotAsked ->
             ViewModel.Error (Debug.toString model)
 
 

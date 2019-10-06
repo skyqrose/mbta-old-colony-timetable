@@ -8,6 +8,7 @@ module Model exposing
     , stopIds
     )
 
+import Json.Decode as Decode
 import Mbta
 import Mbta.Api
 import RemoteData
@@ -19,6 +20,7 @@ type alias Model =
     , services : RemoteDataApi (List Mbta.Service)
     , schedules : RemoteDataApi (List Mbta.Schedule)
     , selectedDay : Day
+    , predictionsStreamState : Mbta.Api.StreamState Mbta.Prediction
     }
 
 
@@ -28,6 +30,7 @@ type Msg
     | ReceiveServices (Mbta.Api.ApiResult (List Mbta.Service))
     | ReceiveSchedules (Mbta.Api.ApiResult (List Mbta.Schedule))
     | SelectDay Day
+    | PredictionsStreamMsg String Decode.Value
 
 
 type alias RemoteDataApi primary =

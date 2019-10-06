@@ -1,12 +1,21 @@
-module Main exposing (main)
+port module Main exposing (main)
 
 import Browser
+import Json.Decode as Decode
 import MakeViewModel
 import Mbta
 import Mbta.Api
 import Model exposing (..)
 import RemoteData
 import View
+
+
+{-| Takes a url
+-}
+port startPredictionsStream : String -> Cmd msg
+
+
+port predictionsStreamEvent : (Decode.Value -> msg) -> Sub msg
 
 
 apiHost : Mbta.Api.Host
@@ -16,11 +25,21 @@ apiHost =
 
 init : ( Model, Cmd Msg )
 init =
+    let
+        ( predictionsStreamState, predictionsStreamUrl ) =
+            Mbta.Api.streamPredictions
+                apiHost
+                []
+                [ Mbta.Api.filterPredictionsByRouteIds routeIds
+                , Mbta.Api.filterPredictionsByStopIds stopIds
+                ]
+    in
     ( { routes = RemoteData.Loading
       , stops = RemoteData.Loading
       , services = RemoteData.Loading
       , schedules = RemoteData.NotAsked
       , selectedDay = Today
+      , predictionsStreamState = predictionsStreamState
       }
     , Cmd.batch
         [ Mbta.Api.getRoutes
@@ -39,6 +58,7 @@ init =
             []
             [ Mbta.Api.filterServicesByRouteIds routeIds ]
         , getSchedules Today
+        , startPredictionsStream predictionsStreamUrl
         ]
     )
 
@@ -82,6 +102,13 @@ update msg model =
             , getSchedules selectedDay
             )
 
+        PredictionsStreamMsg eventString dataJson ->
+            ( { model
+                | predictionsStreamState = Mbta.Api.updateStream eventString dataJson model.predictionsStreamState
+              }
+            , Cmd.none
+            )
+
 
 getSchedules : Day -> Cmd Msg
 getSchedules selectedDay =
@@ -106,11 +133,33 @@ getSchedules selectedDay =
         )
 
 
+predictionsStreamSubscription : Sub Msg
+predictionsStreamSubscription =
+    let
+        msgDecoder : Decode.Decoder Msg
+        msgDecoder =
+            Decode.map2
+                PredictionsStreamMsg
+                (Decode.field "event" Decode.string)
+                (Decode.field "data" Decode.value)
+
+        valueToMsg : Decode.Value -> Msg
+        valueToMsg value =
+            case Decode.decodeValue msgDecoder value of
+                Ok msg ->
+                    msg
+
+                Err e ->
+                    Debug.todo ("Failed to decode stream event" ++ Decode.errorToString e)
+    in
+    predictionsStreamEvent valueToMsg
+
+
 main : Program () Model Msg
 main =
     Browser.document
         { init = \flags -> init
         , view = MakeViewModel.makeViewModel >> View.view
         , update = update
-        , subscriptions = \model -> Sub.none
+        , subscriptions = \model -> predictionsStreamSubscription
         }

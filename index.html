@@ -13,7 +13,28 @@
         JavaScript is required for this page
     </noscript>
     <script>
-        Elm.Main.init();
+        var startEventSource = function (url, eventPort) {
+            var eventNames = ["reset", "add", "update", "remove"];
+            var eventSource = new EventSource(url);
+            for (i = 0; i < eventNames.length; i++) {
+                let eventName = eventNames[i];
+                eventSource.addEventListener(eventName, function (eventData) {
+                    eventPort.send({
+                        event: eventName,
+                        data: JSON.parse(eventData.data),
+                    });
+                }, false)
+            }
+            return eventSource
+        }
+        var app = Elm.Main.init();
+        var predictionsEventSource = undefined
+        app.ports.startPredictionsStream.subscribe(function (url) {
+            if (predictionsEventSource != undefined) {
+                eventSource.close()
+            }
+            predictionsEventSource = startEventSource(url, app.ports.predictionsStreamEvent)
+        })
     </script>
 </body>
 

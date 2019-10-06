@@ -1,5 +1,6 @@
 module Model exposing
-    ( Model
+    ( Day(..)
+    , Model
     , Msg(..)
     , ServiceKey
     , routeIds
@@ -17,7 +18,7 @@ type alias Model =
     , stops : RemoteDataApi (List Mbta.Stop)
     , services : RemoteDataApi (List Mbta.Service)
     , schedules : RemoteDataApi (List Mbta.Schedule)
-    , selectedServiceKey : Maybe ServiceKey
+    , selectedDay : Day
     }
 
 
@@ -26,7 +27,7 @@ type Msg
     | ReceiveStops (Mbta.Api.ApiResult (List Mbta.Stop))
     | ReceiveServices (Mbta.Api.ApiResult (List Mbta.Service))
     | ReceiveSchedules (Mbta.Api.ApiResult (List Mbta.Schedule))
-    | SelectServiceKey ServiceKey
+    | SelectDay Day
 
 
 type alias RemoteDataApi primary =
@@ -48,6 +49,11 @@ stopIds =
     , Mbta.StopId "place-qnctr"
     , Mbta.StopId "place-brntn"
     ]
+
+
+type Day
+    = Today
+    | Future ServiceKey
 
 
 {-| Two services are the same, running at the same time, if all the fields except the id match

@@ -20,7 +20,7 @@ init =
       , stops = RemoteData.Loading
       , services = RemoteData.Loading
       , schedules = RemoteData.NotAsked
-      , selectedServiceKey = Nothing
+      , selectedDay = Today
       }
     , Cmd.batch
         [ Mbta.Api.getRoutes
@@ -38,20 +38,7 @@ init =
             apiHost
             []
             [ Mbta.Api.filterServicesByRouteIds routeIds ]
-        , Mbta.Api.getSchedules
-            ReceiveSchedules
-            apiHost
-            [ Mbta.Api.include
-                (Mbta.Api.scheduleTrip
-                    -- Include the service so we can use it to select an initial serviceKey
-                    |> Mbta.Api.andIts Mbta.Api.tripService
-                )
-            ]
-            [ Mbta.Api.filterSchedulesByRouteIds routeIds
-            , Mbta.Api.filterSchedulesByStopIds stopIds
-
-            -- Implicilty filters to today's schedule
-            ]
+        , getSchedules Today
         ]
     )
 
@@ -83,53 +70,40 @@ update msg model =
         ReceiveSchedules schedulesResult ->
             ( { model
                 | schedules = RemoteData.fromResult schedulesResult
-                , selectedServiceKey =
-                    -- If we haven't selected any services (like for the first fetch), select the one for the day we just got
-                    case model.selectedServiceKey of
-                        Nothing ->
-                            serviceKeyFromSchedulesResult schedulesResult
-
-                        Just _ ->
-                            model.selectedServiceKey
               }
             , Cmd.none
             )
 
-        SelectServiceKey serviceKey ->
+        SelectDay selectedDay ->
             ( { model
-                | selectedServiceKey = Just serviceKey
+                | selectedDay = selectedDay
+                , schedules = RemoteData.Loading
               }
-            , Mbta.Api.getSchedules
-                ReceiveSchedules
-                apiHost
-                [ Mbta.Api.include Mbta.Api.scheduleTrip ]
-                [ Mbta.Api.filterSchedulesByRouteIds routeIds
-                , Mbta.Api.filterSchedulesByStopIds stopIds
-                , Mbta.Api.filterSchedulesByServiceDate serviceKey.startDate
-                ]
+            , getSchedules selectedDay
             )
 
 
-{-| Requires trips and services to be included
--}
-serviceKeyFromSchedulesResult : Mbta.Api.ApiResult (List Mbta.Schedule) -> Maybe ServiceKey
-serviceKeyFromSchedulesResult schedulesResult =
-    schedulesResult
-        |> Result.toMaybe
-        |> Maybe.andThen
-            (\data ->
-                let
-                    schedules =
-                        Mbta.Api.getPrimaryData data
-                in
-                schedules
-                    |> List.head
-                    |> Maybe.map .tripId
-                    |> Maybe.andThen (\tripId -> Mbta.Api.getIncludedTrip tripId data)
-                    |> Maybe.map .serviceId
-                    |> Maybe.andThen (\serviceId -> Mbta.Api.getIncludedService serviceId data)
-                    |> Maybe.map Model.serviceKey
-            )
+getSchedules : Day -> Cmd Msg
+getSchedules selectedDay =
+    let
+        dateFilter : List (Mbta.Api.Filter Mbta.Schedule)
+        dateFilter =
+            case selectedDay of
+                Today ->
+                    [{- No date filter is implicitly today -}]
+
+                Future serviceKey ->
+                    [ Mbta.Api.filterSchedulesByServiceDate serviceKey.startDate ]
+    in
+    Mbta.Api.getSchedules
+        ReceiveSchedules
+        apiHost
+        [ Mbta.Api.include Mbta.Api.scheduleTrip ]
+        ([ Mbta.Api.filterSchedulesByRouteIds routeIds
+         , Mbta.Api.filterSchedulesByStopIds stopIds
+         ]
+            ++ dateFilter
+        )
 
 
 main : Program () Model Msg

@@ -1,7 +1,7 @@
 module ViewModel exposing
-    ( Schedule
-    , ServiceButton
-    , ServiceButtons
+    ( DayButton
+    , DayButtons
+    , Schedule
     , StopHeader
     , Timetable
     , Timetables
@@ -15,18 +15,18 @@ import Model
 
 type ViewModel
     = LoadingServices
-    | ServicesLoaded ServiceButtons
-    | LoadingSchedules ServiceButtons
-    | SchedulesLoaded ServiceButtons Timetables
+    | ServicesLoaded DayButtons
+    | LoadingSchedules DayButtons
+    | SchedulesLoaded DayButtons Timetables
     | Error String
 
 
-type alias ServiceButtons =
-    List ServiceButton
+type alias DayButtons =
+    List DayButton
 
 
-type alias ServiceButton =
-    { serviceKey : Model.ServiceKey
+type alias DayButton =
+    { day : Model.Day
     , text : String
     , isSelected : Bool
     }

@@ -24,17 +24,17 @@ makeViewModel model =
 
         RemoteData.Success services ->
             let
-                serviceButtons =
-                    viewServiceButtons
+                dayButtons =
+                    viewDayButtons
                         (Mbta.Api.getPrimaryData services)
-                        model.selectedServiceKey
+                        model.selectedDay
             in
             case model.schedules of
                 RemoteData.NotAsked ->
-                    ViewModel.ServicesLoaded serviceButtons
+                    ViewModel.ServicesLoaded dayButtons
 
                 RemoteData.Loading ->
-                    ViewModel.LoadingSchedules serviceButtons
+                    ViewModel.LoadingSchedules dayButtons
 
                 RemoteData.Failure e ->
                     ViewModel.Error (Debug.toString e)
@@ -43,7 +43,7 @@ makeViewModel model =
                     case ( model.routes, model.stops ) of
                         ( RemoteData.Success routes, RemoteData.Success stops ) ->
                             ViewModel.SchedulesLoaded
-                                serviceButtons
+                                dayButtons
                                 (viewTimetables
                                     (Mbta.Api.getPrimaryData routes)
                                     (Mbta.Api.getPrimaryData stops)
@@ -58,10 +58,10 @@ makeViewModel model =
                             ViewModel.Error (Debug.toString e)
 
                         ( RemoteData.Loading, _ ) ->
-                            ViewModel.LoadingSchedules serviceButtons
+                            ViewModel.LoadingSchedules dayButtons
 
                         ( _, RemoteData.Loading ) ->
-                            ViewModel.LoadingSchedules serviceButtons
+                            ViewModel.LoadingSchedules dayButtons
 
                         _ ->
                             ViewModel.Error (Debug.toString model)
@@ -70,23 +70,31 @@ makeViewModel model =
             ViewModel.Error (Debug.toString model)
 
 
-viewServiceButtons :
+viewDayButtons :
     List Mbta.Service
-    -> Maybe Model.ServiceKey
-    -> ViewModel.ServiceButtons
-viewServiceButtons services selectedServiceKey =
-    services
-        |> List.map Model.serviceKey
-        |> Helpers.uniq
-        |> sortServiceButtons
-        |> List.map (viewServiceButton selectedServiceKey)
+    -> Model.Day
+    -> ViewModel.DayButtons
+viewDayButtons services selectedDay =
+    let
+        serviceKeys : List Model.ServiceKey
+        serviceKeys =
+            services
+                |> List.map Model.serviceKey
+                |> Helpers.uniq
+                |> sortServiceKeys
+
+        days : List Model.Day
+        days =
+            Model.Today :: List.map Model.Future serviceKeys
+    in
+    List.map (viewDayButton selectedDay) days
 
 
 {-| Sorts to Weekday, Saturday, Sunday, others
 ties are broken by start date
 -}
-sortServiceButtons : List Model.ServiceKey -> List Model.ServiceKey
-sortServiceButtons serviceKeys =
+sortServiceKeys : List Model.ServiceKey -> List Model.ServiceKey
+sortServiceKeys serviceKeys =
     List.sortBy
         (\serviceKey ->
             ( case serviceKey.name of
@@ -107,13 +115,18 @@ sortServiceButtons serviceKeys =
         serviceKeys
 
 
-viewServiceButton : Maybe Model.ServiceKey -> Model.ServiceKey -> ViewModel.ServiceButton
-viewServiceButton selectedServiceKey serviceKey =
-    { serviceKey = serviceKey
+viewDayButton : Model.Day -> Model.Day -> ViewModel.DayButton
+viewDayButton selectedDay buttonDay =
+    { day = buttonDay
     , text =
-        serviceKey.name
-            |> Maybe.withDefault "Service"
-    , isSelected = selectedServiceKey == Just serviceKey
+        case buttonDay of
+            Model.Today ->
+                "Today"
+
+            Model.Future serviceKey ->
+                serviceKey.name
+                    |> Maybe.withDefault "Service"
+    , isSelected = selectedDay == buttonDay
     }
 
 

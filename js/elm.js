@@ -2618,107 +2618,6 @@ var _Parser_findSubString = F5(function(smallString, offset, row, col, bigString
 });
 
 
-// CREATE
-
-var _Regex_never = /.^/;
-
-var _Regex_fromStringWith = F2(function(options, string)
-{
-	var flags = 'g';
-	if (options.multiline) { flags += 'm'; }
-	if (options.caseInsensitive) { flags += 'i'; }
-
-	try
-	{
-		return elm$core$Maybe$Just(new RegExp(string, flags));
-	}
-	catch(error)
-	{
-		return elm$core$Maybe$Nothing;
-	}
-});
-
-
-// USE
-
-var _Regex_contains = F2(function(re, string)
-{
-	return string.match(re) !== null;
-});
-
-
-var _Regex_findAtMost = F3(function(n, re, str)
-{
-	var out = [];
-	var number = 0;
-	var string = str;
-	var lastIndex = re.lastIndex;
-	var prevLastIndex = -1;
-	var result;
-	while (number++ < n && (result = re.exec(string)))
-	{
-		if (prevLastIndex == re.lastIndex) break;
-		var i = result.length - 1;
-		var subs = new Array(i);
-		while (i > 0)
-		{
-			var submatch = result[i];
-			subs[--i] = submatch
-				? elm$core$Maybe$Just(submatch)
-				: elm$core$Maybe$Nothing;
-		}
-		out.push(A4(elm$regex$Regex$Match, result[0], result.index, number, _List_fromArray(subs)));
-		prevLastIndex = re.lastIndex;
-	}
-	re.lastIndex = lastIndex;
-	return _List_fromArray(out);
-});
-
-
-var _Regex_replaceAtMost = F4(function(n, re, replacer, string)
-{
-	var count = 0;
-	function jsReplacer(match)
-	{
-		if (count++ >= n)
-		{
-			return match;
-		}
-		var i = arguments.length - 3;
-		var submatches = new Array(i);
-		while (i > 0)
-		{
-			var submatch = arguments[i];
-			submatches[--i] = submatch
-				? elm$core$Maybe$Just(submatch)
-				: elm$core$Maybe$Nothing;
-		}
-		return replacer(A4(elm$regex$Regex$Match, match, arguments[arguments.length - 2], count, _List_fromArray(submatches)));
-	}
-	return string.replace(re, jsReplacer);
-});
-
-var _Regex_splitAtMost = F3(function(n, re, str)
-{
-	var string = str;
-	var out = [];
-	var start = re.lastIndex;
-	var restoreLastIndex = re.lastIndex;
-	while (n--)
-	{
-		var result = re.exec(string);
-		if (!result) break;
-		out.push(string.slice(start, result.index));
-		start = re.lastIndex;
-	}
-	out.push(string.slice(start));
-	re.lastIndex = restoreLastIndex;
-	return _List_fromArray(out);
-});
-
-var _Regex_infinity = Infinity;
-
-
 function _Url_percentEncode(string)
 {
 	return encodeURIComponent(string);
@@ -5091,6 +4990,10 @@ var elm$core$Result$map2 = F3(
 			}
 		}
 	});
+var author$project$ResultHelpers$combine = A2(
+	elm$core$List$foldr,
+	elm$core$Result$map2(elm$core$List$cons),
+	elm$core$Result$Ok(_List_Nil));
 var elm$core$Result$mapError = F2(
 	function (f, result) {
 		if (result.$ === 'Ok') {
@@ -5102,10 +5005,6 @@ var elm$core$Result$mapError = F2(
 				f(e));
 		}
 	});
-var elm_community$result_extra$Result$Extra$combine = A2(
-	elm$core$List$foldr,
-	elm$core$Result$map2(elm$core$List$cons),
-	elm$core$Result$Ok(_List_Nil));
 var author$project$JsonApi$documentDecoderMany = F2(
 	function (includedDecoder, resourceDecoder) {
 		return author$project$JsonApi$DocumentDecoder(
@@ -5125,7 +5024,7 @@ var author$project$JsonApi$documentDecoderMany = F2(
 									function (decodedData, decodedIncluded) {
 										return {data: decodedData, included: decodedIncluded};
 									}),
-								elm_community$result_extra$Result$Extra$combine(
+								author$project$ResultHelpers$combine(
 									A2(
 										elm$core$List$map,
 										author$project$JsonApi$decodeResource(resourceDecoder),
@@ -8040,272 +7939,127 @@ var author$project$Mbta$Line = F6(
 	function (id, shortName, longName, sortOrder, color, textColor) {
 		return {color: color, id: id, longName: longName, shortName: shortName, sortOrder: sortOrder, textColor: textColor};
 	});
-var author$project$DecodeHelpers$fromResult = function (result) {
-	if (result.$ === 'Ok') {
-		var x = result.a;
-		return elm$json$Json$Decode$succeed(x);
-	} else {
-		var e = result.a;
-		return elm$json$Json$Decode$fail(e);
+var elm$core$Char$toLower = _Char_toLower;
+var author$project$DecodeHelpers$hexToInt = function (_char) {
+	var _n0 = elm$core$Char$toLower(_char);
+	switch (_n0.valueOf()) {
+		case '0':
+			return elm$core$Maybe$Just(0);
+		case '1':
+			return elm$core$Maybe$Just(1);
+		case '2':
+			return elm$core$Maybe$Just(2);
+		case '3':
+			return elm$core$Maybe$Just(3);
+		case '4':
+			return elm$core$Maybe$Just(4);
+		case '5':
+			return elm$core$Maybe$Just(5);
+		case '6':
+			return elm$core$Maybe$Just(6);
+		case '7':
+			return elm$core$Maybe$Just(7);
+		case '8':
+			return elm$core$Maybe$Just(8);
+		case '9':
+			return elm$core$Maybe$Just(9);
+		case 'a':
+			return elm$core$Maybe$Just(10);
+		case 'b':
+			return elm$core$Maybe$Just(11);
+		case 'c':
+			return elm$core$Maybe$Just(12);
+		case 'd':
+			return elm$core$Maybe$Just(13);
+		case 'e':
+			return elm$core$Maybe$Just(14);
+		case 'f':
+			return elm$core$Maybe$Just(15);
+		default:
+			return elm$core$Maybe$Nothing;
 	}
 };
+var elm$core$Maybe$map2 = F3(
+	function (func, ma, mb) {
+		if (ma.$ === 'Nothing') {
+			return elm$core$Maybe$Nothing;
+		} else {
+			var a = ma.a;
+			if (mb.$ === 'Nothing') {
+				return elm$core$Maybe$Nothing;
+			} else {
+				var b = mb.a;
+				return elm$core$Maybe$Just(
+					A2(func, a, b));
+			}
+		}
+	});
+var author$project$DecodeHelpers$hex2ToInt = F2(
+	function (char1, char2) {
+		return A3(
+			elm$core$Maybe$map2,
+			F2(
+				function (int1, int2) {
+					return (int1 * 16) + int2;
+				}),
+			author$project$DecodeHelpers$hexToInt(char1),
+			author$project$DecodeHelpers$hexToInt(char2));
+	});
 var avh4$elm_color$Color$RgbaSpace = F4(
 	function (a, b, c, d) {
 		return {$: 'RgbaSpace', a: a, b: b, c: c, d: d};
 	});
-var avh4$elm_color$Color$rgb = F3(
-	function (r, g, b) {
-		return A4(avh4$elm_color$Color$RgbaSpace, r, g, b, 1.0);
-	});
-var avh4$elm_color$Color$rgba = F4(
-	function (r, g, b, a) {
-		return A4(avh4$elm_color$Color$RgbaSpace, r, g, b, a);
-	});
-var elm$core$List$head = function (list) {
-	if (list.b) {
-		var x = list.a;
-		var xs = list.b;
-		return elm$core$Maybe$Just(x);
-	} else {
-		return elm$core$Maybe$Nothing;
-	}
+var avh4$elm_color$Color$scaleFrom255 = function (c) {
+	return c / 255;
 };
-var elm$core$Maybe$andThen = F2(
-	function (callback, maybeValue) {
-		if (maybeValue.$ === 'Just') {
-			var value = maybeValue.a;
-			return callback(value);
-		} else {
-			return elm$core$Maybe$Nothing;
-		}
+var avh4$elm_color$Color$rgb255 = F3(
+	function (r, g, b) {
+		return A4(
+			avh4$elm_color$Color$RgbaSpace,
+			avh4$elm_color$Color$scaleFrom255(r),
+			avh4$elm_color$Color$scaleFrom255(g),
+			avh4$elm_color$Color$scaleFrom255(b),
+			1.0);
 	});
-var elm$core$Maybe$map = F2(
-	function (f, maybe) {
-		if (maybe.$ === 'Just') {
-			var value = maybe.a;
-			return elm$core$Maybe$Just(
-				f(value));
-		} else {
-			return elm$core$Maybe$Nothing;
-		}
-	});
-var elm$core$Result$fromMaybe = F2(
-	function (err, maybe) {
-		if (maybe.$ === 'Just') {
-			var v = maybe.a;
-			return elm$core$Result$Ok(v);
-		} else {
-			return elm$core$Result$Err(err);
-		}
-	});
-var elm$core$String$fromList = _String_fromList;
 var elm$core$String$foldr = _String_foldr;
 var elm$core$String$toList = function (string) {
 	return A3(elm$core$String$foldr, elm$core$List$cons, _List_Nil, string);
 };
-var elm$core$String$toLower = _String_toLower;
-var elm$regex$Regex$Match = F4(
-	function (match, index, number, submatches) {
-		return {index: index, match: match, number: number, submatches: submatches};
-	});
-var elm$regex$Regex$findAtMost = _Regex_findAtMost;
-var elm$regex$Regex$fromStringWith = _Regex_fromStringWith;
-var elm$regex$Regex$fromString = function (string) {
-	return A2(
-		elm$regex$Regex$fromStringWith,
-		{caseInsensitive: false, multiline: false},
-		string);
-};
-var elm$core$String$reverse = _String_reverse;
-var fredcy$elm_parseint$ParseInt$InvalidRadix = function (a) {
-	return {$: 'InvalidRadix', a: a};
-};
-var fredcy$elm_parseint$ParseInt$InvalidChar = function (a) {
-	return {$: 'InvalidChar', a: a};
-};
-var fredcy$elm_parseint$ParseInt$OutOfRange = function (a) {
-	return {$: 'OutOfRange', a: a};
-};
-var fredcy$elm_parseint$ParseInt$charOffset = F2(
-	function (basis, c) {
-		return elm$core$Char$toCode(c) - elm$core$Char$toCode(basis);
-	});
-var fredcy$elm_parseint$ParseInt$isBetween = F3(
-	function (lower, upper, c) {
-		var ci = elm$core$Char$toCode(c);
-		return (_Utils_cmp(
-			elm$core$Char$toCode(lower),
-			ci) < 1) && (_Utils_cmp(
-			ci,
-			elm$core$Char$toCode(upper)) < 1);
-	});
-var fredcy$elm_parseint$ParseInt$intFromChar = F2(
-	function (radix, c) {
-		var validInt = function (i) {
-			return (_Utils_cmp(i, radix) < 0) ? elm$core$Result$Ok(i) : elm$core$Result$Err(
-				fredcy$elm_parseint$ParseInt$OutOfRange(c));
-		};
-		var toInt = A3(
-			fredcy$elm_parseint$ParseInt$isBetween,
-			_Utils_chr('0'),
-			_Utils_chr('9'),
-			c) ? elm$core$Result$Ok(
-			A2(
-				fredcy$elm_parseint$ParseInt$charOffset,
-				_Utils_chr('0'),
-				c)) : (A3(
-			fredcy$elm_parseint$ParseInt$isBetween,
-			_Utils_chr('a'),
-			_Utils_chr('z'),
-			c) ? elm$core$Result$Ok(
-			10 + A2(
-				fredcy$elm_parseint$ParseInt$charOffset,
-				_Utils_chr('a'),
-				c)) : (A3(
-			fredcy$elm_parseint$ParseInt$isBetween,
-			_Utils_chr('A'),
-			_Utils_chr('Z'),
-			c) ? elm$core$Result$Ok(
-			10 + A2(
-				fredcy$elm_parseint$ParseInt$charOffset,
-				_Utils_chr('A'),
-				c)) : elm$core$Result$Err(
-			fredcy$elm_parseint$ParseInt$InvalidChar(c))));
-		return A2(elm$core$Result$andThen, validInt, toInt);
-	});
-var fredcy$elm_parseint$ParseInt$parseIntR = F2(
-	function (radix, rstring) {
-		var _n0 = elm$core$String$uncons(rstring);
-		if (_n0.$ === 'Nothing') {
-			return elm$core$Result$Ok(0);
-		} else {
-			var _n1 = _n0.a;
-			var c = _n1.a;
-			var rest = _n1.b;
-			return A2(
-				elm$core$Result$andThen,
-				function (ci) {
-					return A2(
-						elm$core$Result$andThen,
-						function (ri) {
-							return elm$core$Result$Ok(ci + (ri * radix));
-						},
-						A2(fredcy$elm_parseint$ParseInt$parseIntR, radix, rest));
-				},
-				A2(fredcy$elm_parseint$ParseInt$intFromChar, radix, c));
-		}
-	});
-var fredcy$elm_parseint$ParseInt$parseIntRadix = F2(
-	function (radix, string) {
-		return ((2 <= radix) && (radix <= 36)) ? A2(
-			fredcy$elm_parseint$ParseInt$parseIntR,
-			radix,
-			elm$core$String$reverse(string)) : elm$core$Result$Err(
-			fredcy$elm_parseint$ParseInt$InvalidRadix(radix));
-	});
-var fredcy$elm_parseint$ParseInt$parseIntHex = fredcy$elm_parseint$ParseInt$parseIntRadix(16);
-var elm$core$Basics$pow = _Basics_pow;
-var noahzgordon$elm_color_extra$Color$Convert$roundToPlaces = F2(
-	function (places, number) {
-		var multiplier = A2(elm$core$Basics$pow, 10, places);
-		return elm$core$Basics$round(number * multiplier) / multiplier;
-	});
-var noahzgordon$elm_color_extra$Color$Convert$hexToColor = function () {
-	var pattern = '' + ('^' + ('#?' + ('(?:' + ('(?:([a-f\\d]{2})([a-f\\d]{2})([a-f\\d]{2}))' + ('|' + ('(?:([a-f\\d])([a-f\\d])([a-f\\d]))' + ('|' + ('(?:([a-f\\d]{2})([a-f\\d]{2})([a-f\\d]{2})([a-f\\d]{2}))' + ('|' + ('(?:([a-f\\d])([a-f\\d])([a-f\\d])([a-f\\d]))' + (')' + '$')))))))))));
-	var extend = function (token) {
-		var _n6 = elm$core$String$toList(token);
-		if (_n6.b && (!_n6.b.b)) {
-			var token_ = _n6.a;
-			return elm$core$String$fromList(
-				_List_fromArray(
-					[token_, token_]));
-		} else {
-			return token;
-		}
-	};
-	return A2(
-		elm$core$Basics$composeR,
-		elm$core$String$toLower,
-		A2(
-			elm$core$Basics$composeR,
-			function (str) {
-				return A2(
-					elm$core$Maybe$map,
-					function (regex) {
-						return A3(elm$regex$Regex$findAtMost, 1, regex, str);
-					},
-					elm$regex$Regex$fromString(pattern));
-			},
-			A2(
-				elm$core$Basics$composeR,
-				elm$core$Maybe$andThen(elm$core$List$head),
-				A2(
-					elm$core$Basics$composeR,
-					elm$core$Maybe$map(
-						function ($) {
-							return $.submatches;
-						}),
-					A2(
-						elm$core$Basics$composeR,
-						elm$core$Maybe$map(
-							elm$core$List$filterMap(elm$core$Basics$identity)),
-						A2(
-							elm$core$Basics$composeR,
-							elm$core$Result$fromMaybe('Parsing hex regex failed'),
-							elm$core$Result$andThen(
-								function (colors) {
-									var _n0 = A2(
-										elm$core$List$map,
-										A2(
-											elm$core$Basics$composeR,
-											extend,
-											A2(
-												elm$core$Basics$composeR,
-												fredcy$elm_parseint$ParseInt$parseIntHex,
-												elm$core$Result$map(elm$core$Basics$toFloat))),
-										colors);
-									_n0$2:
-									while (true) {
-										if (((((_n0.b && (_n0.a.$ === 'Ok')) && _n0.b.b) && (_n0.b.a.$ === 'Ok')) && _n0.b.b.b) && (_n0.b.b.a.$ === 'Ok')) {
-											if (_n0.b.b.b.b) {
-												if ((_n0.b.b.b.a.$ === 'Ok') && (!_n0.b.b.b.b.b)) {
-													var r = _n0.a.a;
-													var _n1 = _n0.b;
-													var g = _n1.a.a;
-													var _n2 = _n1.b;
-													var b = _n2.a.a;
-													var _n3 = _n2.b;
-													var a = _n3.a.a;
-													return elm$core$Result$Ok(
-														A4(
-															avh4$elm_color$Color$rgba,
-															r / 255,
-															g / 255,
-															b / 255,
-															A2(noahzgordon$elm_color_extra$Color$Convert$roundToPlaces, 2, a / 255)));
-												} else {
-													break _n0$2;
-												}
-											} else {
-												var r = _n0.a.a;
-												var _n4 = _n0.b;
-												var g = _n4.a.a;
-												var _n5 = _n4.b;
-												var b = _n5.a.a;
-												return elm$core$Result$Ok(
-													A3(avh4$elm_color$Color$rgb, r / 255, g / 255, b / 255));
-											}
-										} else {
-											break _n0$2;
-										}
-									}
-									return elm$core$Result$Err('Parsing ints from hex failed');
-								})))))));
-}();
-var author$project$Mbta$Decode$color = A2(
+var author$project$DecodeHelpers$colorDecoder = A2(
 	elm$json$Json$Decode$andThen,
-	author$project$DecodeHelpers$fromResult,
-	A2(elm$json$Json$Decode$map, noahzgordon$elm_color_extra$Color$Convert$hexToColor, elm$json$Json$Decode$string));
+	function (chars) {
+		var _n0 = elm$core$String$toList(chars);
+		if ((((((_n0.b && _n0.b.b) && _n0.b.b.b) && _n0.b.b.b.b) && _n0.b.b.b.b.b) && _n0.b.b.b.b.b.b) && (!_n0.b.b.b.b.b.b.b)) {
+			var r1 = _n0.a;
+			var _n1 = _n0.b;
+			var r2 = _n1.a;
+			var _n2 = _n1.b;
+			var g1 = _n2.a;
+			var _n3 = _n2.b;
+			var g2 = _n3.a;
+			var _n4 = _n3.b;
+			var b1 = _n4.a;
+			var _n5 = _n4.b;
+			var b2 = _n5.a;
+			var _n6 = _Utils_Tuple3(
+				A2(author$project$DecodeHelpers$hex2ToInt, r1, r2),
+				A2(author$project$DecodeHelpers$hex2ToInt, g1, g2),
+				A2(author$project$DecodeHelpers$hex2ToInt, b1, b2));
+			if (((_n6.a.$ === 'Just') && (_n6.b.$ === 'Just')) && (_n6.c.$ === 'Just')) {
+				var r = _n6.a.a;
+				var g = _n6.b.a;
+				var b = _n6.c.a;
+				return elm$json$Json$Decode$succeed(
+					A3(avh4$elm_color$Color$rgb255, r, g, b));
+			} else {
+				return elm$json$Json$Decode$fail('Expected color to be in hex /[0-9a-fA-F]{6}/');
+			}
+		} else {
+			return elm$json$Json$Decode$fail('Expected a color to be in the form \"RRGGBB\"');
+		}
+	},
+	elm$json$Json$Decode$string);
+var author$project$Mbta$Decode$color = author$project$DecodeHelpers$colorDecoder;
 var author$project$Mbta$LineId = function (a) {
 	return {$: 'LineId', a: a};
 };
@@ -8363,7 +8117,7 @@ var author$project$JsonApi$relationshipMany = F2(
 							return A2(
 								elm$core$Result$mapError,
 								author$project$JsonApi$RelationshipIdError(relationshipName),
-								elm_community$result_extra$Result$Extra$combine(
+								author$project$ResultHelpers$combine(
 									A2(
 										elm$core$List$map,
 										author$project$JsonApi$decodeId(relatedIdDecoder),
@@ -10022,6 +9776,34 @@ var author$project$Mbta$Api$getPrimaryData = function (_n0) {
 var author$project$Model$serviceKey = function (service) {
 	return {addedDates: service.addedDates, description: service.description, endDate: service.endDate, name: service.name, removedDates: service.removedDates, serviceType: service.serviceType, startDate: service.startDate, typicality: service.typicality, validDays: service.validDays};
 };
+var elm$core$List$head = function (list) {
+	if (list.b) {
+		var x = list.a;
+		var xs = list.b;
+		return elm$core$Maybe$Just(x);
+	} else {
+		return elm$core$Maybe$Nothing;
+	}
+};
+var elm$core$Maybe$andThen = F2(
+	function (callback, maybeValue) {
+		if (maybeValue.$ === 'Just') {
+			var value = maybeValue.a;
+			return callback(value);
+		} else {
+			return elm$core$Maybe$Nothing;
+		}
+	});
+var elm$core$Maybe$map = F2(
+	function (f, maybe) {
+		if (maybe.$ === 'Just') {
+			var value = maybe.a;
+			return elm$core$Maybe$Just(
+				f(value));
+		} else {
+			return elm$core$Maybe$Nothing;
+		}
+	});
 var elm$core$Result$toMaybe = function (result) {
 	if (result.$ === 'Ok') {
 		var v = result.a;
@@ -17323,6 +17105,7 @@ var mdgriffith$elm_ui$Internal$Model$SansSerif = {$: 'SansSerif'};
 var mdgriffith$elm_ui$Internal$Model$Typeface = function (a) {
 	return {$: 'Typeface', a: a};
 };
+var elm$core$String$toLower = _String_toLower;
 var elm$core$String$words = _String_words;
 var mdgriffith$elm_ui$Internal$Model$renderFontClassName = F2(
 	function (font, current) {

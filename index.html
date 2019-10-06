@@ -20,7 +20,7 @@
                 let eventName = eventNames[i];
                 eventSource.addEventListener(eventName, function (eventData) {
                     eventPort.send({
-                        event: eventName,
+                        eventName: eventName,
                         data: JSON.parse(eventData.data),
                     });
                 }, false)

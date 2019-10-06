@@ -15,7 +15,7 @@ import View
 port startPredictionsStream : String -> Cmd msg
 
 
-port predictionsStreamEvent : (Decode.Value -> msg) -> Sub msg
+port predictionsStreamEvent : ({ eventName : String, data : Decode.Value } -> msg) -> Sub msg
 
 
 apiHost : Mbta.Api.Host
@@ -135,24 +135,7 @@ getSchedules selectedDay =
 
 predictionsStreamSubscription : Sub Msg
 predictionsStreamSubscription =
-    let
-        msgDecoder : Decode.Decoder Msg
-        msgDecoder =
-            Decode.map2
-                PredictionsStreamMsg
-                (Decode.field "event" Decode.string)
-                (Decode.field "data" Decode.value)
-
-        valueToMsg : Decode.Value -> Msg
-        valueToMsg value =
-            case Decode.decodeValue msgDecoder value of
-                Ok msg ->
-                    msg
-
-                Err e ->
-                    Debug.todo ("Failed to decode stream event" ++ Decode.errorToString e)
-    in
-    predictionsStreamEvent valueToMsg
+    predictionsStreamEvent (\{ eventName, data } -> PredictionsStreamMsg eventName data)
 
 
 main : Program () Model Msg

@@ -48,22 +48,22 @@ body model =
         ViewModel.LoadingServices ->
             El.text "Loading services"
 
-        ViewModel.ServicesLoaded serviceButtons ->
+        ViewModel.ServicesLoaded dayButtons ->
             El.column
                 []
-                [ viewServiceButtons serviceButtons ]
+                [ viewDayButtons dayButtons ]
 
-        ViewModel.LoadingSchedules serviceButtons ->
+        ViewModel.LoadingSchedules dayButtons ->
             El.column
                 []
-                [ viewServiceButtons serviceButtons
+                [ viewDayButtons dayButtons
                 , El.text "Loading"
                 ]
 
-        ViewModel.SchedulesLoaded serviceButtons timetables ->
+        ViewModel.SchedulesLoaded dayButtons timetables ->
             El.column
                 []
-                [ viewServiceButtons serviceButtons
+                [ viewDayButtons dayButtons
                 , viewTimetables timetables
                 ]
 
@@ -71,29 +71,29 @@ body model =
             El.text e
 
 
-viewServiceButtons : ViewModel.ServiceButtons -> Element Msg
-viewServiceButtons serviceButtons =
+viewDayButtons : ViewModel.DayButtons -> Element Msg
+viewDayButtons dayButtons =
     El.row
         []
         (List.map
-            (\serviceButton ->
+            (\dayButton ->
                 Input.button
                     ([ El.padding 5
                      , Border.width 1
                      , Border.rounded 10
                      ]
-                        ++ (if serviceButton.isSelected then
+                        ++ (if dayButton.isSelected then
                                 [ Background.color shadedColor ]
 
                             else
                                 []
                            )
                     )
-                    { onPress = Just (Model.SelectServiceKey serviceButton.serviceKey)
-                    , label = El.text serviceButton.text
+                    { onPress = Just (Model.SelectDay dayButton.day)
+                    , label = El.text dayButton.text
                     }
             )
-            serviceButtons
+            dayButtons
         )
 
 

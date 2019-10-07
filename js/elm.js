@@ -7934,6 +7934,16 @@ var author$project$Mbta$Decode$facility = A3(
 							author$project$JsonApi$id,
 							author$project$Mbta$Decode$facilityId,
 							author$project$JsonApi$succeed(author$project$Mbta$Facility))))))));
+var author$project$DecodeHelpers$maybeEmptyString = A2(
+	elm$json$Json$Decode$map,
+	function (string) {
+		if (string === '') {
+			return elm$core$Maybe$Nothing;
+		} else {
+			return elm$core$Maybe$Just(string);
+		}
+	},
+	elm$json$Json$Decode$string);
 var author$project$Mbta$Line = F6(
 	function (id, shortName, longName, sortOrder, color, textColor) {
 		return {color: color, id: id, longName: longName, shortName: shortName, sortOrder: sortOrder, textColor: textColor};
@@ -8082,7 +8092,7 @@ var author$project$Mbta$Decode$line = A3(
 				A3(
 					author$project$JsonApi$attribute,
 					'short_name',
-					elm$json$Json$Decode$string,
+					author$project$DecodeHelpers$maybeEmptyString,
 					A2(
 						author$project$JsonApi$id,
 						author$project$Mbta$Decode$lineId,
@@ -8374,7 +8384,7 @@ var author$project$Mbta$Decode$route = A3(
 							A3(
 								author$project$JsonApi$attribute,
 								'short_name',
-								elm$json$Json$Decode$string,
+								author$project$DecodeHelpers$maybeEmptyString,
 								A3(
 									author$project$JsonApi$attribute,
 									'type',
@@ -8784,76 +8794,105 @@ var author$project$Mbta$Decode$stopNode = A3(
 					author$project$JsonApi$id,
 					author$project$Mbta$Decode$stopId,
 					author$project$JsonApi$succeed(author$project$Mbta$Stop_Node))))));
-var author$project$Mbta$Stop_Station = F7(
-	function (id, name, description, wheelchairAccessible, latLng, address, childStops) {
-		return {address: address, childStops: childStops, description: description, id: id, latLng: latLng, name: name, wheelchairAccessible: wheelchairAccessible};
+var author$project$Mbta$Stop_Station = F8(
+	function (id, name, description, wheelchairAccessible, latLng, address, zone, childStops) {
+		return {address: address, childStops: childStops, description: description, id: id, latLng: latLng, name: name, wheelchairAccessible: wheelchairAccessible, zone: zone};
 	});
+var author$project$Mbta$ZoneId = function (a) {
+	return {$: 'ZoneId', a: a};
+};
+var author$project$Mbta$Decode$zoneId = A2(author$project$JsonApi$idDecoder, 'zone', author$project$Mbta$ZoneId);
 var author$project$Mbta$Decode$stopStation = A3(
 	author$project$JsonApi$relationshipMany,
 	'child_stops',
 	author$project$Mbta$Decode$stopId,
 	A3(
-		author$project$JsonApi$attributeMaybe,
-		'address',
-		elm$json$Json$Decode$string,
-		A2(
-			author$project$JsonApi$custom,
-			author$project$Mbta$Decode$latLng,
-			A3(
-				author$project$JsonApi$attribute,
-				'wheelchair_boarding',
-				author$project$Mbta$Decode$wheelchairAccessible,
+		author$project$JsonApi$relationshipMaybe,
+		'zone',
+		author$project$Mbta$Decode$zoneId,
+		A3(
+			author$project$JsonApi$attributeMaybe,
+			'address',
+			elm$json$Json$Decode$string,
+			A2(
+				author$project$JsonApi$custom,
+				author$project$Mbta$Decode$latLng,
 				A3(
-					author$project$JsonApi$attributeMaybe,
-					'description',
-					elm$json$Json$Decode$string,
+					author$project$JsonApi$attribute,
+					'wheelchair_boarding',
+					author$project$Mbta$Decode$wheelchairAccessible,
 					A3(
-						author$project$JsonApi$attribute,
-						'name',
+						author$project$JsonApi$attributeMaybe,
+						'description',
 						elm$json$Json$Decode$string,
-						A2(
-							author$project$JsonApi$id,
-							author$project$Mbta$Decode$stopId,
-							author$project$JsonApi$succeed(author$project$Mbta$Stop_Station))))))));
-var author$project$Mbta$Stop_Stop = F9(
-	function (id, name, description, wheelchairAccessible, latLng, address, parentStation, platformCode, platformName) {
-		return {address: address, description: description, id: id, latLng: latLng, name: name, parentStation: parentStation, platformCode: platformCode, platformName: platformName, wheelchairAccessible: wheelchairAccessible};
-	});
+						A3(
+							author$project$JsonApi$attribute,
+							'name',
+							elm$json$Json$Decode$string,
+							A2(
+								author$project$JsonApi$id,
+								author$project$Mbta$Decode$stopId,
+								author$project$JsonApi$succeed(author$project$Mbta$Stop_Station)))))))));
+var author$project$Mbta$Stop_Stop = function (id) {
+	return function (name) {
+		return function (description) {
+			return function (wheelchairAccessible) {
+				return function (latLng) {
+					return function (address) {
+						return function (parentStation) {
+							return function (platformCode) {
+								return function (platformName) {
+									return function (zone) {
+										return {address: address, description: description, id: id, latLng: latLng, name: name, parentStation: parentStation, platformCode: platformCode, platformName: platformName, wheelchairAccessible: wheelchairAccessible, zone: zone};
+									};
+								};
+							};
+						};
+					};
+				};
+			};
+		};
+	};
+};
 var author$project$Mbta$Decode$stopStop = A3(
-	author$project$JsonApi$attributeMaybe,
-	'platform_name',
-	elm$json$Json$Decode$string,
+	author$project$JsonApi$relationshipMaybe,
+	'zone',
+	author$project$Mbta$Decode$zoneId,
 	A3(
 		author$project$JsonApi$attributeMaybe,
-		'platform_code',
+		'platform_name',
 		elm$json$Json$Decode$string,
 		A3(
-			author$project$JsonApi$relationshipMaybe,
-			'parent_station',
-			author$project$Mbta$Decode$stopId,
+			author$project$JsonApi$attributeMaybe,
+			'platform_code',
+			elm$json$Json$Decode$string,
 			A3(
-				author$project$JsonApi$attributeMaybe,
-				'address',
-				elm$json$Json$Decode$string,
-				A2(
-					author$project$JsonApi$custom,
-					author$project$Mbta$Decode$latLng,
-					A3(
-						author$project$JsonApi$attribute,
-						'wheelchair_boarding',
-						author$project$Mbta$Decode$wheelchairAccessible,
+				author$project$JsonApi$relationshipMaybe,
+				'parent_station',
+				author$project$Mbta$Decode$stopId,
+				A3(
+					author$project$JsonApi$attributeMaybe,
+					'address',
+					elm$json$Json$Decode$string,
+					A2(
+						author$project$JsonApi$custom,
+						author$project$Mbta$Decode$latLng,
 						A3(
-							author$project$JsonApi$attributeMaybe,
-							'description',
-							elm$json$Json$Decode$string,
+							author$project$JsonApi$attribute,
+							'wheelchair_boarding',
+							author$project$Mbta$Decode$wheelchairAccessible,
 							A3(
-								author$project$JsonApi$attribute,
-								'name',
+								author$project$JsonApi$attributeMaybe,
+								'description',
 								elm$json$Json$Decode$string,
-								A2(
-									author$project$JsonApi$id,
-									author$project$Mbta$Decode$stopId,
-									author$project$JsonApi$succeed(author$project$Mbta$Stop_Stop))))))))));
+								A3(
+									author$project$JsonApi$attribute,
+									'name',
+									elm$json$Json$Decode$string,
+									A2(
+										author$project$JsonApi$id,
+										author$project$Mbta$Decode$stopId,
+										author$project$JsonApi$succeed(author$project$Mbta$Stop_Stop)))))))))));
 var author$project$Mbta$StopType_0_Stop = {$: 'StopType_0_Stop'};
 var author$project$Mbta$StopType_1_Station = {$: 'StopType_1_Station'};
 var author$project$Mbta$StopType_2_Entrance = {$: 'StopType_2_Entrance'};
@@ -8949,7 +8988,7 @@ var author$project$Mbta$Decode$trip = A3(
 					A3(
 						author$project$JsonApi$attribute,
 						'name',
-						elm$json$Json$Decode$string,
+						author$project$DecodeHelpers$maybeEmptyString,
 						A3(
 							author$project$JsonApi$relationshipMaybe,
 							'route_pattern',
@@ -8963,7 +9002,7 @@ var author$project$Mbta$Decode$trip = A3(
 									'route',
 									author$project$Mbta$Decode$routeId,
 									A3(
-										author$project$JsonApi$relationshipOne,
+										author$project$JsonApi$relationshipMaybe,
 										'service',
 										author$project$Mbta$Decode$serviceId,
 										A2(
@@ -10742,7 +10781,7 @@ var author$project$MakeViewModel$viewTrip = F3(
 				}
 			}(),
 			name: A2(
-				elm$core$Maybe$map,
+				elm$core$Maybe$andThen,
 				function ($) {
 					return $.name;
 				},

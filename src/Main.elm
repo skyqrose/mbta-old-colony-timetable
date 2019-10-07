@@ -15,7 +15,7 @@ import View
 port startPredictionsStream : String -> Cmd msg
 
 
-port predictionsStreamEvent : ({ eventName : String, data : Decode.Value } -> msg) -> Sub msg
+port predictionsStreamEvent : ({ eventName : String, eventData : Decode.Value } -> msg) -> Sub msg
 
 
 apiHost : Mbta.Api.Host
@@ -102,9 +102,9 @@ update msg model =
             , getSchedules selectedDay
             )
 
-        PredictionsStreamMsg eventString dataJson ->
+        PredictionsStreamMsg eventString eventData ->
             ( { model
-                | predictionsStreamState = Mbta.Api.updateStream eventString dataJson model.predictionsStreamState
+                | predictionsStreamState = Mbta.Api.updateStream eventString eventData model.predictionsStreamState
               }
             , Cmd.none
             )
@@ -135,7 +135,7 @@ getSchedules selectedDay =
 
 predictionsStreamSubscription : Sub Msg
 predictionsStreamSubscription =
-    predictionsStreamEvent (\{ eventName, data } -> PredictionsStreamMsg eventName data)
+    predictionsStreamEvent (\{ eventName, eventData } -> PredictionsStreamMsg eventName eventData)
 
 
 main : Program () Model Msg

@@ -21,7 +21,7 @@
                 eventSource.addEventListener(eventName, function (eventData) {
                     eventPort.send({
                         eventName: eventName,
-                        data: JSON.parse(eventData.data),
+                        eventData: JSON.parse(eventData.data),
                     });
                 }, false)
             }

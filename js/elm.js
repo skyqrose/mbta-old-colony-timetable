@@ -232,87 +232,6 @@ var _JsArray_appendN = F3(function(n, dest, source)
 
 
 
-var _List_Nil_UNUSED = { $: 0 };
-var _List_Nil = { $: '[]' };
-
-function _List_Cons_UNUSED(hd, tl) { return { $: 1, a: hd, b: tl }; }
-function _List_Cons(hd, tl) { return { $: '::', a: hd, b: tl }; }
-
-
-var _List_cons = F2(_List_Cons);
-
-function _List_fromArray(arr)
-{
-	var out = _List_Nil;
-	for (var i = arr.length; i--; )
-	{
-		out = _List_Cons(arr[i], out);
-	}
-	return out;
-}
-
-function _List_toArray(xs)
-{
-	for (var out = []; xs.b; xs = xs.b) // WHILE_CONS
-	{
-		out.push(xs.a);
-	}
-	return out;
-}
-
-var _List_map2 = F3(function(f, xs, ys)
-{
-	for (var arr = []; xs.b && ys.b; xs = xs.b, ys = ys.b) // WHILE_CONSES
-	{
-		arr.push(A2(f, xs.a, ys.a));
-	}
-	return _List_fromArray(arr);
-});
-
-var _List_map3 = F4(function(f, xs, ys, zs)
-{
-	for (var arr = []; xs.b && ys.b && zs.b; xs = xs.b, ys = ys.b, zs = zs.b) // WHILE_CONSES
-	{
-		arr.push(A3(f, xs.a, ys.a, zs.a));
-	}
-	return _List_fromArray(arr);
-});
-
-var _List_map4 = F5(function(f, ws, xs, ys, zs)
-{
-	for (var arr = []; ws.b && xs.b && ys.b && zs.b; ws = ws.b, xs = xs.b, ys = ys.b, zs = zs.b) // WHILE_CONSES
-	{
-		arr.push(A4(f, ws.a, xs.a, ys.a, zs.a));
-	}
-	return _List_fromArray(arr);
-});
-
-var _List_map5 = F6(function(f, vs, ws, xs, ys, zs)
-{
-	for (var arr = []; vs.b && ws.b && xs.b && ys.b && zs.b; vs = vs.b, ws = ws.b, xs = xs.b, ys = ys.b, zs = zs.b) // WHILE_CONSES
-	{
-		arr.push(A5(f, vs.a, ws.a, xs.a, ys.a, zs.a));
-	}
-	return _List_fromArray(arr);
-});
-
-var _List_sortBy = F2(function(f, xs)
-{
-	return _List_fromArray(_List_toArray(xs).sort(function(a, b) {
-		return _Utils_cmp(f(a), f(b));
-	}));
-});
-
-var _List_sortWith = F2(function(f, xs)
-{
-	return _List_fromArray(_List_toArray(xs).sort(function(a, b) {
-		var ord = A2(f, a, b);
-		return ord === elm$core$Basics$EQ ? 0 : ord === elm$core$Basics$LT ? -1 : 1;
-	}));
-});
-
-
-
 // LOG
 
 var _Debug_log_UNUSED = F2(function(tag, value)
@@ -790,6 +709,87 @@ function _Utils_ap(xs, ys)
 	}
 	return root;
 }
+
+
+
+var _List_Nil_UNUSED = { $: 0 };
+var _List_Nil = { $: '[]' };
+
+function _List_Cons_UNUSED(hd, tl) { return { $: 1, a: hd, b: tl }; }
+function _List_Cons(hd, tl) { return { $: '::', a: hd, b: tl }; }
+
+
+var _List_cons = F2(_List_Cons);
+
+function _List_fromArray(arr)
+{
+	var out = _List_Nil;
+	for (var i = arr.length; i--; )
+	{
+		out = _List_Cons(arr[i], out);
+	}
+	return out;
+}
+
+function _List_toArray(xs)
+{
+	for (var out = []; xs.b; xs = xs.b) // WHILE_CONS
+	{
+		out.push(xs.a);
+	}
+	return out;
+}
+
+var _List_map2 = F3(function(f, xs, ys)
+{
+	for (var arr = []; xs.b && ys.b; xs = xs.b, ys = ys.b) // WHILE_CONSES
+	{
+		arr.push(A2(f, xs.a, ys.a));
+	}
+	return _List_fromArray(arr);
+});
+
+var _List_map3 = F4(function(f, xs, ys, zs)
+{
+	for (var arr = []; xs.b && ys.b && zs.b; xs = xs.b, ys = ys.b, zs = zs.b) // WHILE_CONSES
+	{
+		arr.push(A3(f, xs.a, ys.a, zs.a));
+	}
+	return _List_fromArray(arr);
+});
+
+var _List_map4 = F5(function(f, ws, xs, ys, zs)
+{
+	for (var arr = []; ws.b && xs.b && ys.b && zs.b; ws = ws.b, xs = xs.b, ys = ys.b, zs = zs.b) // WHILE_CONSES
+	{
+		arr.push(A4(f, ws.a, xs.a, ys.a, zs.a));
+	}
+	return _List_fromArray(arr);
+});
+
+var _List_map5 = F6(function(f, vs, ws, xs, ys, zs)
+{
+	for (var arr = []; vs.b && ws.b && xs.b && ys.b && zs.b; vs = vs.b, ws = ws.b, xs = xs.b, ys = ys.b, zs = zs.b) // WHILE_CONSES
+	{
+		arr.push(A5(f, vs.a, ws.a, xs.a, ys.a, zs.a));
+	}
+	return _List_fromArray(arr);
+});
+
+var _List_sortBy = F2(function(f, xs)
+{
+	return _List_fromArray(_List_toArray(xs).sort(function(a, b) {
+		return _Utils_cmp(f(a), f(b));
+	}));
+});
+
+var _List_sortWith = F2(function(f, xs)
+{
+	return _List_fromArray(_List_toArray(xs).sort(function(a, b) {
+		var ord = A2(f, a, b);
+		return ord === elm$core$Basics$EQ ? 0 : ord === elm$core$Basics$LT ? -1 : 1;
+	}));
+});
 
 
 
@@ -4679,9 +4679,14 @@ var author$project$Main$apiHost = author$project$Mbta$Api$Default(
 	{
 		apiKey: elm$core$Maybe$Just('84f8e2ba4820455a8b507d886863afd4')
 	});
-var author$project$Mbta$Api$Relationship = function (a) {
-	return {$: 'Relationship', a: a};
+var author$project$Mbta$Api$Filter = function (a) {
+	return {$: 'Filter', a: a};
 };
+var elm$core$Basics$identity = function (x) {
+	return x;
+};
+var elm$core$Basics$EQ = {$: 'EQ'};
+var elm$core$Basics$LT = {$: 'LT'};
 var elm$core$Elm$JsArray$foldr = _JsArray_foldr;
 var elm$core$Array$foldr = F3(
 	function (func, baseCase, _n0) {
@@ -4703,9 +4708,6 @@ var elm$core$Array$foldr = F3(
 			A3(elm$core$Elm$JsArray$foldr, func, baseCase, tail),
 			tree);
 	});
-var elm$core$Basics$EQ = {$: 'EQ'};
-var elm$core$Basics$LT = {$: 'LT'};
-var elm$core$List$cons = _List_cons;
 var elm$core$Array$toList = function (array) {
 	return A3(elm$core$Array$foldr, elm$core$List$cons, _List_Nil, array);
 };
@@ -4762,19 +4764,7 @@ var elm$core$Set$toList = function (_n0) {
 	var dict = _n0.a;
 	return elm$core$Dict$keys(dict);
 };
-var elm$core$Basics$append = _Utils_append;
-var elm$core$Basics$identity = function (x) {
-	return x;
-};
-var author$project$Mbta$Api$andIts = F2(
-	function (_n0, _n1) {
-		var string1 = _n0.a;
-		var string2 = _n1.a;
-		return author$project$Mbta$Api$Relationship(string2 + ('.' + string1));
-	});
-var author$project$Mbta$Api$Filter = function (a) {
-	return {$: 'Filter', a: a};
-};
+var elm$core$List$cons = _List_cons;
 var elm$core$Basics$add = _Basics_add;
 var elm$core$Basics$gt = _Utils_gt;
 var elm$core$List$foldl = F3(
@@ -4882,11 +4872,28 @@ var author$project$Mbta$Api$routeIdToString = function (_n0) {
 	var routeId = _n0.a;
 	return routeId;
 };
-var author$project$Mbta$Api$filterRoutesByIds = function (routeIds) {
-	return A3(author$project$Mbta$Api$filterByList, 'id', author$project$Mbta$Api$routeIdToString, routeIds);
-};
 var author$project$Mbta$Api$filterSchedulesByRouteIds = function (routeIds) {
 	return A3(author$project$Mbta$Api$filterByList, 'route', author$project$Mbta$Api$routeIdToString, routeIds);
+};
+var author$project$Mbta$serviceDateToIso8601 = function (_n0) {
+	var iso8601 = _n0.a;
+	return iso8601;
+};
+var author$project$Mbta$Api$filterByOne = F3(
+	function (key, toString, value) {
+		return author$project$Mbta$Api$Filter(
+			_List_fromArray(
+				[
+					_Utils_Tuple2(
+					key,
+					_List_fromArray(
+						[
+							toString(value)
+						]))
+				]));
+	});
+var author$project$Mbta$Api$filterSchedulesByServiceDate = function (serviceDate) {
+	return A3(author$project$Mbta$Api$filterByOne, 'date', author$project$Mbta$serviceDateToIso8601, serviceDate);
 };
 var author$project$Mbta$Api$stopIdToString = function (_n0) {
 	var stopId = _n0.a;
@@ -4894,15 +4901,6 @@ var author$project$Mbta$Api$stopIdToString = function (_n0) {
 };
 var author$project$Mbta$Api$filterSchedulesByStopIds = function (stopIds) {
 	return A3(author$project$Mbta$Api$filterByList, 'stop', author$project$Mbta$Api$stopIdToString, stopIds);
-};
-var author$project$Mbta$Api$filterServicesByRouteIds = function (routeIds) {
-	return A3(author$project$Mbta$Api$filterByList, 'route', author$project$Mbta$Api$routeIdToString, routeIds);
-};
-var author$project$Mbta$Api$filterStopsByIds = function (stopIds) {
-	return A3(author$project$Mbta$Api$filterByList, 'id', author$project$Mbta$Api$stopIdToString, stopIds);
-};
-var author$project$Mbta$Api$Include = function (a) {
-	return {$: 'Include', a: a};
 };
 var author$project$JsonApi$ApiErrors = function (a) {
 	return {$: 'ApiErrors', a: a};
@@ -5223,6 +5221,7 @@ var elm$json$Json$Decode$OneOf = function (a) {
 	return {$: 'OneOf', a: a};
 };
 var elm$core$Basics$and = _Basics_and;
+var elm$core$Basics$append = _Utils_append;
 var elm$core$Basics$or = _Basics_or;
 var elm$core$Char$toCode = _Char_toCode;
 var elm$core$Char$isLower = function (_char) {
@@ -9592,6 +9591,74 @@ var author$project$Mbta$Api$getList = F6(
 				filters,
 				includes));
 	});
+var author$project$Mbta$Api$getSchedules = F4(
+	function (toMsg, host, includes, filters) {
+		return A6(author$project$Mbta$Api$getList, toMsg, host, author$project$Mbta$Decode$schedule, 'schedules', includes, filters);
+	});
+var author$project$Mbta$Api$Include = function (a) {
+	return {$: 'Include', a: a};
+};
+var author$project$Mbta$Api$include = function (_n0) {
+	var s = _n0.a;
+	return author$project$Mbta$Api$Include(s);
+};
+var author$project$Mbta$Api$Relationship = function (a) {
+	return {$: 'Relationship', a: a};
+};
+var author$project$Mbta$Api$scheduleTrip = author$project$Mbta$Api$Relationship('trip');
+var author$project$Model$ReceiveSchedules = function (a) {
+	return {$: 'ReceiveSchedules', a: a};
+};
+var author$project$Model$routeIds = _List_fromArray(
+	[
+		author$project$Mbta$RouteId('CR-Greenbush'),
+		author$project$Mbta$RouteId('CR-Middleborough'),
+		author$project$Mbta$RouteId('CR-Kingston')
+	]);
+var author$project$Model$stopIds = _List_fromArray(
+	[
+		author$project$Mbta$StopId('place-sstat'),
+		author$project$Mbta$StopId('place-jfk'),
+		author$project$Mbta$StopId('place-qnctr'),
+		author$project$Mbta$StopId('place-brntn')
+	]);
+var author$project$Main$getSchedules = function (selectedDay) {
+	var dateFilter = function () {
+		if (selectedDay.$ === 'Today') {
+			return _List_Nil;
+		} else {
+			var serviceKey = selectedDay.a;
+			return _List_fromArray(
+				[
+					author$project$Mbta$Api$filterSchedulesByServiceDate(serviceKey.startDate)
+				]);
+		}
+	}();
+	return A4(
+		author$project$Mbta$Api$getSchedules,
+		author$project$Model$ReceiveSchedules,
+		author$project$Main$apiHost,
+		_List_fromArray(
+			[
+				author$project$Mbta$Api$include(author$project$Mbta$Api$scheduleTrip)
+			]),
+		_Utils_ap(
+			_List_fromArray(
+				[
+					author$project$Mbta$Api$filterSchedulesByRouteIds(author$project$Model$routeIds),
+					author$project$Mbta$Api$filterSchedulesByStopIds(author$project$Model$stopIds)
+				]),
+			dateFilter));
+};
+var author$project$Mbta$Api$filterRoutesByIds = function (routeIds) {
+	return A3(author$project$Mbta$Api$filterByList, 'id', author$project$Mbta$Api$routeIdToString, routeIds);
+};
+var author$project$Mbta$Api$filterServicesByRouteIds = function (routeIds) {
+	return A3(author$project$Mbta$Api$filterByList, 'route', author$project$Mbta$Api$routeIdToString, routeIds);
+};
+var author$project$Mbta$Api$filterStopsByIds = function (stopIds) {
+	return A3(author$project$Mbta$Api$filterByList, 'id', author$project$Mbta$Api$stopIdToString, stopIds);
+};
 var elm$core$List$any = F2(
 	function (isOkay, list) {
 		any:
@@ -9638,10 +9705,6 @@ var author$project$Mbta$Api$getRoutes = F4(
 			includes) : includes;
 		return A6(author$project$Mbta$Api$getList, toMsg, host, author$project$Mbta$Decode$route, 'routes', includesWithStop, filters);
 	});
-var author$project$Mbta$Api$getSchedules = F4(
-	function (toMsg, host, includes, filters) {
-		return A6(author$project$Mbta$Api$getList, toMsg, host, author$project$Mbta$Decode$schedule, 'schedules', includes, filters);
-	});
 var author$project$Mbta$Api$getServices = F4(
 	function (toMsg, host, includes, filters) {
 		return A6(author$project$Mbta$Api$getList, toMsg, host, author$project$Mbta$Decode$service, 'services', includes, filters);
@@ -9650,18 +9713,9 @@ var author$project$Mbta$Api$getStops = F4(
 	function (toMsg, host, includes, filters) {
 		return A6(author$project$Mbta$Api$getList, toMsg, host, author$project$Mbta$Decode$stop, 'stops', includes, filters);
 	});
-var author$project$Mbta$Api$include = function (_n0) {
-	var s = _n0.a;
-	return author$project$Mbta$Api$Include(s);
-};
-var author$project$Mbta$Api$scheduleTrip = author$project$Mbta$Api$Relationship('trip');
 var author$project$Mbta$Api$stopChildStops = author$project$Mbta$Api$Relationship('child_stops');
-var author$project$Mbta$Api$tripService = author$project$Mbta$Api$Relationship('service');
 var author$project$Model$ReceiveRoutes = function (a) {
 	return {$: 'ReceiveRoutes', a: a};
-};
-var author$project$Model$ReceiveSchedules = function (a) {
-	return {$: 'ReceiveSchedules', a: a};
 };
 var author$project$Model$ReceiveServices = function (a) {
 	return {$: 'ReceiveServices', a: a};
@@ -9669,24 +9723,12 @@ var author$project$Model$ReceiveServices = function (a) {
 var author$project$Model$ReceiveStops = function (a) {
 	return {$: 'ReceiveStops', a: a};
 };
-var author$project$Model$routeIds = _List_fromArray(
-	[
-		author$project$Mbta$RouteId('CR-Greenbush'),
-		author$project$Mbta$RouteId('CR-Middleborough'),
-		author$project$Mbta$RouteId('CR-Kingston')
-	]);
-var author$project$Model$stopIds = _List_fromArray(
-	[
-		author$project$Mbta$StopId('place-sstat'),
-		author$project$Mbta$StopId('place-jfk'),
-		author$project$Mbta$StopId('place-qnctr'),
-		author$project$Mbta$StopId('place-brntn')
-	]);
+var author$project$Model$Today = {$: 'Today'};
 var elm$core$Platform$Cmd$batch = _Platform_batch;
 var krisajenkins$remotedata$RemoteData$Loading = {$: 'Loading'};
 var krisajenkins$remotedata$RemoteData$NotAsked = {$: 'NotAsked'};
 var author$project$Main$init = _Utils_Tuple2(
-	{routes: krisajenkins$remotedata$RemoteData$Loading, schedules: krisajenkins$remotedata$RemoteData$NotAsked, selectedServiceKey: elm$core$Maybe$Nothing, services: krisajenkins$remotedata$RemoteData$Loading, stops: krisajenkins$remotedata$RemoteData$Loading},
+	{routes: krisajenkins$remotedata$RemoteData$Loading, schedules: krisajenkins$remotedata$RemoteData$NotAsked, selectedDay: author$project$Model$Today, services: krisajenkins$remotedata$RemoteData$Loading, stops: krisajenkins$remotedata$RemoteData$Loading},
 	elm$core$Platform$Cmd$batch(
 		_List_fromArray(
 			[
@@ -9720,150 +9762,8 @@ var author$project$Main$init = _Utils_Tuple2(
 					[
 						author$project$Mbta$Api$filterServicesByRouteIds(author$project$Model$routeIds)
 					])),
-				A4(
-				author$project$Mbta$Api$getSchedules,
-				author$project$Model$ReceiveSchedules,
-				author$project$Main$apiHost,
-				_List_fromArray(
-					[
-						author$project$Mbta$Api$include(
-						A2(author$project$Mbta$Api$andIts, author$project$Mbta$Api$tripService, author$project$Mbta$Api$scheduleTrip))
-					]),
-				_List_fromArray(
-					[
-						author$project$Mbta$Api$filterSchedulesByRouteIds(author$project$Model$routeIds),
-						author$project$Mbta$Api$filterSchedulesByStopIds(author$project$Model$stopIds)
-					]))
+				author$project$Main$getSchedules(author$project$Model$Today)
 			])));
-var pzp1997$assoc_list$AssocList$get = F2(
-	function (targetKey, _n0) {
-		get:
-		while (true) {
-			var alist = _n0.a;
-			if (!alist.b) {
-				return elm$core$Maybe$Nothing;
-			} else {
-				var _n2 = alist.a;
-				var key = _n2.a;
-				var value = _n2.b;
-				var rest = alist.b;
-				if (_Utils_eq(key, targetKey)) {
-					return elm$core$Maybe$Just(value);
-				} else {
-					var $temp$targetKey = targetKey,
-						$temp$_n0 = pzp1997$assoc_list$AssocList$D(rest);
-					targetKey = $temp$targetKey;
-					_n0 = $temp$_n0;
-					continue get;
-				}
-			}
-		}
-	});
-var author$project$Mbta$Api$getIncludedService = F2(
-	function (serviceId, _n0) {
-		var data = _n0.a;
-		return A2(pzp1997$assoc_list$AssocList$get, serviceId, data.included.services);
-	});
-var author$project$Mbta$Api$getIncludedTrip = F2(
-	function (tripId, _n0) {
-		var data = _n0.a;
-		return A2(pzp1997$assoc_list$AssocList$get, tripId, data.included.trips);
-	});
-var author$project$Mbta$Api$getPrimaryData = function (_n0) {
-	var data = _n0.a;
-	return data.primaryData;
-};
-var author$project$Model$serviceKey = function (service) {
-	return {addedDates: service.addedDates, description: service.description, endDate: service.endDate, name: service.name, removedDates: service.removedDates, serviceType: service.serviceType, startDate: service.startDate, typicality: service.typicality, validDays: service.validDays};
-};
-var elm$core$List$head = function (list) {
-	if (list.b) {
-		var x = list.a;
-		var xs = list.b;
-		return elm$core$Maybe$Just(x);
-	} else {
-		return elm$core$Maybe$Nothing;
-	}
-};
-var elm$core$Maybe$andThen = F2(
-	function (callback, maybeValue) {
-		if (maybeValue.$ === 'Just') {
-			var value = maybeValue.a;
-			return callback(value);
-		} else {
-			return elm$core$Maybe$Nothing;
-		}
-	});
-var elm$core$Maybe$map = F2(
-	function (f, maybe) {
-		if (maybe.$ === 'Just') {
-			var value = maybe.a;
-			return elm$core$Maybe$Just(
-				f(value));
-		} else {
-			return elm$core$Maybe$Nothing;
-		}
-	});
-var elm$core$Result$toMaybe = function (result) {
-	if (result.$ === 'Ok') {
-		var v = result.a;
-		return elm$core$Maybe$Just(v);
-	} else {
-		return elm$core$Maybe$Nothing;
-	}
-};
-var author$project$Main$serviceKeyFromSchedulesResult = function (schedulesResult) {
-	return A2(
-		elm$core$Maybe$andThen,
-		function (data) {
-			var schedules = author$project$Mbta$Api$getPrimaryData(data);
-			return A2(
-				elm$core$Maybe$map,
-				author$project$Model$serviceKey,
-				A2(
-					elm$core$Maybe$andThen,
-					function (serviceId) {
-						return A2(author$project$Mbta$Api$getIncludedService, serviceId, data);
-					},
-					A2(
-						elm$core$Maybe$map,
-						function ($) {
-							return $.serviceId;
-						},
-						A2(
-							elm$core$Maybe$andThen,
-							function (tripId) {
-								return A2(author$project$Mbta$Api$getIncludedTrip, tripId, data);
-							},
-							A2(
-								elm$core$Maybe$map,
-								function ($) {
-									return $.tripId;
-								},
-								elm$core$List$head(schedules))))));
-		},
-		elm$core$Result$toMaybe(schedulesResult));
-};
-var author$project$Mbta$serviceDateToIso8601 = function (_n0) {
-	var iso8601 = _n0.a;
-	return iso8601;
-};
-var author$project$Mbta$Api$filterByOne = F3(
-	function (key, toString, value) {
-		return author$project$Mbta$Api$Filter(
-			_List_fromArray(
-				[
-					_Utils_Tuple2(
-					key,
-					_List_fromArray(
-						[
-							toString(value)
-						]))
-				]));
-	});
-var author$project$Mbta$Api$filterSchedulesByServiceDate = function (serviceDate) {
-	return A3(author$project$Mbta$Api$filterByOne, 'date', author$project$Mbta$serviceDateToIso8601, serviceDate);
-};
 var elm$core$Platform$Cmd$none = elm$core$Platform$Cmd$batch(_List_Nil);
 var krisajenkins$remotedata$RemoteData$Failure = function (a) {
 	return {$: 'Failure', a: a};
@@ -9916,39 +9816,16 @@ var author$project$Main$update = F2(
 					_Utils_update(
 						model,
 						{
-							schedules: krisajenkins$remotedata$RemoteData$fromResult(schedulesResult),
-							selectedServiceKey: function () {
-								var _n1 = model.selectedServiceKey;
-								if (_n1.$ === 'Nothing') {
-									return author$project$Main$serviceKeyFromSchedulesResult(schedulesResult);
-								} else {
-									return model.selectedServiceKey;
-								}
-							}()
+							schedules: krisajenkins$remotedata$RemoteData$fromResult(schedulesResult)
 						}),
 					elm$core$Platform$Cmd$none);
 			default:
-				var serviceKey = msg.a;
+				var selectedDay = msg.a;
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
-						{
-							selectedServiceKey: elm$core$Maybe$Just(serviceKey)
-						}),
-					A4(
-						author$project$Mbta$Api$getSchedules,
-						author$project$Model$ReceiveSchedules,
-						author$project$Main$apiHost,
-						_List_fromArray(
-							[
-								author$project$Mbta$Api$include(author$project$Mbta$Api$scheduleTrip)
-							]),
-						_List_fromArray(
-							[
-								author$project$Mbta$Api$filterSchedulesByRouteIds(author$project$Model$routeIds),
-								author$project$Mbta$Api$filterSchedulesByStopIds(author$project$Model$stopIds),
-								author$project$Mbta$Api$filterSchedulesByServiceDate(serviceKey.startDate)
-							])));
+						{schedules: krisajenkins$remotedata$RemoteData$Loading, selectedDay: selectedDay}),
+					author$project$Main$getSchedules(selectedDay));
 		}
 	});
 var elm$core$List$member = F2(
@@ -9972,7 +9849,7 @@ var author$project$Helpers$uniq = function (a) {
 			a));
 };
 var elm$core$List$sortBy = _List_sortBy;
-var author$project$MakeViewModel$sortServiceButtons = function (serviceKeys) {
+var author$project$MakeViewModel$sortServiceKeys = function (serviceKeys) {
 	return A2(
 		elm$core$List$sortBy,
 		function (serviceKey) {
@@ -10002,24 +9879,40 @@ var author$project$MakeViewModel$sortServiceButtons = function (serviceKeys) {
 		},
 		serviceKeys);
 };
-var author$project$MakeViewModel$viewServiceButton = F2(
-	function (selectedServiceKey, serviceKey) {
+var author$project$MakeViewModel$viewDayButton = F2(
+	function (selectedDay, buttonDay) {
 		return {
-			isSelected: _Utils_eq(
-				selectedServiceKey,
-				elm$core$Maybe$Just(serviceKey)),
-			serviceKey: serviceKey,
-			text: A2(elm$core$Maybe$withDefault, 'Service', serviceKey.name)
+			day: buttonDay,
+			isSelected: _Utils_eq(selectedDay, buttonDay),
+			text: function () {
+				if (buttonDay.$ === 'Today') {
+					return 'Today';
+				} else {
+					var serviceKey = buttonDay.a;
+					return A2(elm$core$Maybe$withDefault, 'Service', serviceKey.name);
+				}
+			}()
 		};
 	});
-var author$project$MakeViewModel$viewServiceButtons = F2(
-	function (services, selectedServiceKey) {
+var author$project$Model$Future = function (a) {
+	return {$: 'Future', a: a};
+};
+var author$project$Model$serviceKey = function (service) {
+	return {addedDates: service.addedDates, description: service.description, endDate: service.endDate, name: service.name, removedDates: service.removedDates, serviceType: service.serviceType, startDate: service.startDate, typicality: service.typicality, validDays: service.validDays};
+};
+var author$project$MakeViewModel$viewDayButtons = F2(
+	function (services, selectedDay) {
+		var serviceKeys = author$project$MakeViewModel$sortServiceKeys(
+			author$project$Helpers$uniq(
+				A2(elm$core$List$map, author$project$Model$serviceKey, services)));
+		var days = A2(
+			elm$core$List$cons,
+			author$project$Model$Today,
+			A2(elm$core$List$map, author$project$Model$Future, serviceKeys));
 		return A2(
 			elm$core$List$map,
-			author$project$MakeViewModel$viewServiceButton(selectedServiceKey),
-			author$project$MakeViewModel$sortServiceButtons(
-				author$project$Helpers$uniq(
-					A2(elm$core$List$map, author$project$Model$serviceKey, services))));
+			author$project$MakeViewModel$viewDayButton(selectedDay),
+			days);
 	});
 var author$project$MakeViewModel$childIds = function (stop) {
 	if (stop.$ === 'Stop_1_Station') {
@@ -10682,6 +10575,16 @@ var justinmimbs$timezone_data$TimeZone$america__new_york = function (_n0) {
 				justinmimbs$timezone_data$TimeZone$Specification$Rules(justinmimbs$timezone_data$TimeZone$rules_US))));
 };
 var author$project$MakeViewModel$timeZone = justinmimbs$timezone_data$TimeZone$america__new_york(_Utils_Tuple0);
+var elm$core$Maybe$map = F2(
+	function (f, maybe) {
+		if (maybe.$ === 'Just') {
+			var value = maybe.a;
+			return elm$core$Maybe$Just(
+				f(value));
+		} else {
+			return elm$core$Maybe$Nothing;
+		}
+	});
 var elm$core$String$cons = _String_cons;
 var elm$core$String$fromChar = function (_char) {
 	return A2(elm$core$String$cons, _char, '');
@@ -10794,6 +10697,39 @@ var author$project$MakeViewModel$viewScheduleTime = function (schedule) {
 		},
 		author$project$MakeViewModel$scheduleToTime(schedule));
 };
+var elm$core$Maybe$andThen = F2(
+	function (callback, maybeValue) {
+		if (maybeValue.$ === 'Just') {
+			var value = maybeValue.a;
+			return callback(value);
+		} else {
+			return elm$core$Maybe$Nothing;
+		}
+	});
+var pzp1997$assoc_list$AssocList$get = F2(
+	function (targetKey, _n0) {
+		get:
+		while (true) {
+			var alist = _n0.a;
+			if (!alist.b) {
+				return elm$core$Maybe$Nothing;
+			} else {
+				var _n2 = alist.a;
+				var key = _n2.a;
+				var value = _n2.b;
+				var rest = alist.b;
+				if (_Utils_eq(key, targetKey)) {
+					return elm$core$Maybe$Just(value);
+				} else {
+					var $temp$targetKey = targetKey,
+						$temp$_n0 = pzp1997$assoc_list$AssocList$D(rest);
+					targetKey = $temp$targetKey;
+					_n0 = $temp$_n0;
+					continue get;
+				}
+			}
+		}
+	});
 var author$project$MakeViewModel$viewTrip = F3(
 	function (stopDict, maybeTrip, schedules) {
 		return {
@@ -10979,6 +10915,15 @@ var author$project$MakeViewModel$viewTimetables = F4(
 			d1: A5(author$project$MakeViewModel$viewTimetable, author$project$Mbta$D1, stops, stopDict, inboundSchedules, tripGetter)
 		};
 	});
+var author$project$Mbta$Api$getIncludedTrip = F2(
+	function (tripId, _n0) {
+		var data = _n0.a;
+		return A2(pzp1997$assoc_list$AssocList$get, tripId, data.included.trips);
+	});
+var author$project$Mbta$Api$getPrimaryData = function (_n0) {
+	var data = _n0.a;
+	return data.primaryData;
+};
 var author$project$ViewModel$Error = function (a) {
 	return {$: 'Error', a: a};
 };
@@ -11005,16 +10950,16 @@ var author$project$MakeViewModel$makeViewModel = function (model) {
 				elm$core$Debug$toString(e));
 		case 'Success':
 			var services = _n0.a;
-			var serviceButtons = A2(
-				author$project$MakeViewModel$viewServiceButtons,
+			var dayButtons = A2(
+				author$project$MakeViewModel$viewDayButtons,
 				author$project$Mbta$Api$getPrimaryData(services),
-				model.selectedServiceKey);
+				model.selectedDay);
 			var _n1 = model.schedules;
 			switch (_n1.$) {
 				case 'NotAsked':
-					return author$project$ViewModel$ServicesLoaded(serviceButtons);
+					return author$project$ViewModel$ServicesLoaded(dayButtons);
 				case 'Loading':
-					return author$project$ViewModel$LoadingSchedules(serviceButtons);
+					return author$project$ViewModel$LoadingSchedules(dayButtons);
 				case 'Failure':
 					var e = _n1.a;
 					return author$project$ViewModel$Error(
@@ -11038,7 +10983,7 @@ var author$project$MakeViewModel$makeViewModel = function (model) {
 													var stops = _n2.b.a;
 													return A2(
 														author$project$ViewModel$SchedulesLoaded,
-														serviceButtons,
+														dayButtons,
 														A4(
 															author$project$MakeViewModel$viewTimetables,
 															author$project$Mbta$Api$getPrimaryData(routes),
@@ -11082,10 +11027,10 @@ var author$project$MakeViewModel$makeViewModel = function (model) {
 									elm$core$Debug$toString(model));
 							}
 							var _n4 = _n2.b;
-							return author$project$ViewModel$LoadingSchedules(serviceButtons);
+							return author$project$ViewModel$LoadingSchedules(dayButtons);
 						}
 						var _n3 = _n2.a;
-						return author$project$ViewModel$LoadingSchedules(serviceButtons);
+						return author$project$ViewModel$LoadingSchedules(dayButtons);
 					}
 					var e = _n2.b.a;
 					return author$project$ViewModel$Error(
@@ -11096,8 +11041,8 @@ var author$project$MakeViewModel$makeViewModel = function (model) {
 				elm$core$Debug$toString(model));
 	}
 };
-var author$project$Model$SelectServiceKey = function (a) {
-	return {$: 'SelectServiceKey', a: a};
+var author$project$Model$SelectDay = function (a) {
+	return {$: 'SelectDay', a: a};
 };
 var mdgriffith$elm_ui$Internal$Model$Rgba = F4(
 	function (a, b, c, d) {
@@ -16455,13 +16400,13 @@ var mdgriffith$elm_ui$Element$Input$button = F2(
 				_List_fromArray(
 					[label])));
 	});
-var author$project$View$viewServiceButtons = function (serviceButtons) {
+var author$project$View$viewDayButtons = function (dayButtons) {
 	return A2(
 		mdgriffith$elm_ui$Element$row,
 		_List_Nil,
 		A2(
 			elm$core$List$map,
-			function (serviceButton) {
+			function (dayButton) {
 				return A2(
 					mdgriffith$elm_ui$Element$Input$button,
 					_Utils_ap(
@@ -16471,17 +16416,17 @@ var author$project$View$viewServiceButtons = function (serviceButtons) {
 								mdgriffith$elm_ui$Element$Border$width(1),
 								mdgriffith$elm_ui$Element$Border$rounded(10)
 							]),
-						serviceButton.isSelected ? _List_fromArray(
+						dayButton.isSelected ? _List_fromArray(
 							[
 								mdgriffith$elm_ui$Element$Background$color(author$project$View$shadedColor)
 							]) : _List_Nil),
 					{
-						label: mdgriffith$elm_ui$Element$text(serviceButton.text),
+						label: mdgriffith$elm_ui$Element$text(dayButton.text),
 						onPress: elm$core$Maybe$Just(
-							author$project$Model$SelectServiceKey(serviceButton.serviceKey))
+							author$project$Model$SelectDay(dayButton.day))
 					});
 			},
-			serviceButtons));
+			dayButtons));
 };
 var mdgriffith$elm_ui$Internal$Model$AlignX = function (a) {
 	return {$: 'AlignX', a: a};
@@ -16917,33 +16862,33 @@ var author$project$View$body = function (model) {
 		case 'LoadingServices':
 			return mdgriffith$elm_ui$Element$text('Loading services');
 		case 'ServicesLoaded':
-			var serviceButtons = model.a;
+			var dayButtons = model.a;
 			return A2(
 				mdgriffith$elm_ui$Element$column,
 				_List_Nil,
 				_List_fromArray(
 					[
-						author$project$View$viewServiceButtons(serviceButtons)
+						author$project$View$viewDayButtons(dayButtons)
 					]));
 		case 'LoadingSchedules':
-			var serviceButtons = model.a;
+			var dayButtons = model.a;
 			return A2(
 				mdgriffith$elm_ui$Element$column,
 				_List_Nil,
 				_List_fromArray(
 					[
-						author$project$View$viewServiceButtons(serviceButtons),
+						author$project$View$viewDayButtons(dayButtons),
 						mdgriffith$elm_ui$Element$text('Loading')
 					]));
 		case 'SchedulesLoaded':
-			var serviceButtons = model.a;
+			var dayButtons = model.a;
 			var timetables = model.b;
 			return A2(
 				mdgriffith$elm_ui$Element$column,
 				_List_Nil,
 				_List_fromArray(
 					[
-						author$project$View$viewServiceButtons(serviceButtons),
+						author$project$View$viewDayButtons(dayButtons),
 						author$project$View$viewTimetables(timetables)
 					]));
 		default:

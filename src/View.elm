@@ -282,8 +282,27 @@ tripFooter trip =
         Just (Mbta.RouteId "CR-Greenbush") ->
             "GRN"
 
-        Just _ ->
-            ""
+        Just (Mbta.RouteId "CR-Worcester") ->
+            "WOR"
+
+        Just (Mbta.RouteId "CR-Franklin") ->
+            "FKL"
+
+        Just (Mbta.RouteId "CR-Foxboro") ->
+            "FOX"
+
+        Just (Mbta.RouteId "CR-Providence") ->
+            "PRO"
+
+        Just (Mbta.RouteId "CR-Fairmount") ->
+            "FMT"
+
+        Just (Mbta.RouteId routeId) ->
+            if String.startsWith "CR-" routeId then
+                String.dropLeft 3 routeId
+
+            else
+                routeId
 
         Nothing ->
             ""

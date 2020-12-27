@@ -1,8 +1,10 @@
 module Model exposing
-    ( Day(..)
+    ( Corridor(..)
+    , Day(..)
     , Model
     , Msg(..)
     , ServiceKey
+    , corridors
     , routeIds
     , serviceKey
     , stopIds
@@ -18,6 +20,7 @@ type alias Model =
     , stops : RemoteDataApi (List Mbta.Stop)
     , services : RemoteDataApi (List Mbta.Service)
     , schedules : RemoteDataApi (List Mbta.Schedule)
+    , selectedCorridor : Corridor
     , selectedDay : Day
     }
 
@@ -27,6 +30,7 @@ type Msg
     | ReceiveStops (Mbta.Api.ApiResult (List Mbta.Stop))
     | ReceiveServices (Mbta.Api.ApiResult (List Mbta.Service))
     | ReceiveSchedules (Mbta.Api.ApiResult (List Mbta.Schedule))
+    | SelectCorridor Corridor
     | SelectDay Day
 
 
@@ -34,21 +38,54 @@ type alias RemoteDataApi primary =
     RemoteData.RemoteData Mbta.Api.ApiError (Mbta.Api.Data primary)
 
 
-routeIds : List Mbta.RouteId
-routeIds =
-    [ Mbta.RouteId "CR-Greenbush"
-    , Mbta.RouteId "CR-Middleborough"
-    , Mbta.RouteId "CR-Kingston"
+type Corridor
+    = NortheastCorridor
+    | OldColony
+
+
+corridors : List Corridor
+corridors =
+    [ NortheastCorridor
+    , OldColony
     ]
 
 
-stopIds : List Mbta.StopId
-stopIds =
-    [ Mbta.StopId "place-sstat"
-    , Mbta.StopId "place-jfk"
-    , Mbta.StopId "place-qnctr"
-    , Mbta.StopId "place-brntn"
-    ]
+routeIds : Corridor -> List Mbta.RouteId
+routeIds corridor =
+    case corridor of
+        NortheastCorridor ->
+            [ Mbta.RouteId "CR-Worcester"
+            , Mbta.RouteId "CR-Franklin"
+            , Mbta.RouteId "CR-Fairmount"
+            , Mbta.RouteId "CR-Foxboro"
+            , Mbta.RouteId "CR-Providence"
+            ]
+
+        OldColony ->
+            [ Mbta.RouteId "CR-Greenbush"
+            , Mbta.RouteId "CR-Middleborough"
+            , Mbta.RouteId "CR-Kingston"
+            ]
+
+
+stopIds : Corridor -> List Mbta.StopId
+stopIds corridor =
+    case corridor of
+        NortheastCorridor ->
+            [ Mbta.StopId "place-sstat"
+            , Mbta.StopId "place-bbsta"
+            , Mbta.StopId "place-rugg"
+            , Mbta.StopId "place-forhl"
+            , Mbta.StopId "place-NEC-2203"
+            , Mbta.StopId "place-DB-0095"
+            ]
+
+        OldColony ->
+            [ Mbta.StopId "place-sstat"
+            , Mbta.StopId "place-jfk"
+            , Mbta.StopId "place-qnctr"
+            , Mbta.StopId "place-brntn"
+            ]
 
 
 type Day

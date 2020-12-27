@@ -16,10 +16,16 @@ apiHost =
 
 init : ( Model, Cmd Msg )
 init =
+    initCorridor NortheastCorridor
+
+
+initCorridor : Corridor -> ( Model, Cmd Msg )
+initCorridor corridor =
     ( { routes = RemoteData.Loading
       , stops = RemoteData.Loading
       , services = RemoteData.Loading
       , schedules = RemoteData.NotAsked
+      , selectedCorridor = corridor
       , selectedDay = Today
       }
     , Cmd.batch
@@ -27,18 +33,18 @@ init =
             ReceiveRoutes
             apiHost
             []
-            [ Mbta.Api.filterRoutesByIds routeIds ]
+            [ Mbta.Api.filterRoutesByIds (routeIds corridor) ]
         , Mbta.Api.getStops
             ReceiveStops
             apiHost
             [ Mbta.Api.include Mbta.Api.stopChildStops ]
-            [ Mbta.Api.filterStopsByIds stopIds ]
+            [ Mbta.Api.filterStopsByIds (stopIds corridor) ]
         , Mbta.Api.getServices
             ReceiveServices
             apiHost
             []
-            [ Mbta.Api.filterServicesByRouteIds routeIds ]
-        , getSchedules Today
+            [ Mbta.Api.filterServicesByRouteIds (routeIds corridor) ]
+        , getSchedules corridor Today
         ]
     )
 
@@ -74,17 +80,20 @@ update msg model =
             , Cmd.none
             )
 
+        SelectCorridor corridor ->
+            initCorridor corridor
+
         SelectDay selectedDay ->
             ( { model
                 | selectedDay = selectedDay
                 , schedules = RemoteData.Loading
               }
-            , getSchedules selectedDay
+            , getSchedules model.selectedCorridor selectedDay
             )
 
 
-getSchedules : Day -> Cmd Msg
-getSchedules selectedDay =
+getSchedules : Corridor -> Day -> Cmd Msg
+getSchedules corridor selectedDay =
     let
         dateFilter : List (Mbta.Api.Filter Mbta.Schedule)
         dateFilter =
@@ -99,8 +108,8 @@ getSchedules selectedDay =
         ReceiveSchedules
         apiHost
         [ Mbta.Api.include Mbta.Api.scheduleTrip ]
-        ([ Mbta.Api.filterSchedulesByRouteIds routeIds
-         , Mbta.Api.filterSchedulesByStopIds stopIds
+        ([ Mbta.Api.filterSchedulesByRouteIds (routeIds corridor)
+         , Mbta.Api.filterSchedulesByStopIds (stopIds corridor)
          ]
             ++ dateFilter
         )

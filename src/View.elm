@@ -305,6 +305,9 @@ tripFooter trip =
         Just (Mbta.RouteId "CR-Worcester") ->
             "WOR"
 
+        Just (Mbta.RouteId "CR-Needham") ->
+            "NED"
+
         Just (Mbta.RouteId "CR-Franklin") ->
             "FKL"
 

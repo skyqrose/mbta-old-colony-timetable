@@ -47,6 +47,7 @@ routeIds corridor =
     case corridor of
         NortheastCorridor ->
             [ Mbta.RouteId "CR-Worcester"
+            , Mbta.RouteId "CR-Needham"
             , Mbta.RouteId "CR-Franklin"
             , Mbta.RouteId "CR-Fairmount"
             , Mbta.RouteId "CR-Foxboro"

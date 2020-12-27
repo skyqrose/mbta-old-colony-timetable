@@ -9970,6 +9970,7 @@ var $author$project$Model$routeIds = function (corridor) {
 		return _List_fromArray(
 			[
 				$author$project$Mbta$RouteId('CR-Worcester'),
+				$author$project$Mbta$RouteId('CR-Needham'),
 				$author$project$Mbta$RouteId('CR-Franklin'),
 				$author$project$Mbta$RouteId('CR-Fairmount'),
 				$author$project$Mbta$RouteId('CR-Foxboro'),
@@ -17465,6 +17466,8 @@ var $author$project$View$tripFooter = function (trip) {
 							return 'GRN';
 						case 'CR-Worcester':
 							return 'WOR';
+						case 'CR-Needham':
+							return 'NED';
 						case 'CR-Franklin':
 							return 'FKL';
 						case 'CR-Foxboro':

@@ -1,3 +1,4 @@
+dist: focal
 language: elm
 script: npm test && npm run build
 before_deploy:

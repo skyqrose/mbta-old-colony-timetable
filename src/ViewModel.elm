@@ -15,7 +15,8 @@ import RemoteData
 
 
 type alias ViewModel =
-    { dayButtons : RemoteData.RemoteData String DayButtons
+    { selectedCorridor : Model.Corridor
+    , dayButtons : RemoteData.RemoteData String DayButtons
     , timetables : RemoteData.RemoteData String Timetables
     }
 

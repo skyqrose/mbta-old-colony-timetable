@@ -47,7 +47,8 @@ body : ViewModel.ViewModel -> Element Msg
 body model =
     El.column
         []
-        [ case model.dayButtons of
+        [ viewCorridorButtons model.selectedCorridor
+        , case model.dayButtons of
             RemoteData.NotAsked ->
                 El.text "Error services NotAsked"
 
@@ -74,29 +75,45 @@ body model =
         ]
 
 
+viewCorridorButtons : Model.Corridor -> Element Msg
+viewCorridorButtons selectedCorridor =
+    buttonRow
+        .text
+        (.corridor >> Model.SelectCorridor)
+        (.corridor >> (==) selectedCorridor)
+        [ { corridor = Model.NortheastCorridor, text = "Northeast Corridor" }
+        , { corridor = Model.OldColony, text = "Old Colony Branch" }
+        ]
+
+
 viewDayButtons : ViewModel.DayButtons -> Element Msg
 viewDayButtons dayButtons =
+    buttonRow .text (.day >> Model.SelectDay) .isSelected dayButtons
+
+
+buttonRow : (a -> String) -> (a -> Msg) -> (a -> Bool) -> List a -> Element Msg
+buttonRow text msg isSelected elems =
     El.row
         []
         (List.map
-            (\dayButton ->
+            (\elem ->
                 Input.button
                     ([ El.padding 5
                      , Border.width 1
                      , Border.rounded 10
                      ]
-                        ++ (if dayButton.isSelected then
+                        ++ (if isSelected elem then
                                 [ Background.color shadedColor ]
 
                             else
                                 []
                            )
                     )
-                    { onPress = Just (Model.SelectDay dayButton.day)
-                    , label = El.text dayButton.text
+                    { onPress = Just (msg elem)
+                    , label = El.text (text elem)
                     }
             )
-            dayButtons
+            elems
         )
 
 

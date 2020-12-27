@@ -4,7 +4,6 @@ module Model exposing
     , Model
     , Msg(..)
     , ServiceKey
-    , corridors
     , routeIds
     , serviceKey
     , stopIds
@@ -41,13 +40,6 @@ type alias RemoteDataApi primary =
 type Corridor
     = NortheastCorridor
     | OldColony
-
-
-corridors : List Corridor
-corridors =
-    [ NortheastCorridor
-    , OldColony
-    ]
 
 
 routeIds : Corridor -> List Mbta.RouteId

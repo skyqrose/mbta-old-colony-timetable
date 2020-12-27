@@ -15,7 +15,8 @@ import ViewModel
 
 makeViewModel : Model.Model -> ViewModel.ViewModel
 makeViewModel model =
-    { dayButtons =
+    { selectedCorridor = model.selectedCorridor
+    , dayButtons =
         RemoteData.mapBoth
             (\services ->
                 viewDayButtons

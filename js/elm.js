@@ -5508,8 +5508,8 @@ var $elm$core$Task$perform = F2(
 				A2($elm$core$Task$map, toMessage, task)));
 	});
 var $elm$browser$Browser$document = _Browser_document;
+var $author$project$Model$NortheastCorridor = {$: 'NortheastCorridor'};
 var $krisajenkins$remotedata$RemoteData$Loading = {$: 'Loading'};
-var $krisajenkins$remotedata$RemoteData$NotAsked = {$: 'NotAsked'};
 var $author$project$Model$ReceiveRoutes = function (a) {
 	return {$: 'ReceiveRoutes', a: a};
 };
@@ -9965,51 +9965,81 @@ var $author$project$Mbta$Api$include = function (_v0) {
 	var s = _v0.a;
 	return $author$project$Mbta$Api$Include(s);
 };
-var $author$project$Model$routeIds = _List_fromArray(
-	[
-		$author$project$Mbta$RouteId('CR-Greenbush'),
-		$author$project$Mbta$RouteId('CR-Middleborough'),
-		$author$project$Mbta$RouteId('CR-Kingston')
-	]);
+var $author$project$Model$routeIds = function (corridor) {
+	if (corridor.$ === 'NortheastCorridor') {
+		return _List_fromArray(
+			[
+				$author$project$Mbta$RouteId('CR-Worcester'),
+				$author$project$Mbta$RouteId('CR-Franklin'),
+				$author$project$Mbta$RouteId('CR-Fairmount'),
+				$author$project$Mbta$RouteId('CR-Foxboro'),
+				$author$project$Mbta$RouteId('CR-Providence')
+			]);
+	} else {
+		return _List_fromArray(
+			[
+				$author$project$Mbta$RouteId('CR-Greenbush'),
+				$author$project$Mbta$RouteId('CR-Middleborough'),
+				$author$project$Mbta$RouteId('CR-Kingston')
+			]);
+	}
+};
 var $author$project$Mbta$Api$Relationship = function (a) {
 	return {$: 'Relationship', a: a};
 };
 var $author$project$Mbta$Api$scheduleTrip = $author$project$Mbta$Api$Relationship('trip');
-var $author$project$Model$stopIds = _List_fromArray(
-	[
-		$author$project$Mbta$StopId('place-sstat'),
-		$author$project$Mbta$StopId('place-jfk'),
-		$author$project$Mbta$StopId('place-qnctr'),
-		$author$project$Mbta$StopId('place-brntn')
-	]);
-var $author$project$Main$getSchedules = function (selectedDay) {
-	var dateFilter = function () {
-		if (selectedDay.$ === 'Today') {
-			return _List_Nil;
-		} else {
-			var serviceKey = selectedDay.a;
-			return _List_fromArray(
-				[
-					$author$project$Mbta$Api$filterSchedulesByServiceDate(serviceKey.startDate)
-				]);
-		}
-	}();
-	return A4(
-		$author$project$Mbta$Api$getSchedules,
-		$author$project$Model$ReceiveSchedules,
-		$author$project$Main$apiHost,
-		_List_fromArray(
+var $author$project$Model$stopIds = function (corridor) {
+	if (corridor.$ === 'NortheastCorridor') {
+		return _List_fromArray(
 			[
-				$author$project$Mbta$Api$include($author$project$Mbta$Api$scheduleTrip)
-			]),
-		_Utils_ap(
+				$author$project$Mbta$StopId('place-sstat'),
+				$author$project$Mbta$StopId('place-bbsta'),
+				$author$project$Mbta$StopId('place-rugg'),
+				$author$project$Mbta$StopId('place-forhl'),
+				$author$project$Mbta$StopId('place-NEC-2203'),
+				$author$project$Mbta$StopId('place-DB-0095')
+			]);
+	} else {
+		return _List_fromArray(
+			[
+				$author$project$Mbta$StopId('place-sstat'),
+				$author$project$Mbta$StopId('place-jfk'),
+				$author$project$Mbta$StopId('place-qnctr'),
+				$author$project$Mbta$StopId('place-brntn')
+			]);
+	}
+};
+var $author$project$Main$getSchedules = F2(
+	function (corridor, selectedDay) {
+		var dateFilter = function () {
+			if (selectedDay.$ === 'Today') {
+				return _List_Nil;
+			} else {
+				var serviceKey = selectedDay.a;
+				return _List_fromArray(
+					[
+						$author$project$Mbta$Api$filterSchedulesByServiceDate(serviceKey.startDate)
+					]);
+			}
+		}();
+		return A4(
+			$author$project$Mbta$Api$getSchedules,
+			$author$project$Model$ReceiveSchedules,
+			$author$project$Main$apiHost,
 			_List_fromArray(
 				[
-					$author$project$Mbta$Api$filterSchedulesByRouteIds($author$project$Model$routeIds),
-					$author$project$Mbta$Api$filterSchedulesByStopIds($author$project$Model$stopIds)
+					$author$project$Mbta$Api$include($author$project$Mbta$Api$scheduleTrip)
 				]),
-			dateFilter));
-};
+			_Utils_ap(
+				_List_fromArray(
+					[
+						$author$project$Mbta$Api$filterSchedulesByRouteIds(
+						$author$project$Model$routeIds(corridor)),
+						$author$project$Mbta$Api$filterSchedulesByStopIds(
+						$author$project$Model$stopIds(corridor))
+					]),
+				dateFilter));
+	});
 var $author$project$Mbta$Api$getServices = F4(
 	function (toMsg, host, includes, filters) {
 		return A6($author$project$Mbta$Api$getList, toMsg, host, $author$project$Mbta$Decode$service, 'services', includes, filters);
@@ -10019,57 +10049,122 @@ var $author$project$Mbta$Api$getStops = F4(
 		return A6($author$project$Mbta$Api$getList, toMsg, host, $author$project$Mbta$Decode$stop, 'stops', includes, filters);
 	});
 var $author$project$Mbta$Api$stopChildStops = $author$project$Mbta$Api$Relationship('child_stops');
-var $author$project$Main$init = _Utils_Tuple2(
-	{routes: $krisajenkins$remotedata$RemoteData$Loading, schedules: $krisajenkins$remotedata$RemoteData$NotAsked, selectedDay: $author$project$Model$Today, services: $krisajenkins$remotedata$RemoteData$Loading, stops: $krisajenkins$remotedata$RemoteData$Loading},
-	$elm$core$Platform$Cmd$batch(
-		_List_fromArray(
-			[
-				A4(
-				$author$project$Mbta$Api$getRoutes,
-				$author$project$Model$ReceiveRoutes,
-				$author$project$Main$apiHost,
-				_List_Nil,
-				_List_fromArray(
-					[
-						$author$project$Mbta$Api$filterRoutesByIds($author$project$Model$routeIds)
-					])),
-				A4(
-				$author$project$Mbta$Api$getStops,
-				$author$project$Model$ReceiveStops,
-				$author$project$Main$apiHost,
-				_List_fromArray(
-					[
-						$author$project$Mbta$Api$include($author$project$Mbta$Api$stopChildStops)
-					]),
-				_List_fromArray(
-					[
-						$author$project$Mbta$Api$filterStopsByIds($author$project$Model$stopIds)
-					])),
-				A4(
-				$author$project$Mbta$Api$getServices,
-				$author$project$Model$ReceiveServices,
-				$author$project$Main$apiHost,
-				_List_Nil,
-				_List_fromArray(
-					[
-						$author$project$Mbta$Api$filterServicesByRouteIds($author$project$Model$routeIds)
-					])),
-				$author$project$Main$getSchedules($author$project$Model$Today)
-			])));
-var $author$project$ViewModel$Error = function (a) {
-	return {$: 'Error', a: a};
+var $author$project$Main$initCorridor = function (corridor) {
+	return _Utils_Tuple2(
+		{routes: $krisajenkins$remotedata$RemoteData$Loading, schedules: $krisajenkins$remotedata$RemoteData$Loading, selectedCorridor: corridor, selectedDay: $author$project$Model$Today, services: $krisajenkins$remotedata$RemoteData$Loading, stops: $krisajenkins$remotedata$RemoteData$Loading},
+		$elm$core$Platform$Cmd$batch(
+			_List_fromArray(
+				[
+					A4(
+					$author$project$Mbta$Api$getRoutes,
+					$author$project$Model$ReceiveRoutes,
+					$author$project$Main$apiHost,
+					_List_Nil,
+					_List_fromArray(
+						[
+							$author$project$Mbta$Api$filterRoutesByIds(
+							$author$project$Model$routeIds(corridor))
+						])),
+					A4(
+					$author$project$Mbta$Api$getStops,
+					$author$project$Model$ReceiveStops,
+					$author$project$Main$apiHost,
+					_List_fromArray(
+						[
+							$author$project$Mbta$Api$include($author$project$Mbta$Api$stopChildStops)
+						]),
+					_List_fromArray(
+						[
+							$author$project$Mbta$Api$filterStopsByIds(
+							$author$project$Model$stopIds(corridor))
+						])),
+					A4(
+					$author$project$Mbta$Api$getServices,
+					$author$project$Model$ReceiveServices,
+					$author$project$Main$apiHost,
+					_List_Nil,
+					_List_fromArray(
+						[
+							$author$project$Mbta$Api$filterServicesByRouteIds(
+							$author$project$Model$routeIds(corridor))
+						])),
+					A2($author$project$Main$getSchedules, corridor, $author$project$Model$Today)
+				])));
 };
-var $author$project$ViewModel$LoadingSchedules = function (a) {
-	return {$: 'LoadingSchedules', a: a};
+var $author$project$Main$init = $author$project$Main$initCorridor($author$project$Model$NortheastCorridor);
+var $krisajenkins$remotedata$RemoteData$Failure = function (a) {
+	return {$: 'Failure', a: a};
 };
-var $author$project$ViewModel$LoadingServices = {$: 'LoadingServices'};
-var $author$project$ViewModel$SchedulesLoaded = F2(
-	function (a, b) {
-		return {$: 'SchedulesLoaded', a: a, b: b};
+var $krisajenkins$remotedata$RemoteData$NotAsked = {$: 'NotAsked'};
+var $krisajenkins$remotedata$RemoteData$Success = function (a) {
+	return {$: 'Success', a: a};
+};
+var $krisajenkins$remotedata$RemoteData$andMap = F2(
+	function (wrappedValue, wrappedFunction) {
+		var _v0 = _Utils_Tuple2(wrappedFunction, wrappedValue);
+		_v0$2:
+		while (true) {
+			_v0$3:
+			while (true) {
+				_v0$4:
+				while (true) {
+					_v0$5:
+					while (true) {
+						switch (_v0.a.$) {
+							case 'Success':
+								switch (_v0.b.$) {
+									case 'Success':
+										var f = _v0.a.a;
+										var value = _v0.b.a;
+										return $krisajenkins$remotedata$RemoteData$Success(
+											f(value));
+									case 'Failure':
+										break _v0$2;
+									case 'Loading':
+										break _v0$4;
+									default:
+										var _v4 = _v0.b;
+										return $krisajenkins$remotedata$RemoteData$NotAsked;
+								}
+							case 'Failure':
+								var error = _v0.a.a;
+								return $krisajenkins$remotedata$RemoteData$Failure(error);
+							case 'Loading':
+								switch (_v0.b.$) {
+									case 'Failure':
+										break _v0$2;
+									case 'Loading':
+										break _v0$3;
+									case 'NotAsked':
+										break _v0$3;
+									default:
+										break _v0$3;
+								}
+							default:
+								switch (_v0.b.$) {
+									case 'Failure':
+										break _v0$2;
+									case 'Loading':
+										break _v0$4;
+									case 'NotAsked':
+										break _v0$5;
+									default:
+										break _v0$5;
+								}
+						}
+					}
+					var _v3 = _v0.a;
+					return $krisajenkins$remotedata$RemoteData$NotAsked;
+				}
+				var _v2 = _v0.b;
+				return $krisajenkins$remotedata$RemoteData$Loading;
+			}
+			var _v1 = _v0.a;
+			return $krisajenkins$remotedata$RemoteData$Loading;
+		}
+		var error = _v0.b.a;
+		return $krisajenkins$remotedata$RemoteData$Failure(error);
 	});
-var $author$project$ViewModel$ServicesLoaded = function (a) {
-	return {$: 'ServicesLoaded', a: a};
-};
 var $pzp1997$assoc_list$AssocList$get = F2(
 	function (targetKey, _v0) {
 		get:
@@ -10103,6 +10198,46 @@ var $author$project$Mbta$Api$getPrimaryData = function (_v0) {
 	var data = _v0.a;
 	return data.primaryData;
 };
+var $krisajenkins$remotedata$RemoteData$map = F2(
+	function (f, data) {
+		switch (data.$) {
+			case 'Success':
+				var value = data.a;
+				return $krisajenkins$remotedata$RemoteData$Success(
+					f(value));
+			case 'Loading':
+				return $krisajenkins$remotedata$RemoteData$Loading;
+			case 'NotAsked':
+				return $krisajenkins$remotedata$RemoteData$NotAsked;
+			default:
+				var error = data.a;
+				return $krisajenkins$remotedata$RemoteData$Failure(error);
+		}
+	});
+var $krisajenkins$remotedata$RemoteData$mapError = F2(
+	function (f, data) {
+		switch (data.$) {
+			case 'Success':
+				var x = data.a;
+				return $krisajenkins$remotedata$RemoteData$Success(x);
+			case 'Failure':
+				var e = data.a;
+				return $krisajenkins$remotedata$RemoteData$Failure(
+					f(e));
+			case 'Loading':
+				return $krisajenkins$remotedata$RemoteData$Loading;
+			default:
+				return $krisajenkins$remotedata$RemoteData$NotAsked;
+		}
+	});
+var $krisajenkins$remotedata$RemoteData$mapBoth = F2(
+	function (successFn, errorFn) {
+		return A2(
+			$elm$core$Basics$composeL,
+			$krisajenkins$remotedata$RemoteData$mapError(errorFn),
+			$krisajenkins$remotedata$RemoteData$map(successFn));
+	});
+var $krisajenkins$remotedata$RemoteData$succeed = $krisajenkins$remotedata$RemoteData$Success;
 var $elm$core$Debug$toString = _Debug_toString;
 var $author$project$Model$Future = function (a) {
 	return {$: 'Future', a: a};
@@ -10390,32 +10525,33 @@ var $author$project$Mbta$stopWheelchairAccessible = function (stop) {
 			return stop_node.wheelchairAccessible;
 	}
 };
-var $author$project$MakeViewModel$viewStopHeaders = function (stops) {
-	var sortedStops = A2(
-		$elm$core$List$filterMap,
-		function (stopId) {
-			return A2(
-				$elm_community$list_extra$List$Extra$find,
-				function (stop) {
-					return _Utils_eq(
-						$author$project$Mbta$stopId(stop),
-						stopId);
-				},
-				stops);
-		},
-		$author$project$Model$stopIds);
-	return A2(
-		$elm$core$List$map,
-		function (stop) {
-			return {
-				accessible: _Utils_eq(
-					$author$project$Mbta$stopWheelchairAccessible(stop),
-					$author$project$Mbta$Accessible_1_Accessible),
-				stopName: $author$project$Mbta$stopName(stop)
-			};
-		},
-		sortedStops);
-};
+var $author$project$MakeViewModel$viewStopHeaders = F2(
+	function (corridor, stops) {
+		var sortedStops = A2(
+			$elm$core$List$filterMap,
+			function (stopId) {
+				return A2(
+					$elm_community$list_extra$List$Extra$find,
+					function (stop) {
+						return _Utils_eq(
+							$author$project$Mbta$stopId(stop),
+							stopId);
+					},
+					stops);
+			},
+			$author$project$Model$stopIds(corridor));
+		return A2(
+			$elm$core$List$map,
+			function (stop) {
+				return {
+					accessible: _Utils_eq(
+						$author$project$Mbta$stopWheelchairAccessible(stop),
+						$author$project$Mbta$Accessible_1_Accessible),
+					stopName: $author$project$Mbta$stopName(stop)
+				};
+			},
+			sortedStops);
+	});
 var $elm$core$String$cons = _String_cons;
 var $elm$core$String$fromChar = function (_char) {
 	return A2($elm$core$String$cons, _char, '');
@@ -11061,8 +11197,8 @@ var $author$project$MakeViewModel$viewScheduleTime = function (schedule) {
 		},
 		$author$project$MakeViewModel$scheduleToTime(schedule));
 };
-var $author$project$MakeViewModel$viewTrip = F3(
-	function (stopDict, maybeTrip, schedules) {
+var $author$project$MakeViewModel$viewTrip = F4(
+	function (corridor, stopDict, maybeTrip, schedules) {
 		return {
 			bikes: function () {
 				if (maybeTrip.$ === 'Just') {
@@ -11099,11 +11235,11 @@ var $author$project$MakeViewModel$viewTrip = F3(
 							},
 							schedules);
 					},
-					$author$project$Model$stopIds))
+					$author$project$Model$stopIds(corridor)))
 		};
 	});
-var $author$project$MakeViewModel$viewTimetable = F5(
-	function (directionId, stops, stopDict, schedules, tripGetter) {
+var $author$project$MakeViewModel$viewTimetable = F6(
+	function (corridor, directionId, stops, stopDict, schedules, tripGetter) {
 		var trips = A2(
 			$skyqrose$assoc_list_extra$AssocList$Extra$groupBy,
 			function ($) {
@@ -11112,14 +11248,15 @@ var $author$project$MakeViewModel$viewTimetable = F5(
 			schedules);
 		return {
 			directionId: directionId,
-			stopHeaders: $author$project$MakeViewModel$viewStopHeaders(stops),
+			stopHeaders: A2($author$project$MakeViewModel$viewStopHeaders, corridor, stops),
 			trips: A2(
 				$elm$core$List$map,
 				function (_v1) {
 					var tripId = _v1.a;
 					var schedulesOnTrip = _v1.b;
-					return A3(
+					return A4(
 						$author$project$MakeViewModel$viewTrip,
+						corridor,
 						stopDict,
 						tripGetter(tripId),
 						schedulesOnTrip);
@@ -11151,8 +11288,8 @@ var $author$project$MakeViewModel$viewTimetable = F5(
 					$pzp1997$assoc_list$AssocList$toList(trips)))
 		};
 	});
-var $author$project$MakeViewModel$viewTimetables = F4(
-	function (routes, stops, schedules, tripGetter) {
+var $author$project$MakeViewModel$viewTimetables = F5(
+	function (corridor, routes, stops, schedules, tripGetter) {
 		var stopDict = $author$project$MakeViewModel$buildParentStationDict(stops);
 		var _v0 = A2(
 			$elm$core$List$partition,
@@ -11163,120 +11300,62 @@ var $author$project$MakeViewModel$viewTimetables = F4(
 		var inboundSchedules = _v0.a;
 		var outboundSchedules = _v0.b;
 		return {
-			d0: A5($author$project$MakeViewModel$viewTimetable, $author$project$Mbta$D0, stops, stopDict, outboundSchedules, tripGetter),
-			d1: A5($author$project$MakeViewModel$viewTimetable, $author$project$Mbta$D1, stops, stopDict, inboundSchedules, tripGetter)
+			d0: A6($author$project$MakeViewModel$viewTimetable, corridor, $author$project$Mbta$D0, stops, stopDict, outboundSchedules, tripGetter),
+			d1: A6($author$project$MakeViewModel$viewTimetable, corridor, $author$project$Mbta$D1, stops, stopDict, inboundSchedules, tripGetter)
 		};
 	});
 var $author$project$MakeViewModel$makeViewModel = function (model) {
-	var _v0 = model.services;
-	switch (_v0.$) {
-		case 'Loading':
-			return $author$project$ViewModel$LoadingServices;
-		case 'Failure':
-			var e = _v0.a;
-			return $author$project$ViewModel$Error(
-				$elm$core$Debug$toString(e));
-		case 'Success':
-			var services = _v0.a;
-			var dayButtons = A2(
-				$author$project$MakeViewModel$viewDayButtons,
-				$author$project$Mbta$Api$getPrimaryData(services),
-				model.selectedDay);
-			var _v1 = model.schedules;
-			switch (_v1.$) {
-				case 'NotAsked':
-					return $author$project$ViewModel$ServicesLoaded(dayButtons);
-				case 'Loading':
-					return $author$project$ViewModel$LoadingSchedules(dayButtons);
-				case 'Failure':
-					var e = _v1.a;
-					return $author$project$ViewModel$Error(
-						$elm$core$Debug$toString(e));
-				default:
-					var schedules = _v1.a;
-					var _v2 = _Utils_Tuple2(model.routes, model.stops);
-					_v2$2:
-					while (true) {
-						_v2$3:
-						while (true) {
-							_v2$4:
-							while (true) {
-								_v2$5:
-								while (true) {
-									switch (_v2.a.$) {
-										case 'Success':
-											switch (_v2.b.$) {
-												case 'Success':
-													var routes = _v2.a.a;
-													var stops = _v2.b.a;
-													return A2(
-														$author$project$ViewModel$SchedulesLoaded,
-														dayButtons,
-														A4(
-															$author$project$MakeViewModel$viewTimetables,
-															$author$project$Mbta$Api$getPrimaryData(routes),
-															$author$project$Mbta$Api$getPrimaryData(stops),
-															$author$project$Mbta$Api$getPrimaryData(schedules),
-															function (tripId) {
-																return A2($author$project$Mbta$Api$getIncludedTrip, tripId, schedules);
-															}));
-												case 'Failure':
-													break _v2$2;
-												case 'Loading':
-													break _v2$4;
-												default:
-													break _v2$5;
-											}
-										case 'Failure':
-											var e = _v2.a.a;
-											return $author$project$ViewModel$Error(
-												$elm$core$Debug$toString(e));
-										case 'Loading':
-											switch (_v2.b.$) {
-												case 'Failure':
-													break _v2$2;
-												case 'Loading':
-													break _v2$3;
-												default:
-													break _v2$3;
-											}
-										default:
-											switch (_v2.b.$) {
-												case 'Failure':
-													break _v2$2;
-												case 'Loading':
-													break _v2$4;
-												default:
-													break _v2$5;
-											}
-									}
-								}
-								return $author$project$ViewModel$Error(
-									$elm$core$Debug$toString(model));
-							}
-							var _v4 = _v2.b;
-							return $author$project$ViewModel$LoadingSchedules(dayButtons);
-						}
-						var _v3 = _v2.a;
-						return $author$project$ViewModel$LoadingSchedules(dayButtons);
-					}
-					var e = _v2.b.a;
-					return $author$project$ViewModel$Error(
-						$elm$core$Debug$toString(e));
-			}
-		default:
-			return $author$project$ViewModel$Error(
-				$elm$core$Debug$toString(model));
-	}
+	return {
+		dayButtons: A3(
+			$krisajenkins$remotedata$RemoteData$mapBoth,
+			function (services) {
+				return A2(
+					$author$project$MakeViewModel$viewDayButtons,
+					$author$project$Mbta$Api$getPrimaryData(services),
+					model.selectedDay);
+			},
+			function (e) {
+				return $elm$core$Debug$toString(e);
+			},
+			model.services),
+		selectedCorridor: model.selectedCorridor,
+		timetables: A3(
+			$krisajenkins$remotedata$RemoteData$mapBoth,
+			function (_v0) {
+				var routes = _v0.a;
+				var stops = _v0.b;
+				var schedules = _v0.c;
+				return A5(
+					$author$project$MakeViewModel$viewTimetables,
+					model.selectedCorridor,
+					$author$project$Mbta$Api$getPrimaryData(routes),
+					$author$project$Mbta$Api$getPrimaryData(stops),
+					$author$project$Mbta$Api$getPrimaryData(schedules),
+					function (tripId) {
+						return A2($author$project$Mbta$Api$getIncludedTrip, tripId, schedules);
+					});
+			},
+			function (e) {
+				return $elm$core$Debug$toString(e);
+			},
+			A2(
+				$krisajenkins$remotedata$RemoteData$andMap,
+				model.schedules,
+				A2(
+					$krisajenkins$remotedata$RemoteData$andMap,
+					model.stops,
+					A2(
+						$krisajenkins$remotedata$RemoteData$andMap,
+						model.routes,
+						$krisajenkins$remotedata$RemoteData$succeed(
+							F3(
+								function (routes, stops, schedules) {
+									return _Utils_Tuple3(routes, stops, schedules);
+								}))))))
+	};
 };
 var $elm$core$Platform$Sub$batch = _Platform_batch;
 var $elm$core$Platform$Sub$none = $elm$core$Platform$Sub$batch(_List_Nil);
-var $krisajenkins$remotedata$RemoteData$Failure = function (a) {
-	return {$: 'Failure', a: a};
-};
-var $krisajenkins$remotedata$RemoteData$Success = function (a) {
-	return {$: 'Success', a: a};
-};
 var $krisajenkins$remotedata$RemoteData$fromResult = function (result) {
 	if (result.$ === 'Err') {
 		var e = result.a;
@@ -11326,13 +11405,16 @@ var $author$project$Main$update = F2(
 							schedules: $krisajenkins$remotedata$RemoteData$fromResult(schedulesResult)
 						}),
 					$elm$core$Platform$Cmd$none);
+			case 'SelectCorridor':
+				var corridor = msg.a;
+				return $author$project$Main$initCorridor(corridor);
 			default:
 				var selectedDay = msg.a;
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
 						{schedules: $krisajenkins$remotedata$RemoteData$Loading, selectedDay: selectedDay}),
-					$author$project$Main$getSchedules(selectedDay));
+					A2($author$project$Main$getSchedules, model.selectedCorridor, selectedDay));
 		}
 	});
 var $mdgriffith$elm_ui$Internal$Model$Unkeyed = function (a) {
@@ -11340,7 +11422,7 @@ var $mdgriffith$elm_ui$Internal$Model$Unkeyed = function (a) {
 };
 var $mdgriffith$elm_ui$Internal$Model$AsColumn = {$: 'AsColumn'};
 var $mdgriffith$elm_ui$Internal$Model$asColumn = $mdgriffith$elm_ui$Internal$Model$AsColumn;
-var $mdgriffith$elm_ui$Internal$Style$classes = {above: 'a', active: 'atv', alignBottom: 'ab', alignCenterX: 'cx', alignCenterY: 'cy', alignContainerBottom: 'acb', alignContainerCenterX: 'accx', alignContainerCenterY: 'accy', alignContainerRight: 'acr', alignLeft: 'al', alignRight: 'ar', alignTop: 'at', alignedHorizontally: 'ah', alignedVertically: 'av', any: 's', behind: 'bh', below: 'b', bold: 'w7', borderDashed: 'bd', borderDotted: 'bdt', borderNone: 'bn', borderSolid: 'bs', capturePointerEvents: 'cpe', clip: 'cp', clipX: 'cpx', clipY: 'cpy', column: 'c', container: 'ctr', contentBottom: 'cb', contentCenterX: 'ccx', contentCenterY: 'ccy', contentLeft: 'cl', contentRight: 'cr', contentTop: 'ct', cursorPointer: 'cptr', cursorText: 'ctxt', focus: 'fcs', focusedWithin: 'focus-within', fullSize: 'fs', grid: 'g', hasBehind: 'hbh', heightContent: 'hc', heightExact: 'he', heightFill: 'hf', heightFillPortion: 'hfp', hover: 'hv', imageContainer: 'ic', inFront: 'fr', inputMultiline: 'iml', inputMultilineFiller: 'imlf', inputMultilineParent: 'imlp', inputMultilineWrapper: 'implw', inputText: 'it', italic: 'i', link: 'lnk', nearby: 'nb', noTextSelection: 'notxt', onLeft: 'ol', onRight: 'or', opaque: 'oq', overflowHidden: 'oh', page: 'pg', paragraph: 'p', passPointerEvents: 'ppe', root: 'ui', row: 'r', scrollbars: 'sb', scrollbarsX: 'sbx', scrollbarsY: 'sby', seButton: 'sbt', single: 'e', sizeByCapital: 'cap', spaceEvenly: 'sev', strike: 'sk', text: 't', textCenter: 'tc', textExtraBold: 'w8', textExtraLight: 'w2', textHeavy: 'w9', textJustify: 'tj', textJustifyAll: 'tja', textLeft: 'tl', textLight: 'w3', textMedium: 'w5', textNormalWeight: 'w4', textRight: 'tr', textSemiBold: 'w6', textThin: 'w1', textUnitalicized: 'tun', transition: 'ts', transparent: 'clr', underline: 'u', widthContent: 'wc', widthExact: 'we', widthFill: 'wf', widthFillPortion: 'wfp', wrapped: 'wrp'};
+var $mdgriffith$elm_ui$Internal$Style$classes = {above: 'a', active: 'atv', alignBottom: 'ab', alignCenterX: 'cx', alignCenterY: 'cy', alignContainerBottom: 'acb', alignContainerCenterX: 'accx', alignContainerCenterY: 'accy', alignContainerRight: 'acr', alignLeft: 'al', alignRight: 'ar', alignTop: 'at', alignedHorizontally: 'ah', alignedVertically: 'av', any: 's', behind: 'bh', below: 'b', bold: 'w7', borderDashed: 'bd', borderDotted: 'bdt', borderNone: 'bn', borderSolid: 'bs', capturePointerEvents: 'cpe', clip: 'cp', clipX: 'cpx', clipY: 'cpy', column: 'c', container: 'ctr', contentBottom: 'cb', contentCenterX: 'ccx', contentCenterY: 'ccy', contentLeft: 'cl', contentRight: 'cr', contentTop: 'ct', cursorPointer: 'cptr', cursorText: 'ctxt', focus: 'fcs', focusedWithin: 'focus-within', fullSize: 'fs', grid: 'g', hasBehind: 'hbh', heightContent: 'hc', heightExact: 'he', heightFill: 'hf', heightFillPortion: 'hfp', hover: 'hv', imageContainer: 'ic', inFront: 'fr', inputLabel: 'lbl', inputMultiline: 'iml', inputMultilineFiller: 'imlf', inputMultilineParent: 'imlp', inputMultilineWrapper: 'implw', inputText: 'it', italic: 'i', link: 'lnk', nearby: 'nb', noTextSelection: 'notxt', onLeft: 'ol', onRight: 'or', opaque: 'oq', overflowHidden: 'oh', page: 'pg', paragraph: 'p', passPointerEvents: 'ppe', root: 'ui', row: 'r', scrollbars: 'sb', scrollbarsX: 'sbx', scrollbarsY: 'sby', seButton: 'sbt', single: 'e', sizeByCapital: 'cap', spaceEvenly: 'sev', strike: 'sk', text: 't', textCenter: 'tc', textExtraBold: 'w8', textExtraLight: 'w2', textHeavy: 'w9', textJustify: 'tj', textJustifyAll: 'tja', textLeft: 'tl', textLight: 'w3', textMedium: 'w5', textNormalWeight: 'w4', textRight: 'tr', textSemiBold: 'w6', textThin: 'w1', textUnitalicized: 'tun', transition: 'ts', transparent: 'clr', underline: 'u', widthContent: 'wc', widthExact: 'we', widthFill: 'wf', widthFillPortion: 'wfp', wrapped: 'wrp'};
 var $mdgriffith$elm_ui$Internal$Model$Generic = {$: 'Generic'};
 var $mdgriffith$elm_ui$Internal$Model$div = $mdgriffith$elm_ui$Internal$Model$Generic;
 var $mdgriffith$elm_ui$Internal$Model$NoNearbyChildren = {$: 'NoNearbyChildren'};
@@ -11758,7 +11840,7 @@ var $mdgriffith$elm_ui$Internal$Model$renderFocusStyle = function (focus) {
 					]))),
 			A2(
 			$mdgriffith$elm_ui$Internal$Model$Style,
-			$mdgriffith$elm_ui$Internal$Style$dot($mdgriffith$elm_ui$Internal$Style$classes.any) + (':focus .focusable, ' + ($mdgriffith$elm_ui$Internal$Style$dot($mdgriffith$elm_ui$Internal$Style$classes.any) + '.focusable:focus')),
+			($mdgriffith$elm_ui$Internal$Style$dot($mdgriffith$elm_ui$Internal$Style$classes.any) + ':focus .focusable, ') + (($mdgriffith$elm_ui$Internal$Style$dot($mdgriffith$elm_ui$Internal$Style$classes.any) + '.focusable:focus, ') + ('.ui-slide-bar:focus + ' + ($mdgriffith$elm_ui$Internal$Style$dot($mdgriffith$elm_ui$Internal$Style$classes.any) + ' .focusable-thumb'))),
 			A2(
 				$elm$core$List$filterMap,
 				$elm$core$Basics$identity,
@@ -11816,6 +11898,10 @@ var $elm$virtual_dom$VirtualDom$property = F2(
 			_VirtualDom_property,
 			_VirtualDom_noInnerHtmlOrFormAction(key),
 			_VirtualDom_noJavaScriptOrHtmlUri(value));
+	});
+var $mdgriffith$elm_ui$Internal$Style$AllChildren = F2(
+	function (a, b) {
+		return {$: 'AllChildren', a: a, b: b};
 	});
 var $mdgriffith$elm_ui$Internal$Style$Batch = function (a) {
 	return {$: 'Batch', a: a};
@@ -12149,7 +12235,35 @@ var $mdgriffith$elm_ui$Internal$Style$baseSheet = _List_fromArray(
 				$mdgriffith$elm_ui$Internal$Style$dot($mdgriffith$elm_ui$Internal$Style$classes.imageContainer))),
 		_List_fromArray(
 			[
-				A2($mdgriffith$elm_ui$Internal$Style$Prop, 'display', 'block')
+				A2($mdgriffith$elm_ui$Internal$Style$Prop, 'display', 'block'),
+				A2(
+				$mdgriffith$elm_ui$Internal$Style$Descriptor,
+				$mdgriffith$elm_ui$Internal$Style$dot($mdgriffith$elm_ui$Internal$Style$classes.heightFill),
+				_List_fromArray(
+					[
+						A2(
+						$mdgriffith$elm_ui$Internal$Style$Child,
+						'img',
+						_List_fromArray(
+							[
+								A2($mdgriffith$elm_ui$Internal$Style$Prop, 'max-height', '100%'),
+								A2($mdgriffith$elm_ui$Internal$Style$Prop, 'object-fit', 'cover')
+							]))
+					])),
+				A2(
+				$mdgriffith$elm_ui$Internal$Style$Descriptor,
+				$mdgriffith$elm_ui$Internal$Style$dot($mdgriffith$elm_ui$Internal$Style$classes.widthFill),
+				_List_fromArray(
+					[
+						A2(
+						$mdgriffith$elm_ui$Internal$Style$Child,
+						'img',
+						_List_fromArray(
+							[
+								A2($mdgriffith$elm_ui$Internal$Style$Prop, 'max-width', '100%'),
+								A2($mdgriffith$elm_ui$Internal$Style$Prop, 'object-fit', 'cover')
+							]))
+					]))
 			])),
 		A2(
 		$mdgriffith$elm_ui$Internal$Style$Class,
@@ -12193,7 +12307,8 @@ var $mdgriffith$elm_ui$Internal$Style$baseSheet = _List_fromArray(
 						$mdgriffith$elm_ui$Internal$Style$dot($mdgriffith$elm_ui$Internal$Style$classes.nearby),
 						_List_fromArray(
 							[
-								A2($mdgriffith$elm_ui$Internal$Style$Prop, 'position', 'fixed')
+								A2($mdgriffith$elm_ui$Internal$Style$Prop, 'position', 'fixed'),
+								A2($mdgriffith$elm_ui$Internal$Style$Prop, 'z-index', '20')
 							]))
 					]))
 			])),
@@ -12633,7 +12748,8 @@ var $mdgriffith$elm_ui$Internal$Style$baseSheet = _List_fromArray(
 				_List_fromArray(
 					[
 						A2($mdgriffith$elm_ui$Internal$Style$Prop, 'line-height', '1.05'),
-						A2($mdgriffith$elm_ui$Internal$Style$Prop, 'background', 'transparent')
+						A2($mdgriffith$elm_ui$Internal$Style$Prop, 'background', 'transparent'),
+						A2($mdgriffith$elm_ui$Internal$Style$Prop, 'text-align', 'inherit')
 					])),
 				A2(
 				$mdgriffith$elm_ui$Internal$Style$Descriptor,
@@ -12823,6 +12939,13 @@ var $mdgriffith$elm_ui$Internal$Style$baseSheet = _List_fromArray(
 						_List_fromArray(
 							[
 								A2($mdgriffith$elm_ui$Internal$Style$Prop, 'justify-content', 'space-between')
+							])),
+						A2(
+						$mdgriffith$elm_ui$Internal$Style$Descriptor,
+						$mdgriffith$elm_ui$Internal$Style$dot($mdgriffith$elm_ui$Internal$Style$classes.inputLabel),
+						_List_fromArray(
+							[
+								A2($mdgriffith$elm_ui$Internal$Style$Prop, 'align-items', 'baseline')
 							]))
 					])),
 				A2(
@@ -12837,17 +12960,11 @@ var $mdgriffith$elm_ui$Internal$Style$baseSheet = _List_fromArray(
 						$mdgriffith$elm_ui$Internal$Style$dot($mdgriffith$elm_ui$Internal$Style$classes.any),
 						_List_fromArray(
 							[
-								A2($mdgriffith$elm_ui$Internal$Style$Prop, 'flex-basis', '0%'),
+								A2($mdgriffith$elm_ui$Internal$Style$Prop, 'flex-basis', '0px'),
+								A2($mdgriffith$elm_ui$Internal$Style$Prop, 'min-height', 'min-content'),
 								A2(
 								$mdgriffith$elm_ui$Internal$Style$Descriptor,
 								$mdgriffith$elm_ui$Internal$Style$dot($mdgriffith$elm_ui$Internal$Style$classes.heightExact),
-								_List_fromArray(
-									[
-										A2($mdgriffith$elm_ui$Internal$Style$Prop, 'flex-basis', 'auto')
-									])),
-								A2(
-								$mdgriffith$elm_ui$Internal$Style$Descriptor,
-								$mdgriffith$elm_ui$Internal$Style$dot($mdgriffith$elm_ui$Internal$Style$classes.column),
 								_List_fromArray(
 									[
 										A2($mdgriffith$elm_ui$Internal$Style$Prop, 'flex-basis', 'auto')
@@ -13171,7 +13288,7 @@ var $mdgriffith$elm_ui$Internal$Style$baseSheet = _List_fromArray(
 				$mdgriffith$elm_ui$Internal$Style$dot($mdgriffith$elm_ui$Internal$Style$classes.inputMultiline),
 				_List_fromArray(
 					[
-						A2($mdgriffith$elm_ui$Internal$Style$Prop, 'white-space', 'pre-wrap'),
+						A2($mdgriffith$elm_ui$Internal$Style$Prop, 'white-space', 'pre-wrap !important'),
 						A2($mdgriffith$elm_ui$Internal$Style$Prop, 'height', '100%'),
 						A2($mdgriffith$elm_ui$Internal$Style$Prop, 'width', '100%'),
 						A2($mdgriffith$elm_ui$Internal$Style$Prop, 'background-color', 'transparent')
@@ -13194,14 +13311,14 @@ var $mdgriffith$elm_ui$Internal$Style$baseSheet = _List_fromArray(
 				$mdgriffith$elm_ui$Internal$Style$dot($mdgriffith$elm_ui$Internal$Style$classes.inputMultilineParent),
 				_List_fromArray(
 					[
-						A2($mdgriffith$elm_ui$Internal$Style$Prop, 'white-space', 'pre-wrap'),
+						A2($mdgriffith$elm_ui$Internal$Style$Prop, 'white-space', 'pre-wrap !important'),
 						A2($mdgriffith$elm_ui$Internal$Style$Prop, 'cursor', 'text'),
 						A2(
 						$mdgriffith$elm_ui$Internal$Style$Child,
 						$mdgriffith$elm_ui$Internal$Style$dot($mdgriffith$elm_ui$Internal$Style$classes.inputMultilineFiller),
 						_List_fromArray(
 							[
-								A2($mdgriffith$elm_ui$Internal$Style$Prop, 'white-space', 'pre-wrap'),
+								A2($mdgriffith$elm_ui$Internal$Style$Prop, 'white-space', 'pre-wrap !important'),
 								A2($mdgriffith$elm_ui$Internal$Style$Prop, 'color', 'transparent')
 							]))
 					])),
@@ -13212,6 +13329,7 @@ var $mdgriffith$elm_ui$Internal$Style$baseSheet = _List_fromArray(
 					[
 						A2($mdgriffith$elm_ui$Internal$Style$Prop, 'display', 'block'),
 						A2($mdgriffith$elm_ui$Internal$Style$Prop, 'white-space', 'normal'),
+						A2($mdgriffith$elm_ui$Internal$Style$Prop, 'overflow-wrap', 'break-word'),
 						A2(
 						$mdgriffith$elm_ui$Internal$Style$Descriptor,
 						$mdgriffith$elm_ui$Internal$Style$dot($mdgriffith$elm_ui$Internal$Style$classes.hasBehind),
@@ -13227,7 +13345,7 @@ var $mdgriffith$elm_ui$Internal$Style$baseSheet = _List_fromArray(
 									]))
 							])),
 						A2(
-						$mdgriffith$elm_ui$Internal$Style$Child,
+						$mdgriffith$elm_ui$Internal$Style$AllChildren,
 						$mdgriffith$elm_ui$Internal$Style$dot($mdgriffith$elm_ui$Internal$Style$classes.text),
 						_List_fromArray(
 							[
@@ -13235,12 +13353,40 @@ var $mdgriffith$elm_ui$Internal$Style$baseSheet = _List_fromArray(
 								A2($mdgriffith$elm_ui$Internal$Style$Prop, 'white-space', 'normal')
 							])),
 						A2(
-						$mdgriffith$elm_ui$Internal$Style$Child,
+						$mdgriffith$elm_ui$Internal$Style$AllChildren,
+						$mdgriffith$elm_ui$Internal$Style$dot($mdgriffith$elm_ui$Internal$Style$classes.paragraph),
+						_List_fromArray(
+							[
+								A2($mdgriffith$elm_ui$Internal$Style$Prop, 'display', 'inline'),
+								A2(
+								$mdgriffith$elm_ui$Internal$Style$Descriptor,
+								'::after',
+								_List_fromArray(
+									[
+										A2($mdgriffith$elm_ui$Internal$Style$Prop, 'content', 'none')
+									])),
+								A2(
+								$mdgriffith$elm_ui$Internal$Style$Descriptor,
+								'::before',
+								_List_fromArray(
+									[
+										A2($mdgriffith$elm_ui$Internal$Style$Prop, 'content', 'none')
+									]))
+							])),
+						A2(
+						$mdgriffith$elm_ui$Internal$Style$AllChildren,
 						$mdgriffith$elm_ui$Internal$Style$dot($mdgriffith$elm_ui$Internal$Style$classes.single),
 						_List_fromArray(
 							[
 								A2($mdgriffith$elm_ui$Internal$Style$Prop, 'display', 'inline'),
 								A2($mdgriffith$elm_ui$Internal$Style$Prop, 'white-space', 'normal'),
+								A2(
+								$mdgriffith$elm_ui$Internal$Style$Descriptor,
+								$mdgriffith$elm_ui$Internal$Style$dot($mdgriffith$elm_ui$Internal$Style$classes.widthExact),
+								_List_fromArray(
+									[
+										A2($mdgriffith$elm_ui$Internal$Style$Prop, 'display', 'inline-block')
+									])),
 								A2(
 								$mdgriffith$elm_ui$Internal$Style$Descriptor,
 								$mdgriffith$elm_ui$Internal$Style$dot($mdgriffith$elm_ui$Internal$Style$classes.inFront),
@@ -13290,20 +13436,6 @@ var $mdgriffith$elm_ui$Internal$Style$baseSheet = _List_fromArray(
 									[
 										A2($mdgriffith$elm_ui$Internal$Style$Prop, 'display', 'inline'),
 										A2($mdgriffith$elm_ui$Internal$Style$Prop, 'white-space', 'normal')
-									])),
-								A2(
-								$mdgriffith$elm_ui$Internal$Style$Child,
-								$mdgriffith$elm_ui$Internal$Style$dot($mdgriffith$elm_ui$Internal$Style$classes.single),
-								_List_fromArray(
-									[
-										A2(
-										$mdgriffith$elm_ui$Internal$Style$Child,
-										$mdgriffith$elm_ui$Internal$Style$dot($mdgriffith$elm_ui$Internal$Style$classes.text),
-										_List_fromArray(
-											[
-												A2($mdgriffith$elm_ui$Internal$Style$Prop, 'display', 'inline'),
-												A2($mdgriffith$elm_ui$Internal$Style$Prop, 'white-space', 'normal')
-											]))
 									]))
 							])),
 						A2(
@@ -13311,7 +13443,7 @@ var $mdgriffith$elm_ui$Internal$Style$baseSheet = _List_fromArray(
 						$mdgriffith$elm_ui$Internal$Style$dot($mdgriffith$elm_ui$Internal$Style$classes.row),
 						_List_fromArray(
 							[
-								A2($mdgriffith$elm_ui$Internal$Style$Prop, 'display', 'inline-flex')
+								A2($mdgriffith$elm_ui$Internal$Style$Prop, 'display', 'inline')
 							])),
 						A2(
 						$mdgriffith$elm_ui$Internal$Style$Child,
@@ -13681,6 +13813,20 @@ var $mdgriffith$elm_ui$Internal$Style$renderRules = F2(
 										childRules),
 									rendered.others)
 							});
+					case 'AllChildren':
+						var child = rule.a;
+						var childRules = rule.b;
+						return _Utils_update(
+							rendered,
+							{
+								others: A2(
+									$elm$core$List$cons,
+									A2(
+										$mdgriffith$elm_ui$Internal$Style$renderRules,
+										A2($mdgriffith$elm_ui$Internal$Style$emptyIntermediate, parent.selector + (' ' + child), ''),
+										childRules),
+									rendered.others)
+							});
 					case 'Descriptor':
 						var descriptor = rule.a;
 						var descriptorRules = rule.b;
@@ -13914,7 +14060,12 @@ var $mdgriffith$elm_ui$Internal$Model$renderStyle = F4(
 						'',
 						props);
 					return _List_fromArray(
-						[selector + ('-fs:focus {' + (renderedProps + '\n}')), '.' + ($mdgriffith$elm_ui$Internal$Style$classes.any + (':focus ~ ' + (selector + ('-fs:not(.focus)  {' + (renderedProps + '\n}'))))), '.' + ($mdgriffith$elm_ui$Internal$Style$classes.any + (':focus ' + (selector + ('-fs  {' + (renderedProps + '\n}'))))), selector + ('-fs:focus-within {' + (renderedProps + '\n}')), '.focusable-parent:focus ~ ' + ('.' + ($mdgriffith$elm_ui$Internal$Style$classes.any + (' ' + (selector + ('-fs {' + (renderedProps + '\n}'))))))]);
+						[
+							selector + ('-fs:focus {' + (renderedProps + '\n}')),
+							('.' + ($mdgriffith$elm_ui$Internal$Style$classes.any + (':focus ' + (selector + '-fs  {')))) + (renderedProps + '\n}'),
+							(selector + '-fs:focus-within {') + (renderedProps + '\n}'),
+							('.ui-slide-bar:focus + ' + ($mdgriffith$elm_ui$Internal$Style$dot($mdgriffith$elm_ui$Internal$Style$classes.any) + (' .focusable-thumb' + (selector + '-fs {')))) + (renderedProps + '\n}')
+						]);
 				default:
 					return _List_fromArray(
 						[
@@ -14259,7 +14410,7 @@ var $mdgriffith$elm_ui$Internal$Model$renderStyleRule = F3(
 							A2(
 							$mdgriffith$elm_ui$Internal$Model$Property,
 							'padding',
-							$elm$core$String$fromInt(top) + ('px ' + ($elm$core$String$fromInt(right) + ('px ' + ($elm$core$String$fromInt(bottom) + ('px ' + ($elm$core$String$fromInt(left) + 'px')))))))
+							$elm$core$String$fromFloat(top) + ('px ' + ($elm$core$String$fromFloat(right) + ('px ' + ($elm$core$String$fromFloat(bottom) + ('px ' + ($elm$core$String$fromFloat(left) + 'px')))))))
 						]));
 			case 'BorderWidth':
 				var cls = rule.a;
@@ -15591,7 +15742,7 @@ var $mdgriffith$elm_ui$Internal$Model$renderHeight = function (h) {
 				$mdgriffith$elm_ui$Internal$Model$Single,
 				cls,
 				'min-height',
-				$elm$core$String$fromInt(minSize) + 'px');
+				$elm$core$String$fromInt(minSize) + 'px !important');
 			var _v1 = $mdgriffith$elm_ui$Internal$Model$renderHeight(len);
 			var newFlag = _v1.a;
 			var newAttrs = _v1.b;
@@ -16669,8 +16820,9 @@ var $mdgriffith$elm_ui$Internal$Model$Text = function (a) {
 var $mdgriffith$elm_ui$Element$text = function (content) {
 	return $mdgriffith$elm_ui$Internal$Model$Text(content);
 };
-var $author$project$Model$SelectDay = function (a) {
-	return {$: 'SelectDay', a: a};
+var $author$project$Model$OldColony = {$: 'OldColony'};
+var $author$project$Model$SelectCorridor = function (a) {
+	return {$: 'SelectCorridor', a: a};
 };
 var $mdgriffith$elm_ui$Internal$Model$Button = {$: 'Button'};
 var $mdgriffith$elm_ui$Internal$Model$Describe = function (a) {
@@ -16685,6 +16837,7 @@ var $elm$html$Html$Attributes$boolProperty = F2(
 			$elm$json$Json$Encode$bool(bool));
 	});
 var $elm$html$Html$Attributes$disabled = $elm$html$Html$Attributes$boolProperty('disabled');
+var $mdgriffith$elm_ui$Element$Input$enter = 'Enter';
 var $mdgriffith$elm_ui$Internal$Model$NoAttribute = {$: 'NoAttribute'};
 var $mdgriffith$elm_ui$Element$Input$hasFocusStyle = function (attr) {
 	if (((attr.$ === 'StyleClass') && (attr.b.$ === 'PseudoSelector')) && (attr.b.a.$ === 'Focus')) {
@@ -16716,7 +16869,6 @@ var $elm$html$Html$Events$onClick = function (msg) {
 		$elm$json$Json$Decode$succeed(msg));
 };
 var $mdgriffith$elm_ui$Element$Events$onClick = A2($elm$core$Basics$composeL, $mdgriffith$elm_ui$Internal$Model$Attr, $elm$html$Html$Events$onClick);
-var $mdgriffith$elm_ui$Element$Input$enter = 'Enter';
 var $elm$virtual_dom$VirtualDom$MayPreventDefault = function (a) {
 	return {$: 'MayPreventDefault', a: a};
 };
@@ -16727,28 +16879,30 @@ var $elm$html$Html$Events$preventDefaultOn = F2(
 			event,
 			$elm$virtual_dom$VirtualDom$MayPreventDefault(decoder));
 	});
-var $mdgriffith$elm_ui$Element$Input$onKey = F2(
-	function (desiredCode, msg) {
-		var decode = function (code) {
-			return _Utils_eq(code, desiredCode) ? $elm$json$Json$Decode$succeed(msg) : $elm$json$Json$Decode$fail('Not the enter key');
-		};
-		var isKey = A2(
-			$elm$json$Json$Decode$andThen,
-			decode,
-			A2($elm$json$Json$Decode$field, 'key', $elm$json$Json$Decode$string));
-		return $mdgriffith$elm_ui$Internal$Model$Attr(
+var $mdgriffith$elm_ui$Element$Input$onKeyLookup = function (lookup) {
+	var decode = function (code) {
+		var _v0 = lookup(code);
+		if (_v0.$ === 'Nothing') {
+			return $elm$json$Json$Decode$fail('No key matched');
+		} else {
+			var msg = _v0.a;
+			return $elm$json$Json$Decode$succeed(msg);
+		}
+	};
+	var isKey = A2(
+		$elm$json$Json$Decode$andThen,
+		decode,
+		A2($elm$json$Json$Decode$field, 'key', $elm$json$Json$Decode$string));
+	return $mdgriffith$elm_ui$Internal$Model$Attr(
+		A2(
+			$elm$html$Html$Events$preventDefaultOn,
+			'keydown',
 			A2(
-				$elm$html$Html$Events$preventDefaultOn,
-				'keyup',
-				A2(
-					$elm$json$Json$Decode$map,
-					function (fired) {
-						return _Utils_Tuple2(fired, true);
-					},
-					isKey)));
-	});
-var $mdgriffith$elm_ui$Element$Input$onEnter = function (msg) {
-	return A2($mdgriffith$elm_ui$Element$Input$onKey, $mdgriffith$elm_ui$Element$Input$enter, msg);
+				$elm$json$Json$Decode$map,
+				function (fired) {
+					return _Utils_Tuple2(fired, true);
+				},
+				isKey)));
 };
 var $mdgriffith$elm_ui$Internal$Model$Class = F2(
 	function (a, b) {
@@ -16756,6 +16910,7 @@ var $mdgriffith$elm_ui$Internal$Model$Class = F2(
 	});
 var $mdgriffith$elm_ui$Internal$Flag$cursor = $mdgriffith$elm_ui$Internal$Flag$flag(21);
 var $mdgriffith$elm_ui$Element$pointer = A2($mdgriffith$elm_ui$Internal$Model$Class, $mdgriffith$elm_ui$Internal$Flag$cursor, $mdgriffith$elm_ui$Internal$Style$classes.cursorPointer);
+var $mdgriffith$elm_ui$Element$Input$space = ' ';
 var $elm$html$Html$Attributes$tabindex = function (n) {
 	return A2(
 		_VirtualDom_attribute,
@@ -16806,7 +16961,10 @@ var $mdgriffith$elm_ui$Element$Input$button = F2(
 													$mdgriffith$elm_ui$Element$Events$onClick(msg),
 													A2(
 														$elm$core$List$cons,
-														$mdgriffith$elm_ui$Element$Input$onEnter(msg),
+														$mdgriffith$elm_ui$Element$Input$onKeyLookup(
+															function (code) {
+																return _Utils_eq(code, $mdgriffith$elm_ui$Element$Input$enter) ? $elm$core$Maybe$Just(msg) : (_Utils_eq(code, $mdgriffith$elm_ui$Element$Input$space) ? $elm$core$Maybe$Just(msg) : $elm$core$Maybe$Nothing);
+															}),
 														attrs));
 											}
 										}()))))))),
@@ -16846,16 +17004,17 @@ var $mdgriffith$elm_ui$Internal$Model$PaddingStyle = F5(
 	});
 var $mdgriffith$elm_ui$Internal$Flag$padding = $mdgriffith$elm_ui$Internal$Flag$flag(2);
 var $mdgriffith$elm_ui$Element$padding = function (x) {
+	var f = x;
 	return A2(
 		$mdgriffith$elm_ui$Internal$Model$StyleClass,
 		$mdgriffith$elm_ui$Internal$Flag$padding,
 		A5(
 			$mdgriffith$elm_ui$Internal$Model$PaddingStyle,
 			'p-' + $elm$core$String$fromInt(x),
-			x,
-			x,
-			x,
-			x));
+			f,
+			f,
+			f,
+			f));
 };
 var $mdgriffith$elm_ui$Internal$Flag$borderRound = $mdgriffith$elm_ui$Internal$Flag$flag(17);
 var $mdgriffith$elm_ui$Element$Border$rounded = function (radius) {
@@ -16913,33 +17072,79 @@ var $mdgriffith$elm_ui$Element$Border$width = function (v) {
 			v,
 			v));
 };
-var $author$project$View$viewDayButtons = function (dayButtons) {
-	return A2(
-		$mdgriffith$elm_ui$Element$row,
-		_List_Nil,
+var $author$project$View$buttonRow = F4(
+	function (text, msg, isSelected, elems) {
+		return A2(
+			$mdgriffith$elm_ui$Element$row,
+			_List_Nil,
+			A2(
+				$elm$core$List$map,
+				function (elem) {
+					return A2(
+						$mdgriffith$elm_ui$Element$Input$button,
+						_Utils_ap(
+							_List_fromArray(
+								[
+									$mdgriffith$elm_ui$Element$padding(5),
+									$mdgriffith$elm_ui$Element$Border$width(1),
+									$mdgriffith$elm_ui$Element$Border$rounded(10)
+								]),
+							isSelected(elem) ? _List_fromArray(
+								[
+									$mdgriffith$elm_ui$Element$Background$color($author$project$View$shadedColor)
+								]) : _List_Nil),
+						{
+							label: $mdgriffith$elm_ui$Element$text(
+								text(elem)),
+							onPress: $elm$core$Maybe$Just(
+								msg(elem))
+						});
+				},
+				elems));
+	});
+var $author$project$View$viewCorridorButtons = function (selectedCorridor) {
+	return A4(
+		$author$project$View$buttonRow,
+		function ($) {
+			return $.text;
+		},
 		A2(
-			$elm$core$List$map,
-			function (dayButton) {
-				return A2(
-					$mdgriffith$elm_ui$Element$Input$button,
-					_Utils_ap(
-						_List_fromArray(
-							[
-								$mdgriffith$elm_ui$Element$padding(5),
-								$mdgriffith$elm_ui$Element$Border$width(1),
-								$mdgriffith$elm_ui$Element$Border$rounded(10)
-							]),
-						dayButton.isSelected ? _List_fromArray(
-							[
-								$mdgriffith$elm_ui$Element$Background$color($author$project$View$shadedColor)
-							]) : _List_Nil),
-					{
-						label: $mdgriffith$elm_ui$Element$text(dayButton.text),
-						onPress: $elm$core$Maybe$Just(
-							$author$project$Model$SelectDay(dayButton.day))
-					});
+			$elm$core$Basics$composeR,
+			function ($) {
+				return $.corridor;
 			},
-			dayButtons));
+			$author$project$Model$SelectCorridor),
+		A2(
+			$elm$core$Basics$composeR,
+			function ($) {
+				return $.corridor;
+			},
+			$elm$core$Basics$eq(selectedCorridor)),
+		_List_fromArray(
+			[
+				{corridor: $author$project$Model$NortheastCorridor, text: 'Northeast Corridor'},
+				{corridor: $author$project$Model$OldColony, text: 'Old Colony Branch'}
+			]));
+};
+var $author$project$Model$SelectDay = function (a) {
+	return {$: 'SelectDay', a: a};
+};
+var $author$project$View$viewDayButtons = function (dayButtons) {
+	return A4(
+		$author$project$View$buttonRow,
+		function ($) {
+			return $.text;
+		},
+		A2(
+			$elm$core$Basics$composeR,
+			function ($) {
+				return $.day;
+			},
+			$author$project$Model$SelectDay),
+		function ($) {
+			return $.isSelected;
+		},
+		dayButtons);
 };
 var $mdgriffith$elm_ui$Internal$Model$SpacingStyle = F3(
 	function (a, b, c) {
@@ -17258,8 +17463,19 @@ var $author$project$View$tripFooter = function (trip) {
 							return 'KIN';
 						case 'CR-Greenbush':
 							return 'GRN';
+						case 'CR-Worcester':
+							return 'WOR';
+						case 'CR-Franklin':
+							return 'FKL';
+						case 'CR-Foxboro':
+							return 'FOX';
+						case 'CR-Providence':
+							return 'PRO';
+						case 'CR-Fairmount':
+							return 'FMT';
 						default:
-							return '';
+							var routeId = _v0.a.a;
+							return A2($elm$core$String$startsWith, 'CR-', routeId) ? A2($elm$core$String$dropLeft, 3, routeId) : routeId;
 					}
 				} else {
 					return '';
@@ -17351,43 +17567,43 @@ var $author$project$View$viewTimetables = function (timetables) {
 			]));
 };
 var $author$project$View$body = function (model) {
-	switch (model.$) {
-		case 'LoadingServices':
-			return $mdgriffith$elm_ui$Element$text('Loading services');
-		case 'ServicesLoaded':
-			var dayButtons = model.a;
-			return A2(
-				$mdgriffith$elm_ui$Element$column,
-				_List_Nil,
-				_List_fromArray(
-					[
-						$author$project$View$viewDayButtons(dayButtons)
-					]));
-		case 'LoadingSchedules':
-			var dayButtons = model.a;
-			return A2(
-				$mdgriffith$elm_ui$Element$column,
-				_List_Nil,
-				_List_fromArray(
-					[
-						$author$project$View$viewDayButtons(dayButtons),
-						$mdgriffith$elm_ui$Element$text('Loading')
-					]));
-		case 'SchedulesLoaded':
-			var dayButtons = model.a;
-			var timetables = model.b;
-			return A2(
-				$mdgriffith$elm_ui$Element$column,
-				_List_Nil,
-				_List_fromArray(
-					[
-						$author$project$View$viewDayButtons(dayButtons),
-						$author$project$View$viewTimetables(timetables)
-					]));
-		default:
-			var e = model.a;
-			return $mdgriffith$elm_ui$Element$text(e);
-	}
+	return A2(
+		$mdgriffith$elm_ui$Element$column,
+		_List_Nil,
+		_List_fromArray(
+			[
+				$author$project$View$viewCorridorButtons(model.selectedCorridor),
+				function () {
+				var _v0 = model.dayButtons;
+				switch (_v0.$) {
+					case 'NotAsked':
+						return $mdgriffith$elm_ui$Element$text('Error services NotAsked');
+					case 'Loading':
+						return $mdgriffith$elm_ui$Element$text('Loading');
+					case 'Failure':
+						var e = _v0.a;
+						return $mdgriffith$elm_ui$Element$text(e);
+					default:
+						var dayButtons = _v0.a;
+						return $author$project$View$viewDayButtons(dayButtons);
+				}
+			}(),
+				function () {
+				var _v1 = model.timetables;
+				switch (_v1.$) {
+					case 'NotAsked':
+						return $mdgriffith$elm_ui$Element$text('Error routes stops or schedules NotAsked');
+					case 'Loading':
+						return $mdgriffith$elm_ui$Element$text('Loading');
+					case 'Failure':
+						var e = _v1.a;
+						return $mdgriffith$elm_ui$Element$text(e);
+					default:
+						var timetables = _v1.a;
+						return $author$project$View$viewTimetables(timetables);
+				}
+			}()
+			]));
 };
 var $mdgriffith$elm_ui$Internal$Model$OnlyDynamic = F2(
 	function (a, b) {

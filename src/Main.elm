@@ -24,7 +24,7 @@ initCorridor corridor =
     ( { routes = RemoteData.Loading
       , stops = RemoteData.Loading
       , services = RemoteData.Loading
-      , schedules = RemoteData.NotAsked
+      , schedules = RemoteData.Loading
       , selectedCorridor = corridor
       , selectedDay = Today
       }

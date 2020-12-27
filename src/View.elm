@@ -9,6 +9,7 @@ import Element.Input as Input
 import Element.Region as Region
 import Mbta
 import Model exposing (Msg)
+import RemoteData
 import ViewModel
 
 
@@ -44,31 +45,33 @@ view model =
 
 body : ViewModel.ViewModel -> Element Msg
 body model =
-    case model of
-        ViewModel.LoadingServices ->
-            El.text "Loading services"
+    El.column
+        []
+        [ case model.dayButtons of
+            RemoteData.NotAsked ->
+                El.text "Error services NotAsked"
 
-        ViewModel.ServicesLoaded dayButtons ->
-            El.column
-                []
-                [ viewDayButtons dayButtons ]
+            RemoteData.Loading ->
+                El.text "Loading"
 
-        ViewModel.LoadingSchedules dayButtons ->
-            El.column
-                []
-                [ viewDayButtons dayButtons
-                , El.text "Loading"
-                ]
+            RemoteData.Failure e ->
+                El.text e
 
-        ViewModel.SchedulesLoaded dayButtons timetables ->
-            El.column
-                []
-                [ viewDayButtons dayButtons
-                , viewTimetables timetables
-                ]
+            RemoteData.Success dayButtons ->
+                viewDayButtons dayButtons
+        , case model.timetables of
+            RemoteData.NotAsked ->
+                El.text "Error routes stops or schedules NotAsked"
 
-        ViewModel.Error e ->
-            El.text e
+            RemoteData.Loading ->
+                El.text "Loading"
+
+            RemoteData.Failure e ->
+                El.text e
+
+            RemoteData.Success timetables ->
+                viewTimetables timetables
+        ]
 
 
 viewDayButtons : ViewModel.DayButtons -> Element Msg

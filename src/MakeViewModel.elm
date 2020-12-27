@@ -15,60 +15,31 @@ import ViewModel
 
 makeViewModel : Model.Model -> ViewModel.ViewModel
 makeViewModel model =
-    case model.services of
-        RemoteData.Loading ->
-            ViewModel.LoadingServices
-
-        RemoteData.Failure e ->
-            ViewModel.Error (Debug.toString e)
-
-        RemoteData.Success services ->
-            let
-                dayButtons =
-                    viewDayButtons
-                        (Mbta.Api.getPrimaryData services)
-                        model.selectedDay
-            in
-            case model.schedules of
-                RemoteData.NotAsked ->
-                    ViewModel.ServicesLoaded dayButtons
-
-                RemoteData.Loading ->
-                    ViewModel.LoadingSchedules dayButtons
-
-                RemoteData.Failure e ->
-                    ViewModel.Error (Debug.toString e)
-
-                RemoteData.Success schedules ->
-                    case ( model.routes, model.stops ) of
-                        ( RemoteData.Success routes, RemoteData.Success stops ) ->
-                            ViewModel.SchedulesLoaded
-                                dayButtons
-                                (viewTimetables
-                                    model.selectedCorridor
-                                    (Mbta.Api.getPrimaryData routes)
-                                    (Mbta.Api.getPrimaryData stops)
-                                    (Mbta.Api.getPrimaryData schedules)
-                                    (\tripId -> Mbta.Api.getIncludedTrip tripId schedules)
-                                )
-
-                        ( RemoteData.Failure e, _ ) ->
-                            ViewModel.Error (Debug.toString e)
-
-                        ( _, RemoteData.Failure e ) ->
-                            ViewModel.Error (Debug.toString e)
-
-                        ( RemoteData.Loading, _ ) ->
-                            ViewModel.LoadingSchedules dayButtons
-
-                        ( _, RemoteData.Loading ) ->
-                            ViewModel.LoadingSchedules dayButtons
-
-                        _ ->
-                            ViewModel.Error (Debug.toString model)
-
-        RemoteData.NotAsked ->
-            ViewModel.Error (Debug.toString model)
+    { dayButtons =
+        RemoteData.mapBoth
+            (\services ->
+                viewDayButtons
+                    (Mbta.Api.getPrimaryData services)
+                    model.selectedDay
+            )
+            (\e -> Debug.toString e)
+            model.services
+    , timetables =
+        RemoteData.succeed (\routes stops schedules -> ( routes, stops, schedules ))
+            |> RemoteData.andMap model.routes
+            |> RemoteData.andMap model.stops
+            |> RemoteData.andMap model.schedules
+            |> RemoteData.mapBoth
+                (\( routes, stops, schedules ) ->
+                    viewTimetables
+                        model.selectedCorridor
+                        (Mbta.Api.getPrimaryData routes)
+                        (Mbta.Api.getPrimaryData stops)
+                        (Mbta.Api.getPrimaryData schedules)
+                        (\tripId -> Mbta.Api.getIncludedTrip tripId schedules)
+                )
+                (\e -> Debug.toString e)
+    }
 
 
 viewDayButtons :

@@ -6,19 +6,18 @@ module ViewModel exposing
     , Timetable
     , Timetables
     , Trip
-    , ViewModel(..)
+    , ViewModel
     )
 
 import Mbta
 import Model
+import RemoteData
 
 
-type ViewModel
-    = LoadingServices
-    | ServicesLoaded DayButtons
-    | LoadingSchedules DayButtons
-    | SchedulesLoaded DayButtons Timetables
-    | Error String
+type alias ViewModel =
+    { dayButtons : RemoteData.RemoteData String DayButtons
+    , timetables : RemoteData.RemoteData String Timetables
+    }
 
 
 type alias DayButtons =

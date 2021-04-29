@@ -1,0 +1,21 @@
+version: 2
+updates:
+- package-ecosystem: elm
+  directory: "/"
+  schedule:
+    interval: daily
+    time: "10:00"
+  open-pull-requests-limit: 10
+- package-ecosystem: npm
+  directory: "/"
+  schedule:
+    interval: daily
+    time: "10:00"
+  open-pull-requests-limit: 10
+  ignore:
+  - dependency-name: elm
+    versions:
+    - 0.19.1-4
+  - dependency-name: elm-test
+    versions:
+    - 0.19.1-revision5
